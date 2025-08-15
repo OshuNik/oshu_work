@@ -28,7 +28,8 @@
     renderError,
     showCustomConfirm,
     createSupabaseHeaders,
-    highlightText
+    highlightText,
+    checkRateLimit
   } = UTIL;
 
   const container = document.getElementById('favorites-list');

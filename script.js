@@ -34,7 +34,8 @@
     showCustomConfirm,
     createSupabaseHeaders,
     parseTotal,
-    escapeHtml
+    escapeHtml,
+    checkRateLimit
   } = UTIL;
 
   // Кэшируем DOM элементы с проверкой на null
