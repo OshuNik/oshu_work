@@ -386,7 +386,7 @@
         elements.attachments.appendChild(imgBtn);
     }
     if (originalDetailsHtml) {
-        elements.fullText.innerHTML = originalDetailsHtml;
+        elements.fullText.innerHTML = escapeHtml(originalDetailsHtml);
     }
     if (!bestImageUrl && !originalDetailsHtml) {
         elements.details.remove();
