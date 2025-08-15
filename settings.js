@@ -69,18 +69,15 @@
     if (!input) return null;
     
     let channelId = input.trim();
-    console.log('🔍 Валидация канала:', channelId);
     
     // Преобразование t.me ссылок
     if (channelId.includes('t.me/')) {
       channelId = '@' + channelId.split('t.me/')[1].split('/')[0];
-      console.log('🔗 Преобразован из t.me:', channelId);
     }
     
     // Добавление @ если отсутствует
     if (!channelId.startsWith('@')) channelId = '@' + channelId;
     
-    console.log('✅ Финальный channelId:', channelId);
     
     // Валидация username
     const username = channelId.substring(1);
@@ -100,7 +97,6 @@
    * @returns {Promise<boolean>} true если канал существует, false если нет
    */
   async function isChannelExists(channelId) {
-    console.log('🔍 Проверяем существование канала...');
     try {
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?channel_id=eq.${encodeURIComponent(channelId)}&select=id`, {
         headers: createSupabaseHeaders()
@@ -108,7 +104,6 @@
       
       if (response.ok) {
         const existingChannels = await response.json();
-        console.log('📊 Найдено существующих каналов:', existingChannels.length);
         return existingChannels.length > 0;
       } else {
         console.warn('⚠️ Ошибка проверки дубликатов:', response.status, response.statusText);
@@ -132,8 +127,6 @@
       is_enabled: true 
     };
     
-    console.log('📤 Отправляем данные в API:', newChannelData);
-    console.log('🌐 URL:', API_ENDPOINTS.CHANNELS);
     
     const response = await fetch(API_ENDPOINTS.CHANNELS, {
       method: 'POST',

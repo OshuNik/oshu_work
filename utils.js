@@ -428,8 +428,7 @@
      
      // Определяем, находимся ли мы в Mini App
      const isMiniApp = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-     console.log('🚀 PTR: Mini App detected:', isMiniApp);
-
+ 
     const wrapper = document.querySelector('.main-wrapper');
     const ptrBar = wrapper?.querySelector('.ptr-bar');
     if (!wrapper || !ptrBar) {
@@ -452,7 +451,6 @@
               // В Mini App делаем PTR максимально простым
      const THRESHOLD = isMiniApp ? 15 : (CFG.PTR_CONFIG?.THRESHOLD || 60);
      const BAR_HEIGHT = CFG.PTR_CONFIG?.BAR_HEIGHT || 75;
-     console.log('🚀 PTR: Threshold:', THRESHOLD, 'BAR_HEIGHT:', BAR_HEIGHT);
 
     let startY = 0;
     let pullDistance = 0;

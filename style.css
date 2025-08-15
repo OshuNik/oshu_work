@@ -1,5 +1,4 @@
-/* Оптимизированная загрузка шрифтов с fallback */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap&font-display=swap');
+/* Шрифты теперь загружаются через preconnect в HTML для лучшей производительности */
 
 :root {
     /* Основные цвета */
