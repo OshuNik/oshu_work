@@ -96,9 +96,18 @@
     String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const stripTags = (html = '') => {
+    if (!html) return '';
+    
+    // Создаем временный div
     const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    
+    // Безопасно добавляем только текстовый контент
+    // Это предотвращает выполнение любых скриптов
+    tmp.textContent = html;
+    
+    // Если нужно обработать HTML теги, используем textContent для извлечения
+    // чистого текста без выполнения потенциально опасного кода
+    return tmp.textContent || '';
   };
 
   const debounce = (fn, delay = 250) => {
@@ -113,6 +122,35 @@
     if (!q) return escapeHtml(text);
     const rx = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     return escapeHtml(text).replace(rx, '<mark class="highlight">$1</mark>');
+  };
+
+  // Безопасная функция для вставки подсвеченного текста без XSS
+  const setHighlightedText = (element, text, query) => {
+    if (!query) {
+      element.textContent = text;
+      return;
+    }
+    
+    // Очищаем элемент
+    element.textContent = '';
+    
+    const rx = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(rx);
+    
+    parts.forEach((part, i) => {
+      if (i % 2 === 1) {
+        // Это совпадение - создаем mark элемент
+        const mark = document.createElement('mark');
+        mark.className = 'highlight';
+        mark.textContent = part;
+        element.appendChild(mark);
+      } else {
+        // Это обычный текст
+        if (part) {
+          element.appendChild(document.createTextNode(part));
+        }
+      }
+    });
   };
 
   function sanitizeLink(raw = '') {
@@ -356,7 +394,7 @@
     elements.category.textContent = v.category || 'NO_CATEGORY';
     const summaryText = v.reason || 'Описание не было сгенерировано.';
     elements.summary.dataset.originalSummary = summaryText;
-    elements.summary.innerHTML = searchQuery ? highlightText(summaryText, searchQuery) : escapeHtml(summaryText);
+    setHighlightedText(elements.summary, summaryText, searchQuery);
     const infoRows = [];
     const cleanVal = val => String(val ?? '').replace(/[«»"“”'‘’`']/g,'').trim();
     const isMeaningful = val => !!cleanVal(val) && !['не указано', 'n/a'].includes(cleanVal(val).toLowerCase());
@@ -631,7 +669,8 @@
     escapeHtml, 
     stripTags, 
     debounce, 
-    highlightText, 
+    highlightText,
+    setHighlightedText, 
     safeAlert, 
     uiToast,
     formatTimestamp, 

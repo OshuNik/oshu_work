@@ -243,17 +243,37 @@
     }
   });
 
+  // Предотвращение race conditions в updateStatus
+  const updateStatusLocks = new Set();
+  
   async function updateStatus(id, newStatus){
     if (!id) return;
+    
+    // Проверяем блокировку - предотвращает двойные клики
+    if (updateStatusLocks.has(id)) {
+      console.log('updateStatus уже выполняется для ID:', id);
+      return;
+    }
+    
+    // Блокируем операцию
+    updateStatusLocks.add(id);
+    
+    try {
     const isFavorite = newStatus === STATUSES.FAVORITE;
     
     if (isFavorite) {
         const ok = await showCustomConfirm('Добавить в избранное?');
-        if (!ok) return;
+        if (!ok) {
+          updateStatusLocks.delete(id);
+          return;
+        }
     }
     
     const cardEl = document.querySelector(`#card-${CSS.escape(id)}`);
-    if (!cardEl) return;
+    if (!cardEl) {
+      updateStatusLocks.delete(id);
+      return;
+    }
     
     cardEl.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
     cardEl.style.opacity = '0';
@@ -308,6 +328,13 @@
           }
       }
     });
+    } catch (error) {
+      console.error('Ошибка в updateStatus:', error);
+      safeAlert('Произошла ошибка при обновлении статуса');
+    } finally {
+      // Всегда снимаем блокировку
+      updateStatusLocks.delete(id);
+    }
   }
 
   async function fetchNext(key, isInitialLoad = false) {
@@ -679,11 +706,32 @@
     
     const isMobile = isMobileDevice();
     
+    // Глобальная система cleanup для предотвращения memory leaks
+    const globalListeners = [];
+    
+    const addGlobalListener = (element, event, handler, options) => {
+      element.addEventListener(event, handler, options);
+      globalListeners.push({ element, event, handler });
+    };
+    
+    const cleanupGlobalListeners = () => {
+      globalListeners.forEach(({ element, event, handler }) => {
+        element.removeEventListener(event, handler);
+      });
+      globalListeners.length = 0;
+    };
+    
+    // Очищаем listeners при перезагрузке страницы
+    if (window.oshuworkCleanup) {
+      window.oshuworkCleanup();
+    }
+    window.oshuworkCleanup = cleanupGlobalListeners;
+    
     if (isMobile) {
       // Добавляем touchstart обработчики как fallback
       
       // Обработчики для кнопок действий
-      document.addEventListener('touchstart', (e) => {
+      const actionButtonHandler = (e) => {
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
         
@@ -699,20 +747,22 @@
         } else if (action === 'delete') {
           updateStatus(btn.dataset.id, STATUSES.DELETED);
         }
-      }, { passive: false });
+      };
+      addGlobalListener(document, 'touchstart', actionButtonHandler, { passive: false });
       
       // Обработчики для вкладок - используем более мягкий подход
-      document.addEventListener('touchstart', (e) => {
+      const tabTouchStartHandler = (e) => {
         const tab = e.target.closest('.tab-button');
         if (!tab) return;
         
         
         // НЕ предотвращаем по умолчанию - это может конфликтовать с PTR
         // Вместо этого используем touchend для активации
-      }, { passive: true });
+      };
+      addGlobalListener(document, 'touchstart', tabTouchStartHandler, { passive: true });
       
       // Активируем вкладку только при touchend
-      document.addEventListener('touchend', (e) => {
+      const tabTouchEndHandler = (e) => {
         const tab = e.target.closest('.tab-button');
         if (!tab) return;
         
@@ -721,19 +771,21 @@
         if (targetId) {
           activateTabByTarget(targetId);
         }
-      });
+      };
+      addGlobalListener(document, 'touchend', tabTouchEndHandler);
       
       // Обработчики для поиска
       if (searchInput) {
-        searchInput.addEventListener('touchstart', (e) => {
+        const searchTouchHandler = (e) => {
           searchInput.focus();
-        });
+        };
+        searchInput.addEventListener('touchstart', searchTouchHandler);
       }
       
       // Дополнительные обработчики для мобильных устройств
       
       // Обработчик для всех кликабельных элементов
-      document.addEventListener('touchend', (e) => {
+      const allClickableHandler = (e) => {
         const target = e.target;
         
         // Проверяем, есть ли у элемента data-action
@@ -745,17 +797,19 @@
         if (target.classList.contains('tab-button')) {
           // Не вызываем действие здесь, оно уже обработано в touchstart
         }
-      });
+      };
+      addGlobalListener(document, 'touchend', allClickableHandler);
       
       // Обработчик для предотвращения zoom на двойное касание
       let lastTouchEnd = 0;
-      document.addEventListener('touchend', (e) => {
+      const preventZoomHandler = (e) => {
         const now = (new Date()).getTime();
         if (now - lastTouchEnd <= 300) {
           e.preventDefault();
         }
         lastTouchEnd = now;
-      }, false);
+      };
+      addGlobalListener(document, 'touchend', preventZoomHandler, false);
       
     } else {
     }
@@ -769,7 +823,7 @@
     if (isMobile) {
       
       // Используем делегирование для всех кликабельных элементов
-      document.addEventListener('click', (e) => {
+      const universalClickHandler = (e) => {
         // Обработка кнопок действий
         const actionBtn = e.target.closest('[data-action]');
         if (actionBtn) {
@@ -819,10 +873,11 @@
           }
           return;
         }
-      });
+      };
+      addGlobalListener(document, 'click', universalClickHandler);
       
       // Дополнительная обработка для touch событий
-      document.addEventListener('touchstart', (e) => {
+      const touchVisualFeedbackHandler = (e) => {
         const target = e.target;
         
         // Добавляем визуальную обратную связь для touch (НО НЕ ДЛЯ ВКЛАДОК И КНОПКИ ОЧИСТКИ!)
@@ -846,7 +901,8 @@
             target.style.opacity = '';
           }, 150);
         }
-      });
+      };
+      addGlobalListener(document, 'touchstart', touchVisualFeedbackHandler);
       
     } else {
     }

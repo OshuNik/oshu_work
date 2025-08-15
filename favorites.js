@@ -72,7 +72,7 @@
             visibleCount++;
             const summaryEl = card.querySelector('.card-summary');
             if (summaryEl && summaryEl.dataset.originalSummary) {
-                summaryEl.innerHTML = highlightText(summaryEl.dataset.originalSummary, query);
+                window.utils.setHighlightedText(summaryEl, summaryEl.dataset.originalSummary, query);
             }
         }
     });
@@ -128,12 +128,31 @@
     }
   }
 
+  // Предотвращение race conditions в favorites updateStatus
+  const updateStatusLocksFav = new Set();
+  
   async function updateStatus(vacancyId, newStatus) {
-    const ok = await showCustomConfirm('Удалить из избранного?');
-    if (!ok) return;
+    // Проверяем блокировку - предотвращает двойные клики
+    if (updateStatusLocksFav.has(vacancyId)) {
+      console.log('updateStatus уже выполняется для ID:', vacancyId);
+      return;
+    }
+    
+    // Блокируем операцию
+    updateStatusLocksFav.add(vacancyId);
+    
+    try {
+      const ok = await showCustomConfirm('Удалить из избранного?');
+      if (!ok) {
+        updateStatusLocksFav.delete(vacancyId);
+        return;
+      }
 
     const cardElement = document.getElementById(`card-${vacancyId}`);
-    if (!cardElement) return;
+    if (!cardElement) {
+      updateStatusLocksFav.delete(vacancyId);
+      return;
+    }
 
     cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
     cardElement.style.opacity = '0';
@@ -183,6 +202,13 @@
             }
         }
     });
+    } catch (error) {
+      console.error('Ошибка в favorites updateStatus:', error);
+      safeAlert('Произошла ошибка при обновлении статуса');
+    } finally {
+      // Всегда снимаем блокировку
+      updateStatusLocksFav.delete(vacancyId);
+    }
   }
 
   container?.addEventListener('click', (e) => {
