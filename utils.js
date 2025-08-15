@@ -386,7 +386,17 @@
         elements.attachments.appendChild(imgBtn);
     }
     if (originalDetailsHtml) {
-        elements.fullText.innerHTML = escapeHtml(originalDetailsHtml);
+        // Безопасная обработка: разрешаем только базовые теги форматирования
+        const allowedTags = /<\/?(?:br|p|strong|b|em|i|u|span|div)(?:\s[^>]*)?>|&[a-zA-Z0-9#]+;/gi;
+        const safeHtml = originalDetailsHtml
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Удаляем script теги
+            .replace(/on\w+\s*=\s*"[^"]*"/gi, '') // Удаляем event handlers (onclick, onload и т.д.)
+            .replace(/javascript:/gi, '') // Удаляем javascript: ссылки
+            .replace(/data:/gi, '') // Удаляем data: ссылки
+            .replace(/<iframe\b[^>]*>/gi, '') // Удаляем iframe
+            .replace(/<object\b[^>]*>/gi, '') // Удаляем object
+            .replace(/<embed\b[^>]*>/gi, ''); // Удаляем embed
+        elements.fullText.innerHTML = safeHtml;
     }
     if (!bestImageUrl && !originalDetailsHtml) {
         elements.details.remove();
