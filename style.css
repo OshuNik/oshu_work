@@ -50,6 +50,7 @@ body {
     padding-bottom: 80px;
     padding-top: 20px; /* Добавляем небольшой отступ сверху для плашки */
     transition: transform 0.3s ease-out;
+    will-change: transform; /* Оптимизация анимаций PTR */
 }
 .main-wrapper.ptr-pulling {
     transition: none;
@@ -81,6 +82,7 @@ body {
     
     opacity: 0;
     transition: opacity 0.2s ease-out;
+    will-change: opacity; /* Оптимизация анимаций показа/скрытия */
 }
 .ptr-bar.ptr-visible {
     opacity: 1;
@@ -92,6 +94,7 @@ body {
     stroke: var(--text-color);
     stroke-width: 2.5;
     transition: transform 0.2s ease-out;
+    will-change: transform; /* Оптимизация поворота иконки */
 }
 .ptr-bar.ptr-ready .ptr-icon {
     transform: rotate(180deg);
@@ -160,6 +163,7 @@ body {
     cursor: pointer;
     box-shadow: var(--box-shadow);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    will-change: transform, box-shadow; /* Оптимизация кнопочных анимаций */
 }
 
 .header-button:active {
@@ -248,6 +252,7 @@ input[type="search"]::-webkit-search-cancel-button { display: none; }
     box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
     transition: all 0.3s ease-out;
     overflow: hidden;
+    will-change: transform; /* Оптимизация анимаций карточек */
 }
 .card-header {
     margin-bottom: 12px;
@@ -310,6 +315,7 @@ details > summary::-webkit-details-marker {
   padding: 0;
   cursor: pointer;
   transition: transform 0.1s ease-out;
+  will-change: transform; /* Оптимизация кнопок действий */
 }
 .card-action-btn:active {
     transform: scale(0.9);
@@ -522,6 +528,11 @@ mark.highlight {
     to { transform: rotate(360deg); }
 }
 
+/* Добавляем will-change для спиннера */
+.retro-spinner, .retro-spinner-inline {
+    will-change: transform;
+}
+
 .settings-tabs { display: flex; gap: 5px; margin-bottom: 20px; }
 .settings-tab-button {
     flex-grow: 1;
@@ -535,6 +546,7 @@ mark.highlight {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    will-change: transform, background-color; /* Оптимизация settings табов */
 }
 .settings-tab-button.active {
     background-color: var(--accent-blue);
@@ -727,6 +739,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     cursor: pointer;
     box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
     transition: transform 0.1s, box-shadow 0.1s;
+    will-change: transform, box-shadow; /* Оптимизация confirm кнопок */
 }
 .custom-confirm-button:active {
     transform: translate(calc(var(--shadow-offset)/2), calc(var(--shadow-offset)/2));
@@ -746,6 +759,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     cursor: pointer;
     box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--accent-red);
     transition: transform 0.1s, box-shadow 0.1s;
+    will-change: transform, box-shadow; /* Оптимизация delete кнопок */
     margin-top: 25px;
 }
 .button-delete:active {
@@ -880,6 +894,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     font-size: 12px;
     color: var(--text-color);
     transition: transform 0.2s ease-out;
+    will-change: transform; /* Оптимизация details анимаций */
 }
 .card-body summary:hover, .card-body summary:active { color: var(--text-color); }
 .card-body summary:hover::before, .card-body summary:active::before { color: var(--accent-green); }
@@ -924,6 +939,7 @@ details[open] .vacancy-text {
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
+  will-change: transform, box-shadow; /* Оптимизация load-more кнопок */
 }
 .load-more-btn:hover { filter: brightness(1.02); }
 .load-more-btn:active {
@@ -949,13 +965,14 @@ details[open] .vacancy-text {
   color: var(--text-color);
   border: var(--border-width) solid var(--border-color);
   border-radius: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .2s ease, transform .2s ease;
+  will-change: opacity, transform; /* Оптимизация появления тостов */
   padding: 10px 16px;
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
   font-family: 'Roboto Mono', monospace;
   font-size: 14px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .2s ease, transform .2s ease;
   display: flex;
   align-items: center;
   gap: 12px;
