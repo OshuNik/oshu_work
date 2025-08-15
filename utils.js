@@ -594,7 +594,16 @@
        pullDistance = e.touches[0].clientY - startY;
        
        if (pullDistance > 0) {
-         e.preventDefault();
+         // Только вызываем preventDefault если событие действительно cancelable
+         // Это предотвращает ошибку Intervention
+         try {
+           if (e.cancelable) {
+             e.preventDefault();
+           }
+         } catch (error) {
+           // Игнорируем ошибки preventDefault для совместимости
+           console.debug('preventDefault не удался:', error.message);
+         }
          
          // В Mini App делаем сопротивление более плавным, но все еще легким
          const resistance = isMiniApp ? 0.6 : 0.7;
@@ -650,15 +659,29 @@
      };
 
     // Добавляем listeners с возможностью очистки
-    // Используем capture: true для более агрессивного перехвата событий
+    // Используем более умную стратегию для passive событий
     document.body.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
-    document.body.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
-    document.body.addEventListener('touchend', handleTouchEnd, { capture: true });
+    
+    // Для touchmove пробуем сначала non-passive, если не работает - fallback на passive
+    try {
+      document.body.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+    } catch (error) {
+      // Fallback для браузеров, которые принудительно делают touchmove passive
+      console.debug('Используем passive touchmove для совместимости');
+      document.body.addEventListener('touchmove', handleTouchMove, { passive: true, capture: true });
+    }
+    
+    document.body.addEventListener('touchend', handleTouchEnd, { passive: true, capture: true });
     
     // Сохраняем cleanup функцию для возможности удаления listeners
     wrapper.ptrCleanup = () => {
       document.body.removeEventListener('touchstart', handleTouchStart, { capture: true });
-      document.body.removeEventListener('touchmove', handleTouchMove, { capture: true });
+      // Удаляем touchmove обработчик (пробуем оба варианта для надежности)
+      try {
+        document.body.removeEventListener('touchmove', handleTouchMove, { capture: true });
+      } catch (error) {
+        console.debug('Cleanup touchmove fallback');
+      }
       document.body.removeEventListener('touchend', handleTouchEnd, { capture: true });
     };
   }
