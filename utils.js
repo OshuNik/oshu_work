@@ -698,7 +698,10 @@
             }
             
             // Если rate limit не превышен, выполняем обновление
-            onRefresh();
+            // Добавляем флаг isPullToRefresh чтобы fetchNext знал что это PTR
+            if (typeof onRefresh === 'function') {
+              onRefresh(true); // Передаем флаг isPullToRefresh
+            }
           });
           
           const safetyTimeout = setTimeout(() => {

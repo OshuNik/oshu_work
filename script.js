@@ -346,7 +346,7 @@
     }
   }
 
-  async function fetchNext(key, isInitialLoad = false) {
+  async function fetchNext(key, isInitialLoad = false, isPullToRefresh = false) {
     
     const st = state[key];
     const container = containers[key];
@@ -356,11 +356,17 @@
       return;
     }
 
-    // Проверяем rate limit для загрузки вакансий
-    const rateResult = await checkRateLimit('loadVacancies');
-    if (!rateResult.allowed) {
-      uiToast(rateResult.message);
-      return;
+    // Проверяем rate limit только для дополнительных загрузок (Load More)
+    // НЕ применяем rate limit для:
+    // - Первоначальной загрузки (isInitialLoad)
+    // - Pull-to-refresh (isPullToRefresh - уже проверен в PTR)
+    // - Переключения вкладок (offset === 0)
+    if (!isInitialLoad && !isPullToRefresh && st.offset > 0) {
+      const rateResult = await checkRateLimit('loadVacancies');
+      if (!rateResult.allowed) {
+        uiToast(rateResult.message);
+        return;
+      }
     }
     
     st.busy = true;
@@ -453,12 +459,12 @@
     }
   }
   
-  async function refetchFromZeroSmooth(key) {
+  async function refetchFromZeroSmooth(key, isPullToRefresh = false) {
     const st = state[key];
     const container = containers[key];
     if (!container || st.busy) return;
     st.offset = 0;
-    await fetchNext(key, false);
+    await fetchNext(key, false, isPullToRefresh);
   }
 
   async function seamlessSearch(key) {
@@ -1036,7 +1042,7 @@
     });
     
     setupPullToRefresh({
-        onRefresh: () => refetchFromZeroSmooth(state.activeKey),
+        onRefresh: (isPullToRefresh) => refetchFromZeroSmooth(state.activeKey, isPullToRefresh),
         refreshEventName: 'feed:loaded'
     });
     
