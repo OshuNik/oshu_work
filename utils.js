@@ -468,7 +468,154 @@
   /**
    * НОВАЯ ВЕРСИЯ PULL-TO-REFRESH
    */
-     function setupPullToRefresh(options = {}) {
+     /**
+   * CLIENT-SIDE RATE LIMITER
+   * Защита от злоупотреблений API на основе Token Bucket алгоритма
+   */
+  class RateLimiter {
+    constructor(options = {}) {
+      this.tokensPerInterval = options.tokensPerInterval || 1;
+      this.interval = this.parseInterval(options.interval || 1000);
+      this.bucketSize = options.bucketSize || this.tokensPerInterval;
+      this.tokens = this.bucketSize;
+      this.lastRefill = Date.now();
+      this.fireImmediately = options.fireImmediately || false;
+    }
+
+    parseInterval(interval) {
+      if (typeof interval === 'number') return interval;
+      if (typeof interval === 'string') {
+        switch (interval.toLowerCase()) {
+          case 'second': return 1000;
+          case 'minute': return 60 * 1000;
+          case 'hour': return 60 * 60 * 1000;
+          case 'day': return 24 * 60 * 60 * 1000;
+          default: return parseInt(interval) || 1000;
+        }
+      }
+      return 1000;
+    }
+
+    refillTokens() {
+      const now = Date.now();
+      const timePassed = now - this.lastRefill;
+      const tokensToAdd = Math.floor(timePassed / this.interval * this.tokensPerInterval);
+      
+      if (tokensToAdd > 0) {
+        this.tokens = Math.min(this.bucketSize, this.tokens + tokensToAdd);
+        this.lastRefill = now;
+      }
+    }
+
+    async removeTokens(count = 1) {
+      this.refillTokens();
+      
+      if (this.fireImmediately) {
+        if (this.tokens >= count) {
+          this.tokens -= count;
+          return this.tokens;
+        } else {
+          return -1; // Не хватает токенов, возвращаем отрицательное число
+        }
+      } else {
+        // Ожидаем пока не наберется достаточно токенов
+        while (this.tokens < count) {
+          const waitTime = Math.ceil((count - this.tokens) / this.tokensPerInterval * this.interval);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          this.refillTokens();
+        }
+        this.tokens -= count;
+        return this.tokens;
+      }
+    }
+
+    tryRemoveTokens(count = 1) {
+      this.refillTokens();
+      if (this.tokens >= count) {
+        this.tokens -= count;
+        return true;
+      }
+      return false;
+    }
+
+    getTokensRemaining() {
+      this.refillTokens();
+      return this.tokens;
+    }
+  }
+
+  // Создаем глобальные ограничители для разных типов операций
+  const rateLimiters = {
+    // Загрузка вакансий: 1 запрос в 2 секунды
+    loadVacancies: new RateLimiter({
+      tokensPerInterval: 1,
+      interval: 2000,
+      fireImmediately: true
+    }),
+    
+    // Поиск: 3 запроса в 5 секунд
+    search: new RateLimiter({
+      tokensPerInterval: 3,
+      interval: 5000,
+      fireImmediately: true
+    }),
+    
+    // Добавление в избранное: 5 запросов в минуту
+    favorite: new RateLimiter({
+      tokensPerInterval: 5,
+      interval: 'minute',
+      fireImmediately: true
+    }),
+    
+    // Обновление статуса: 10 запросов в минуту
+    updateStatus: new RateLimiter({
+      tokensPerInterval: 10,
+      interval: 'minute',
+      fireImmediately: true
+    }),
+    
+    // Pull-to-refresh: 1 запрос в 3 секунды
+    refresh: new RateLimiter({
+      tokensPerInterval: 1,
+      interval: 3000,
+      fireImmediately: true
+    })
+  };
+
+  // Функция проверки rate limit с user-friendly сообщениями
+  async function checkRateLimit(operation, count = 1) {
+    const limiter = rateLimiters[operation];
+    if (!limiter) {
+      console.warn(`Rate limiter для операции "${operation}" не найден`);
+      return { allowed: true };
+    }
+
+    const remaining = await limiter.removeTokens(count);
+    
+    if (remaining < 0) {
+      // Определяем сообщение в зависимости от операции
+      const messages = {
+        loadVacancies: 'Подождите 2 секунды перед следующей загрузкой',
+        search: 'Слишком много поисковых запросов. Подождите 5 секунд',
+        favorite: 'Лимит добавления в избранное превышен. Подождите минуту',
+        updateStatus: 'Слишком много обновлений. Подождите минуту',
+        refresh: 'Подождите 3 секунды перед повторным обновлением'
+      };
+      
+      return {
+        allowed: false,
+        message: messages[operation] || 'Слишком много запросов. Подождите немного',
+        remainingTokens: 0
+      };
+    }
+
+    return {
+      allowed: true,
+      remainingTokens: remaining
+    };
+  }
+
+  function setupPullToRefresh(options = {}) {
      const { onRefresh, refreshEventName } = options;
      if (typeof onRefresh !== 'function' || !refreshEventName) {
        return;
@@ -541,7 +688,18 @@
             }
           }
 
-          onRefresh();
+          // Проверяем rate limit для refresh операции
+          checkRateLimit('refresh').then(rateResult => {
+            if (!rateResult.allowed) {
+              // Показываем сообщение о rate limit и возвращаемся к waiting
+              ptrText.textContent = rateResult.message;
+              setTimeout(() => setState('waiting'), 2000);
+              return;
+            }
+            
+            // Если rate limit не превышен, выполняем обновление
+            onRefresh();
+          });
           
           const safetyTimeout = setTimeout(() => {
             if (state === 'refreshing') setState('waiting');
@@ -708,9 +866,11 @@
     ensureLoadMore, 
     updateLoadMore,
     createVacancyCard,
-    setupPullToRefresh, // <-- Новая функция
+    setupPullToRefresh,
     showCustomConfirm,
     createSupabaseHeaders,
-    parseTotal
+    parseTotal,
+    checkRateLimit, // <-- Rate Limiter функция
+    RateLimiter    // <-- Класс для создания кастомных лимитеров
   };
 })();

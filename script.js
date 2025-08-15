@@ -254,6 +254,14 @@
       console.log('updateStatus уже выполняется для ID:', id);
       return;
     }
+
+    // Проверяем rate limit для обновления статуса
+    const operation = newStatus === STATUSES.FAVORITE ? 'favorite' : 'updateStatus';
+    const rateResult = await checkRateLimit(operation);
+    if (!rateResult.allowed) {
+      uiToast(rateResult.message);
+      return;
+    }
     
     // Блокируем операцию
     updateStatusLocks.add(id);
@@ -344,6 +352,13 @@
     
     
     if (!container || st.busy) {
+      return;
+    }
+
+    // Проверяем rate limit для загрузки вакансий
+    const rateResult = await checkRateLimit('loadVacancies');
+    if (!rateResult.allowed) {
+      uiToast(rateResult.message);
       return;
     }
     
@@ -449,6 +464,13 @@
       const st = state[key];
       const container = containers[key];
       if (!container || st.busy) return;
+      
+      // Проверяем rate limit для поиска
+      const rateResult = await checkRateLimit('search');
+      if (!rateResult.allowed) {
+        uiToast(rateResult.message);
+        return;
+      }
       
       st.busy = true;
       st.offset = 0;

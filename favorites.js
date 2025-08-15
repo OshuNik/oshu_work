@@ -137,6 +137,13 @@
       console.log('updateStatus уже выполняется для ID:', vacancyId);
       return;
     }
+
+    // Проверяем rate limit для удаления из избранного
+    const rateResult = await checkRateLimit('favorite');
+    if (!rateResult.allowed) {
+      uiToast(rateResult.message);
+      return;
+    }
     
     // Блокируем операцию
     updateStatusLocksFav.add(vacancyId);
