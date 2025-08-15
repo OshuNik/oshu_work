@@ -701,31 +701,31 @@
     return isMobile;
   }
 
+  // Глобальная система cleanup для предотвращения memory leaks
+  const globalListeners = [];
+  
+  const addGlobalListener = (element, event, handler, options) => {
+    element.addEventListener(event, handler, options);
+    globalListeners.push({ element, event, handler });
+  };
+  
+  const cleanupGlobalListeners = () => {
+    globalListeners.forEach(({ element, event, handler }) => {
+      element.removeEventListener(event, handler);
+    });
+    globalListeners.length = 0;
+  };
+  
+  // Очищаем listeners при перезагрузке страницы
+  if (window.oshuworkCleanup) {
+    window.oshuworkCleanup();
+  }
+  window.oshuworkCleanup = cleanupGlobalListeners;
+
   // Fallback обработчики для мобильных устройств
   function setupMobileFallbacks() {
     
     const isMobile = isMobileDevice();
-    
-    // Глобальная система cleanup для предотвращения memory leaks
-    const globalListeners = [];
-    
-    const addGlobalListener = (element, event, handler, options) => {
-      element.addEventListener(event, handler, options);
-      globalListeners.push({ element, event, handler });
-    };
-    
-    const cleanupGlobalListeners = () => {
-      globalListeners.forEach(({ element, event, handler }) => {
-        element.removeEventListener(event, handler);
-      });
-      globalListeners.length = 0;
-    };
-    
-    // Очищаем listeners при перезагрузке страницы
-    if (window.oshuworkCleanup) {
-      window.oshuworkCleanup();
-    }
-    window.oshuworkCleanup = cleanupGlobalListeners;
     
     if (isMobile) {
       // Добавляем touchstart обработчики как fallback
