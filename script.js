@@ -33,7 +33,8 @@
     setupPullToRefresh,
     showCustomConfirm,
     createSupabaseHeaders,
-    parseTotal
+    parseTotal,
+    escapeHtml
   } = UTIL;
 
   // Кэшируем DOM элементы с проверкой на null
@@ -1168,7 +1169,7 @@
       `;
       errorDiv.innerHTML = `
         <h3>Ошибка загрузки приложения</h3>
-        <p>${error.message}</p>
+        <p>${escapeHtml(error.message)}</p>
         <button onclick="location.reload()" style="
           background: white;
           color: #ff4444;
