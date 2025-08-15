@@ -978,43 +978,7 @@
     }
   }
 
-  // Диагностика производительности для мобильных устройств (отключена в production)
-  function setupMobilePerformanceMonitoring() {
-    // FPS мониторинг отключен для улучшения производительности
-    // В development режиме можно включить для отладки
-    const isDevelopment = false; // Установить true только для отладки
-    
-    if (isDevelopment) {
-      const isMobile = isMobileDevice();
-      
-      if (isMobile) {
-        // Мониторинг FPS (только в development)
-        let frameCount = 0;
-        let lastTime = performance.now();
-        
-        function countFrames() {
-          frameCount++;
-          const currentTime = performance.now();
-          
-          if (currentTime - lastTime >= 1000) {
-            const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-            
-            if (fps < 30) {
-              console.warn('⚠️ Низкая производительность: FPS < 30');
-            }
-            
-            frameCount = 0;
-            lastTime = currentTime;
-          }
-          
-          requestAnimationFrame(countFrames);
-        }
-        
-        // Запускаем мониторинг FPS только в development
-        requestAnimationFrame(countFrames);
-      }
-    }
-  }
+  // FPS мониторинг полностью удален для улучшения производительности
 
   // Улучшенная функция инициализации
   async function init() {
@@ -1060,7 +1024,7 @@
     // Проверяем доступность элементов и настраиваем обработчики
     if (ensureElementAccessibility()) {
       setupMobileEventHandlers();
-      setupMobilePerformanceMonitoring(); // Добавляем вызов новой функции
+      // FPS мониторинг удален для улучшения производительности
     }
     
     // Приоритетная загрузка только основной категории для быстрого отображения
