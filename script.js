@@ -574,11 +574,18 @@
 
   function showOnly(targetId){
     vacancyLists.forEach(list=>{
-      list.classList.remove('active');
-      list.style.display='none';
+      const isActive = list.id === targetId;
+      list.classList.toggle('active', isActive);
+      list.style.display = isActive ? '' : 'none';
+      
+      // Управляем aria-hidden для accessibility
+      // Активный таб не должен быть скрыт от assistive technologies
+      if (isActive) {
+        list.removeAttribute('aria-hidden');
+      } else {
+        list.setAttribute('aria-hidden', 'true');
+      }
     });
-    const target=document.getElementById(targetId);
-    if(target){ target.classList.add('active'); target.style.display=''; }
   }
   
   async function activateTabByTarget(targetId){
