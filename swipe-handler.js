@@ -33,10 +33,10 @@
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
                     
-                    // Дополнительная защита от сворачивания при мало вакансиях
+                    // Дополнительная защита от сворачивания для старых версий Telegram
                     if (window.Telegram?.WebApp) {
                         try {
-                            window.Telegram.WebApp.disableVerticalSwipes();
+                            // Только expand для версии 6.0
                             window.Telegram.WebApp.expand();
                         } catch (e) {}
                     }
@@ -44,8 +44,6 @@
                     // Блокируем все системные жесты во время свайпа
                     document.body.style.overscrollBehavior = 'none';
                     document.documentElement.style.overscrollBehavior = 'none';
-                    document.body.style.position = 'fixed';
-                    document.body.style.width = '100%';
                     
                     // Сохраняем начальную позицию для точного определения направления
                     event.target._swipeStartX = event.pageX;
@@ -122,8 +120,6 @@
                     document.documentElement.style.overscrollBehavior = '';
                     document.body.style.touchAction = '';
                     document.body.style.userSelect = '';
-                    document.body.style.position = '';
-                    document.body.style.width = '';
 
                     // Убираем классы
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
@@ -139,30 +135,17 @@
                     
                     if (absX > threshold) {
                         if (dx < 0 && deleteBtn) {
-                            // Плавная анимация удаления без дерганья
-                            card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out, height 0.3s ease-out 0.2s, margin 0.3s ease-out 0.2s, padding 0.3s ease-out 0.2s';
+                            // Простая анимация удаления
+                            card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translateX(-100%)';
                             card.style.opacity = '0';
-                            // Плавное схлопывание высоты для уменьшения дерганья
-                            setTimeout(() => {
-                                card.style.height = '0';
-                                card.style.margin = '0';
-                                card.style.padding = '0';
-                                card.style.overflow = 'hidden';
-                            }, 200);
-                            setTimeout(() => deleteBtn.click(), 500);
+                            setTimeout(() => deleteBtn.click(), 400);
                         } else if (dx > 0 && favoriteBtn) {
-                            // Плавная анимация добавления в избранное
-                            card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out, height 0.3s ease-out 0.2s, margin 0.3s ease-out 0.2s, padding 0.3s ease-out 0.2s';
+                            // Простая анимация добавления в избранное
+                            card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translateX(100%)';
                             card.style.opacity = '0';
-                            setTimeout(() => {
-                                card.style.height = '0';
-                                card.style.margin = '0';
-                                card.style.padding = '0';
-                                card.style.overflow = 'hidden';
-                            }, 200);
-                            setTimeout(() => favoriteBtn.click(), 500);
+                            setTimeout(() => favoriteBtn.click(), 400);
                         } else {
                             // Плавный возврат на место
                             card.style.transition = 'transform 0.3s ease-out';
@@ -221,20 +204,11 @@
     }
 
     function setupSwipes() {
-        // Отключаем вертикальные свайпы Telegram для предотвращения сворачивания
+        // Настройка для Telegram WebApp версии 6.0
         if (window.Telegram?.WebApp) {
             try {
-                window.Telegram.WebApp.disableVerticalSwipes();
                 window.Telegram.WebApp.expand();
-            } catch (e) {
-                // Fallback через postEvent для старых версий
-                if (window.TelegramWebviewProxy?.postEvent) {
-                    window.TelegramWebviewProxy.postEvent('web_app_setup_swipe_behavior', {
-                        allow_vertical_swipe: false
-                    });
-                    window.TelegramWebviewProxy.postEvent('web_app_expand', null);
-                }
-            }
+            } catch (e) {}
         }
 
         // Дополнительная защита от сворачивания на краях
