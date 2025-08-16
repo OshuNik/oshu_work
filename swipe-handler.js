@@ -9,12 +9,18 @@
         }
 
         // Настройка свайпов для карточек
+        console.log('SwipeHandler: настраиваем draggable для', document.querySelectorAll('.vacancy-card').length, 'карточек');
+        
         interact('.vacancy-card').draggable({
+            // Разрешить свайп с любого места карточки  
             allowFrom: '.vacancy-card',
-            ignoreFrom: 'button, a, input, .image-link-button',
+            // Игнорировать кнопки и ссылки
+            ignoreFrom: 'button, a, input, .image-link-button, .card-actions',
+            // Блокировать только по горизонтали
             lockAxis: 'x',
             listeners: {
                 start(event) {
+                    console.log('SwipeHandler: начало свайпа');
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
                 },
@@ -118,13 +124,37 @@
         });
     }
 
+    // Инициализация свайпов для новых карточек
+    function initForNewCards() {
+        if (typeof interact === 'undefined') return;
+        
+        // Реинициализируем interact для всех карточек
+        interact('.vacancy-card').unset();
+        initSwipeHandler();
+    }
+
     // Инициализация
     function init() {
+        console.log('SwipeHandler: инициализация');
+        
         // Ждем загрузки interact.js
         if (typeof interact !== 'undefined') {
+            console.log('SwipeHandler: interact.js найден');
             initSwipeHandler();
             addSwipeIcons();
+            
+            // Следим за добавлением новых карточек
+            const observer = new MutationObserver(() => {
+                addSwipeIcons();
+                initForNewCards();
+            });
+            
+            // Наблюдаем за изменениями в контейнерах вакансий
+            document.querySelectorAll('.vacancy-list').forEach(list => {
+                observer.observe(list, { childList: true, subtree: true });
+            });
         } else {
+            console.log('SwipeHandler: ждем interact.js');
             setTimeout(init, 100);
         }
     }
@@ -136,9 +166,19 @@
         init();
     }
 
+    // Тестовая инициализация по клику (удалить после тестов)
+    window.addEventListener('click', function(e) {
+        if (e.target.textContent === 'TEST_SWIPE') {
+            console.log('Принудительная инициализация свайпов');
+            initSwipeHandler();
+            addSwipeIcons();
+        }
+    });
+
     // Экспортируем функции для использования в других модулях
     window.SwipeHandler = {
         init: initSwipeHandler,
-        addIcons: addSwipeIcons
+        addIcons: addSwipeIcons,
+        initForNewCards: initForNewCards
     };
 })();

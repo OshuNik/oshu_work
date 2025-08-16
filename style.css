@@ -34,12 +34,6 @@
 .hidden { display: none !important; }
 
 /* === SWIPE ANIMATIONS === */
-.vacancy-card {
-  touch-action: none;
-  user-select: none;
-  transition: transform var(--transition-normal), opacity var(--transition-normal);
-  will-change: transform;
-}
 
 .vacancy-card.swiping {
   transition: none;
@@ -299,6 +293,10 @@ input[type="search"]::-webkit-search-cancel-button { display: none; }
     transition: all 0.3s ease-out;
     overflow: hidden;
     will-change: transform; /* Оптимизация анимаций карточек */
+    
+    /* Swipe support */
+    touch-action: none;
+    user-select: none;
 }
 .card-header {
     margin-bottom: 12px;
