@@ -12,12 +12,15 @@
         console.log('SwipeHandler: настраиваем draggable для', document.querySelectorAll('.vacancy-card').length, 'карточек');
         
         interact('.vacancy-card').draggable({
-            // Разрешить свайп с любого места карточки  
-            allowFrom: '.vacancy-card',
+            // Разрешить свайп только с области карточки
+            allowFrom: '.card-body, .card-header',
             // Игнорировать кнопки и ссылки
             ignoreFrom: 'button, a, input, .image-link-button, .card-actions',
-            // Блокировать только по горизонтали
+            // Ограничить движение только по горизонтали
+            startAxis: 'x',
             lockAxis: 'x',
+            // Требуем минимальное движение для старта
+            hold: 50,
             listeners: {
                 start(event) {
                     console.log('SwipeHandler: начало свайпа');
@@ -25,67 +28,85 @@
                     event.target.style.zIndex = '100';
                 },
                 move(event) {
-                    const dx = event.dx;
+                    // Используем относительное смещение от начала свайпа
+                    const dx = event.pageX - event.x0;
                     const absX = Math.abs(dx);
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
-                    // Двигаем карточку
-                    event.target.style.transform = `translateX(${dx}px)`;
+                    // Ограничиваем максимальное смещение
+                    const maxMove = 120;
+                    const limitedDx = Math.max(-maxMove, Math.min(maxMove, dx));
 
-                    // Показываем иконки и меняем цвет при движении > 30px
-                    if (absX > 30) {
+                    // Двигаем карточку плавно
+                    event.target.style.transform = `translateX(${limitedDx}px)`;
+
+                    // Показываем иконки и меняем цвет при движении > 40px
+                    if (absX > 40) {
                         if (dx < 0) {
                             // Свайп влево - удалить
                             event.target.classList.add('swipe-left');
                             event.target.classList.remove('swipe-right');
-                            leftIcon.classList.add('visible');
-                            rightIcon.classList.remove('visible');
+                            if (leftIcon) leftIcon.classList.add('visible');
+                            if (rightIcon) rightIcon.classList.remove('visible');
                         } else {
                             // Свайп вправо - в избранное
                             event.target.classList.add('swipe-right');
                             event.target.classList.remove('swipe-left');
-                            rightIcon.classList.add('visible');
-                            leftIcon.classList.remove('visible');
+                            if (rightIcon) rightIcon.classList.add('visible');
+                            if (leftIcon) leftIcon.classList.remove('visible');
                         }
                     } else {
                         event.target.classList.remove('swipe-left', 'swipe-right');
-                        leftIcon.classList.remove('visible');
-                        rightIcon.classList.remove('visible');
+                        if (leftIcon) leftIcon.classList.remove('visible');
+                        if (rightIcon) rightIcon.classList.remove('visible');
                     }
                 },
                 end(event) {
                     const card = event.target;
-                    const dx = event.dx;
+                    const dx = event.pageX - event.x0;
                     const absX = Math.abs(dx);
                     const deleteBtn = card.querySelector('[data-action="delete"]');
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
 
+                    console.log('SwipeHandler: конец свайпа, dx:', dx, 'absX:', absX);
+
                     // Убираем классы
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
-                    card.querySelector('.swipe-icon.left').classList.remove('visible');
-                    card.querySelector('.swipe-icon.right').classList.remove('visible');
+                    const leftIcon = card.querySelector('.swipe-icon.left');
+                    const rightIcon = card.querySelector('.swipe-icon.right');
+                    if (leftIcon) leftIcon.classList.remove('visible');
+                    if (rightIcon) rightIcon.classList.remove('visible');
                     card.style.zIndex = '';
 
                     // Если свайп больше 80px - выполняем действие
                     if (absX > 80) {
                         if (dx < 0 && deleteBtn) {
                             // Свайп влево - удалить
+                            console.log('SwipeHandler: удаляем карточку');
                             card.style.transform = 'translateX(-100%)';
                             card.style.opacity = '0';
-                            setTimeout(() => deleteBtn.click(), 300);
+                            setTimeout(() => {
+                                console.log('SwipeHandler: кликаем delete кнопку');
+                                deleteBtn.click();
+                            }, 300);
                         } else if (dx > 0 && favoriteBtn) {
                             // Свайп вправо - в избранное
+                            console.log('SwipeHandler: добавляем в избранное');
                             card.style.transform = 'translateX(100%)';
                             card.style.opacity = '0';
-                            setTimeout(() => favoriteBtn.click(), 300);
-                            return;
+                            setTimeout(() => {
+                                console.log('SwipeHandler: кликаем favorite кнопку');
+                                favoriteBtn.click();
+                            }, 300);
                         } else {
                             // Возвращаем на место если нет кнопки
+                            console.log('SwipeHandler: кнопка не найдена, возвращаем карточку');
                             card.style.transform = 'translateX(0px)';
                         }
                     } else {
                         // Возвращаем на место
+                        console.log('SwipeHandler: свайп недостаточный, возвращаем карточку');
                         card.style.transform = 'translateX(0px)';
                     }
                 }

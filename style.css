@@ -294,8 +294,8 @@ input[type="search"]::-webkit-search-cancel-button { display: none; }
     overflow: hidden;
     will-change: transform; /* Оптимизация анимаций карточек */
     
-    /* Swipe support */
-    touch-action: none;
+    /* Swipe support - разрешаем вертикальную прокрутку */
+    touch-action: pan-y;
     user-select: none;
 }
 .card-header {
