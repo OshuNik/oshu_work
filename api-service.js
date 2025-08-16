@@ -86,7 +86,7 @@
     // Загрузить вакансии для категории
     async fetchVacancies(key, limit, offset, query, signal) {
       const url = this.buildCategoryUrl(key, limit, offset, query);
-      const headers = this.createHeaders();
+      const headers = this.createHeaders({ prefer: 'count=exact' });
       
       try {
         const response = await UTIL.fetchWithRetry(url, {
