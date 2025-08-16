@@ -11,6 +11,8 @@
     constructor() {
       this.initialized = false;
       this.initPromise = null;
+      this.eventListeners = new Map();
+      this.abortController = new AbortController();
     }
 
     // Проверить готовность всех зависимостей
@@ -39,7 +41,18 @@
     async waitForDOM() {
       return new Promise((resolve) => {
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', resolve);
+          const domLoadedHandler = () => {
+            resolve();
+          };
+          document.addEventListener('DOMContentLoaded', domLoadedHandler, { 
+            once: true,
+            signal: this.abortController.signal 
+          });
+          this.eventListeners.set('DOMContentLoaded', { 
+            element: document, 
+            event: 'DOMContentLoaded', 
+            handler: domLoadedHandler 
+          });
         } else {
           resolve();
         }
@@ -48,39 +61,77 @@
 
     // Настроить обработчики событий приложения
     setupAppEventHandlers() {
+      const signal = this.abortController.signal;
+      
       // Обработчик поиска
-      document.addEventListener('search:triggered', async (e) => {
+      const searchHandler = async (e) => {
         const { query } = e.detail;
         await this.handleSearch(query);
+      };
+      document.addEventListener('search:triggered', searchHandler, { signal });
+      this.eventListeners.set('search:triggered', { 
+        element: document, 
+        event: 'search:triggered', 
+        handler: searchHandler 
       });
 
       // Обработчик активации вкладки
-      document.addEventListener('tab:activated', async (e) => {
+      const tabActivatedHandler = async (e) => {
         const { targetId } = e.detail;
         await this.handleTabActivation(targetId);
+      };
+      document.addEventListener('tab:activated', tabActivatedHandler, { signal });
+      this.eventListeners.set('tab:activated', { 
+        element: document, 
+        event: 'tab:activated', 
+        handler: tabActivatedHandler 
       });
 
       // Обработчик длинного нажатия на вкладку
-      document.addEventListener('tab:longPress', async (e) => {
+      const tabLongPressHandler = async (e) => {
         const { key } = e.detail;
         await this.handleTabLongPress(key);
+      };
+      document.addEventListener('tab:longPress', tabLongPressHandler, { signal });
+      this.eventListeners.set('tab:longPress', { 
+        element: document, 
+        event: 'tab:longPress', 
+        handler: tabLongPressHandler 
       });
 
       // Обработчик действий с вакансиями
-      document.addEventListener('vacancy:action', async (e) => {
+      const vacancyActionHandler = async (e) => {
         const { action, vacancyId, url } = e.detail;
         await this.handleVacancyAction(action, vacancyId, url);
+      };
+      document.addEventListener('vacancy:action', vacancyActionHandler, { signal });
+      this.eventListeners.set('vacancy:action', { 
+        element: document, 
+        event: 'vacancy:action', 
+        handler: vacancyActionHandler 
       });
 
       // Обработчик загрузки дополнительных вакансий
-      document.addEventListener('loadMore:triggered', async (e) => {
+      const loadMoreHandler = async (e) => {
         const { key } = e.detail;
         await this.handleLoadMore(key);
+      };
+      document.addEventListener('loadMore:triggered', loadMoreHandler, { signal });
+      this.eventListeners.set('loadMore:triggered', { 
+        element: document, 
+        event: 'loadMore:triggered', 
+        handler: loadMoreHandler 
       });
 
       // Обработчик появления страницы
-      document.addEventListener('page:visible', () => {
+      const pageVisibleHandler = () => {
         this.handlePageVisible();
+      };
+      document.addEventListener('page:visible', pageVisibleHandler, { signal });
+      this.eventListeners.set('page:visible', { 
+        element: document, 
+        event: 'page:visible', 
+        handler: pageVisibleHandler 
       });
     }
 
@@ -493,6 +544,23 @@
 
     // Очистка при уничтожении
     destroy() {
+      // Отменяем все event listeners через AbortController
+      this.abortController.abort();
+      
+      // Fallback: ручная очистка listeners если AbortController не сработал
+      for (const [key, listener] of this.eventListeners) {
+        try {
+          listener.element.removeEventListener(listener.event, listener.handler);
+        } catch (error) {
+          console.warn(`Не удалось удалить listener ${key}:`, error);
+        }
+      }
+      this.eventListeners.clear();
+      
+      // Создаем новый AbortController для возможного переиспользования
+      this.abortController = new AbortController();
+      
+      // Очищаем остальные компоненты
       window.eventManager?.destroy();
       window.stateManager?.destroy();
       window.domManager?.clearCache();

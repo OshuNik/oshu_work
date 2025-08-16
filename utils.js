@@ -848,6 +848,76 @@
   }
 
 
+  // Глобальный менеджер очистки listeners
+  const GlobalCleanupManager = {
+    listeners: new Set(),
+    
+    // Добавить listener с автоматической очисткой
+    addManagedListener(element, event, handler, options = {}) {
+      if (!element) return null;
+      
+      element.addEventListener(event, handler, options);
+      const listenerInfo = { element, event, handler, options };
+      this.listeners.add(listenerInfo);
+      
+      // Возвращаем функцию для ручного удаления
+      return () => {
+        this.removeManagedListener(listenerInfo);
+      };
+    },
+    
+    // Удалить конкретный listener
+    removeManagedListener(listenerInfo) {
+      const { element, event, handler } = listenerInfo;
+      try {
+        element.removeEventListener(event, handler);
+        this.listeners.delete(listenerInfo);
+      } catch (error) {
+        console.warn('Ошибка удаления listener:', error);
+      }
+    },
+    
+    // Очистить все listeners
+    cleanup() {
+      for (const listenerInfo of this.listeners) {
+        this.removeManagedListener(listenerInfo);
+      }
+      this.listeners.clear();
+    },
+    
+    // Получить статистику
+    getStats() {
+      return {
+        totalListeners: this.listeners.size,
+        types: Array.from(this.listeners).reduce((acc, { event }) => {
+          acc[event] = (acc[event] || 0) + 1;
+          return acc;
+        }, {})
+      };
+    }
+  };
+  
+  // Telegram WebApp cleanup function
+  function setupTelegramCleanup() {
+    if (!tg) return;
+    
+    // Очистка при закрытии WebApp
+    GlobalCleanupManager.addManagedListener(window, 'beforeunload', () => {
+      GlobalCleanupManager.cleanup();
+      window.appController?.destroy();
+      window.eventManager?.destroy();
+    });
+    
+    // Очистка при смене видимости
+    GlobalCleanupManager.addManagedListener(document, 'visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        // Мягкая очистка неактивных listeners
+        window.eventManager?.getStats && console.log('Event Manager Stats:', window.eventManager.getStats());
+        window.appController?.getStats && console.log('App Controller Stats:', window.appController.getStats());
+      }
+    });
+  }
+
   window.utils = {
     tg, 
     escapeHtml, 
@@ -874,6 +944,12 @@
     createSupabaseHeaders,
     parseTotal,
     checkRateLimit, // <-- Rate Limiter функция
-    RateLimiter    // <-- Класс для создания кастомных лимитеров
+    RateLimiter,    // <-- Класс для создания кастомных лимитеров
+    GlobalCleanupManager, // <-- Менеджер автоматической очистки listeners
+    setupTelegramCleanup  // <-- Настройка cleanup для Telegram WebApp
   };
+  
+  // Автоматическая инициализация cleanup для Telegram WebApp
+  setupTelegramCleanup();
+
 })();
