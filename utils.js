@@ -261,6 +261,23 @@
   }
   const formatTimestamp = (s) => formatSmartTime(s);
 
+  // Проверяет, является ли вакансия "новой" (опубликована ≤ 3 часов назад)
+  function isVacancyNew(dateString) {
+    if (!dateString) return false;
+    
+    try {
+      const vacancyDate = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - vacancyDate;
+      const diffHours = diffMs / (1000 * 60 * 60);
+      
+      return diffHours <= 3; // Менее или равно 3 часов
+    } catch (error) {
+      console.warn('Ошибка при парсинге даты вакансии:', dateString, error);
+      return false;
+    }
+  }
+
   function parseTotal(resp){
     const cr = resp.headers.get('content-range');
     if (!cr || !cr.includes('/')) return 0;
@@ -470,6 +487,15 @@
     if (v.category === CFG.CATEGORIES.MAIN) card.classList.add('category-main');
     else if (v.category === CFG.CATEGORIES.MAYBE) card.classList.add('category-maybe');
     else card.classList.add('category-other');
+    
+    // Проверяем, является ли вакансия "новой" (≤ 3 часов)
+    const isNew = isVacancyNew(v.date);
+    if (isNew) {
+      const newBadge = document.createElement('div');
+      newBadge.className = 'new-badge';
+      newBadge.textContent = 'NEW';
+      card.appendChild(newBadge);
+    }
     const elements = {
       applyBtn: card.querySelector('[data-element="apply-btn"]'),
       favoriteBtn: card.querySelector('[data-element="favorite-btn"]'),
@@ -571,6 +597,45 @@
       stripTags(originalDetailsHtml)
     ].filter(Boolean);
     card.dataset.searchText = searchChunks.join(' ').toLowerCase();
+    // Добавляем обработчики для анимаций действий
+    const attachActionAnimations = (card) => {
+      const heartBtn = card.querySelector('[data-element="favorite-btn"]');
+      const planeBtn = card.querySelector('[data-element="apply-btn"]');
+      const crossBtn = card.querySelector('[data-element="delete-btn"]');
+      
+      // Анимация сердца (избранное)
+      if (heartBtn) {
+        heartBtn.addEventListener('click', () => {
+          heartBtn.classList.add('animate-heart');
+          setTimeout(() => heartBtn.classList.remove('animate-heart'), 600);
+        });
+      }
+      
+      // Анимация самолетика (отклик)
+      if (planeBtn) {
+        planeBtn.addEventListener('click', () => {
+          planeBtn.classList.add('animate-plane');
+          setTimeout(() => planeBtn.classList.remove('animate-plane'), 600);
+        });
+      }
+      
+      // Анимация крестика (удаление)
+      if (crossBtn) {
+        crossBtn.addEventListener('click', () => {
+          crossBtn.classList.add('animate-cross');
+          setTimeout(() => crossBtn.classList.remove('animate-cross'), 300);
+          
+          // Анимация удаления карточки
+          setTimeout(() => {
+            card.classList.add('animate-card-remove');
+          }, 200);
+        });
+      }
+    };
+    
+    // Применяем анимации к карточке
+    attachActionAnimations(card);
+    
     return card;
   }
   
