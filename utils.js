@@ -156,18 +156,64 @@
   function sanitizeLink(raw = '') {
     let s = String(raw).trim();
     if (!s) return '';
+    
+    // Белый список разрешенных протоколов
+    const ALLOWED_PROTOCOLS = ['https:', 'http:', 'tg:'];
+    
+    // Белый список разрешенных доменов для Telegram
+    const ALLOWED_DOMAINS = [
+      't.me',
+      'telegram.me',
+      'telegram.org'
+    ];
+    
+    // Преобразуем Telegram ссылки в HTTPS
     if (/^(t\.me|telegram\.me)\//i.test(s)) {
         s = 'https://' + s;
     }
+    
+    // Добавляем https:// для доменов без протокола
     if (!/^[a-z]+:\/\//i.test(s) && s.includes('.')) {
         s = 'https://' + s;
     }
+    
     try {
         const url = new URL(s);
-        if (['https:', 'http:', 'tg:'].includes(url.protocol)) {
+        
+        // Проверяем протокол
+        if (!ALLOWED_PROTOCOLS.includes(url.protocol)) {
+            return '';
+        }
+        
+        // Дополнительная проверка для Telegram доменов
+        if (url.protocol === 'https:' && url.hostname) {
+          const hostname = url.hostname.toLowerCase();
+          // Разрешаем только безопасные домены или Telegram домены
+          if (hostname.startsWith('t.me') || hostname.startsWith('telegram.me') || 
+              ALLOWED_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain))) {
+            return url.href;
+          }
+          
+          // Для других HTTPS доменов делаем базовую проверку
+          if (hostname.match(/^[a-z0-9.-]+\.[a-z]{2,}$/i)) {
+            return url.href;
+          }
+        }
+        
+        // Для tg: протокола разрешаем только базовые паттерны
+        if (url.protocol === 'tg:') {
             return url.href;
         }
-    } catch (e) {}
+        
+        // Для http протокола - более строгая проверка
+        if (url.protocol === 'http:' && url.hostname && 
+            url.hostname.match(/^[a-z0-9.-]+\.[a-z]{2,}$/i)) {
+            return url.href;
+        }
+        
+    } catch (e) {
+        // Невалидный URL
+    }
     return '';
   }
   
@@ -238,17 +284,80 @@
   async function fetchWithRetry(url, options = {}, retryCfg = { retries: 0, backoffMs: 300 }) {
     let attempt = 0;
     let lastErr = null;
-    while (attempt <= (retryCfg.retries || 0)) {
+    
+    // Валидация входных параметров
+    if (!url || typeof url !== 'string') {
+      throw new Error('fetchWithRetry: некорректный URL');
+    }
+    
+    const maxRetries = Math.max(0, Math.min(5, retryCfg.retries || 0)); // Ограничиваем ретраи
+    const backoffMs = Math.max(100, Math.min(5000, retryCfg.backoffMs || 300)); // Ограничиваем задержку
+    
+    while (attempt <= maxRetries) {
       try {
-        return await fetch(url, options);
+        const response = await fetch(url, options);
+        
+        // Проверяем статус ответа
+        if (!response.ok) {
+          const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+          error.status = response.status;
+          error.response = response;
+          
+          // Для некоторых статусов не делаем ретрай
+          if (response.status === 400 || response.status === 401 || 
+              response.status === 403 || response.status === 404) {
+            throw error;
+          }
+          
+          // Для серверных ошибок делаем ретрай
+          if (response.status >= 500 && attempt < maxRetries) {
+            lastErr = error;
+            throw error;
+          }
+          
+          throw error;
+        }
+        
+        return response;
       } catch (e) {
         lastErr = e;
-        if (attempt === retryCfg.retries) break;
-        await new Promise(r => setTimeout(r, (retryCfg.backoffMs || 300) * Math.pow(2, attempt)));
+        
+        // Логируем попытки (только в development)
+        if (typeof console !== 'undefined' && console.warn) {
+          console.warn(`fetchWithRetry попытка ${attempt + 1}/${maxRetries + 1} неудачна:`, e.message);
+        }
+        
+        // Последняя попытка - кидаем ошибку
+        if (attempt === maxRetries) {
+          break;
+        }
+        
+        // Определяем, стоит ли делать ретрай
+        const shouldRetry = 
+          e.name === 'TypeError' || // Сетевые ошибки
+          e.name === 'AbortError' || // Timeout
+          (e.status && e.status >= 500); // Серверные ошибки
+          
+        if (!shouldRetry) {
+          break;
+        }
+        
+        // Экспоненциальная задержка с джиттером
+        const delay = backoffMs * Math.pow(2, attempt) + Math.random() * 100;
+        await new Promise(r => setTimeout(r, delay));
         attempt++;
       }
     }
-    throw lastErr || new Error('Network error');
+    
+    // Создаем более информативную ошибку
+    const finalError = lastErr || new Error('Network error');
+    if (lastErr && lastErr.status) {
+      finalError.message = `Запрос не удался после ${maxRetries + 1} попыток. Последняя ошибка: HTTP ${lastErr.status}`;
+    } else {
+      finalError.message = `Сетевая ошибка после ${maxRetries + 1} попыток: ${lastErr?.message || 'Неизвестная ошибка'}`;
+    }
+    
+    throw finalError;
   }
 
   function renderEmptyState(container, message) {

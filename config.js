@@ -1,9 +1,9 @@
 // config.js — все настраиваемые параметры в одном месте
 
 window.APP_CONFIG = {
-  // 👉 ваши действующие данные Supabase
-  SUPABASE_URL: 'https://lwfhtwnfqmdjwzrdznvv.supabase.co',
-  SUPABASE_ANON_KEY: 'sb_publishable_j2pTEm1MIJTXyAeluGHocQ_w16iaDj4',
+  // 👉 Supabase конфигурация (используем переменные окружения если доступны)
+  SUPABASE_URL: window.SUPABASE_URL || 'https://lwfhtwnfqmdjwzrdznvv.supabase.co',
+  SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY || 'sb_publishable_j2pTEm1MIJTXyAeluGHocQ_w16iaDj4',
 
   // Порции на главной
   PAGE_SIZE_MAIN: 10,
