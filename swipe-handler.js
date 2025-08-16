@@ -2,6 +2,8 @@
 (function() {
     'use strict';
 
+    let isInitialized = false;
+
     function initSwipeHandler() {
         if (typeof interact === 'undefined') {
             console.warn('interact.js не загружен');
@@ -9,18 +11,32 @@
         }
 
         // Настройка свайпов для карточек
-        console.log('SwipeHandler: настраиваем draggable для', document.querySelectorAll('.vacancy-card').length, 'карточек');
+        const cards = document.querySelectorAll('.vacancy-card');
+        console.log('SwipeHandler: найдено карточек:', cards.length);
+        console.log('SwipeHandler: примеры карточек:', cards[0]?.id, cards[1]?.id);
         
+        if (cards.length === 0) {
+            console.warn('SwipeHandler: карточки не найдены, попробуем позже');
+            setTimeout(() => initSwipeHandler(), 1000);
+            return;
+        }
+
+        if (isInitialized) {
+            console.log('SwipeHandler: уже инициализирован, пропускаем');
+            return;
+        }
+
+        console.log('SwipeHandler: первая инициализация свайпов');
+        isInitialized = true;
+
         interact('.vacancy-card').draggable({
-            // Разрешить свайп только с области карточки
-            allowFrom: '.card-body, .card-header',
-            // Игнорировать кнопки и ссылки
-            ignoreFrom: 'button, a, input, .image-link-button, .card-actions',
+            // Разрешить свайп с любого места карточки
+            allowFrom: '.vacancy-card',
+            // Игнорировать только кнопки и ссылки
+            ignoreFrom: 'button, a, input',
             // Ограничить движение только по горизонтали
             startAxis: 'x',
             lockAxis: 'x',
-            // Требуем минимальное движение для старта
-            hold: 50,
             listeners: {
                 start(event) {
                     console.log('SwipeHandler: начало свайпа');
@@ -149,9 +165,9 @@
     function initForNewCards() {
         if (typeof interact === 'undefined') return;
         
-        // Реинициализируем interact для всех карточек
-        interact('.vacancy-card').unset();
-        initSwipeHandler();
+        console.log('SwipeHandler: добавление свайпов к новым карточкам');
+        // НЕ сбрасываем isInitialized, просто добавляем иконки
+        addSwipeIcons();
     }
 
     // Главная функция инициализации свайпов
@@ -203,11 +219,20 @@
     // Тестовая инициализация по клику (удалить после тестов)
     window.addEventListener('click', function(e) {
         if (e.target.textContent === 'TEST_SWIPE') {
-            console.log('Принудительная инициализация свайпов');
-            initSwipeHandler();
-            addSwipeIcons();
+            console.log('Принудительная реинициализация свайпов');
+            isInitialized = false;
+            interact('.vacancy-card').unset();
+            setupSwipes();
         }
     });
+
+    // Добавляем тестовую кнопку
+    setTimeout(() => {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = 'TEST_SWIPE';
+        testBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:5px;';
+        document.body.appendChild(testBtn);
+    }, 2000);
 
     // Экспортируем функции для использования в других модулях
     window.SwipeHandler = {
