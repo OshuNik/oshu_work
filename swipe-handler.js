@@ -41,9 +41,14 @@
                         } catch (e) {}
                     }
                     
-                    // Блокируем все системные жесты во время свайпа
+                    // Полная блокировка скролла и вертикального движения
                     document.body.style.overscrollBehavior = 'none';
                     document.documentElement.style.overscrollBehavior = 'none';
+                    document.body.style.overflow = 'hidden';
+                    document.documentElement.style.overflow = 'hidden';
+                    
+                    // Сохраняем текущую позицию скролла
+                    event.target._savedScrollTop = window.pageYOffset || document.documentElement.scrollTop;
                     
                     // Сохраняем начальную позицию для точного определения направления
                     event.target._swipeStartX = event.pageX;
@@ -57,21 +62,18 @@
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
-                    // Блокируем PTR только при реальном горизонтальном движении
-                    if (absX > 15 && absX > absY * 1.5) {
-                        // Предотвращаем PTR и системные жесты только при четком горизонтальном свайпе
-                        try {
-                            event.preventDefault();
-                            if (event.originalEvent) {
-                                event.originalEvent.preventDefault();
-                                event.originalEvent.stopPropagation();
-                            }
-                        } catch (e) {}
-                        
-                        // Дополнительная блокировка через CSS
-                        document.body.style.touchAction = 'none';
-                        document.body.style.userSelect = 'none';
-                    }
+                    // Агрессивная блокировка всех touch событий при любом движении
+                    try {
+                        event.preventDefault();
+                        if (event.originalEvent) {
+                            event.originalEvent.preventDefault();
+                            event.originalEvent.stopPropagation();
+                        }
+                    } catch (e) {}
+                    
+                    // Полная блокировка PTR и других жестов
+                    document.body.style.touchAction = 'none';
+                    document.body.style.userSelect = 'none';
 
                     // Плавное ограничение с затуханием
                     const maxMove = 140;
@@ -115,11 +117,19 @@
                     const deleteBtn = card.querySelector('[data-action="delete"]');
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
 
-                    // Восстанавливаем CSS свойства
+                    // Восстанавливаем CSS свойства и скролл
                     document.body.style.overscrollBehavior = '';
                     document.documentElement.style.overscrollBehavior = '';
                     document.body.style.touchAction = '';
                     document.body.style.userSelect = '';
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    
+                    // Восстанавливаем позицию скролла
+                    if (typeof card._savedScrollTop === 'number') {
+                        window.scrollTo(0, card._savedScrollTop);
+                        delete card._savedScrollTop;
+                    }
 
                     // Убираем классы
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
@@ -164,6 +174,20 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 document.querySelectorAll('.vacancy-card.swiping').forEach(card => {
+                    // Восстанавливаем все CSS свойства
+                    document.body.style.overscrollBehavior = '';
+                    document.documentElement.style.overscrollBehavior = '';
+                    document.body.style.touchAction = '';
+                    document.body.style.userSelect = '';
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    
+                    // Восстанавливаем позицию скролла
+                    if (typeof card._savedScrollTop === 'number') {
+                        window.scrollTo(0, card._savedScrollTop);
+                        delete card._savedScrollTop;
+                    }
+                    
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
                     card.style.transform = 'translateX(0px)';
                     card.style.zIndex = '';
@@ -215,6 +239,30 @@
         document.body.style.position = 'relative';
         document.body.style.overflow = 'hidden auto';
         document.documentElement.style.overflow = 'hidden auto';
+        
+        // Глобальный блокировщик вертикальных жестов во время свайпа
+        let isSwipeActive = false;
+        
+        // Отслеживаем активные свайпы
+        document.addEventListener('touchstart', (e) => {
+            const target = e.target.closest('.vacancy-card');
+            if (target && target.classList.contains('swiping')) {
+                isSwipeActive = true;
+            }
+        }, true);
+        
+        document.addEventListener('touchmove', (e) => {
+            if (isSwipeActive) {
+                try {
+                    e.preventDefault();
+                    e.stopPropagation();
+                } catch (err) {}
+            }
+        }, { passive: false, capture: true });
+        
+        document.addEventListener('touchend', () => {
+            isSwipeActive = false;
+        }, true);
         
         initSwipeHandler();
         addSwipeIcons();
