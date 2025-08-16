@@ -23,15 +23,22 @@
         interact('.vacancy-card').draggable({
             allowFrom: '.vacancy-card',
             ignoreFrom: 'button, a, input',
-            // Убираем строгое ограничение по оси для естественного свайпа
+            // Менее строгие ограничения для естественного свайпа
             startAxis: 'xy',
             lockAxis: 'start',
-            // Увеличиваем порог для начала свайпа
-            threshold: 15,
+            // Уменьшаем порог для лучшей отзывчивости
+            threshold: 10,
             listeners: {
                 start(event) {
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
+                    
+                    // Предотвращаем системные жесты при горизонтальном движении
+                    if (event.originalEvent) {
+                        try {
+                            event.originalEvent.preventDefault();
+                        } catch (e) {}
+                    }
                 },
                 move(event) {
                     const dx = event.pageX - event.x0;
@@ -39,9 +46,16 @@
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
+                    // Предотвращаем вертикальную прокрутку во время свайпа
+                    if (absX > 10 && event.originalEvent) {
+                        try {
+                            event.originalEvent.preventDefault();
+                        } catch (e) {}
+                    }
+
                     // Плавное ограничение с затуханием
-                    const maxMove = 150;
-                    const resistance = 0.6;
+                    const maxMove = 140;
+                    const resistance = 0.7;
                     let limitedDx;
                     
                     if (absX <= maxMove) {
@@ -55,8 +69,8 @@
                     // Плавная анимация движения
                     event.target.style.transform = `translateX(${limitedDx}px)`;
 
-                    // Показываем индикаторы при движении > 60px
-                    if (absX > 60) {
+                    // Показываем индикаторы при движении > 50px (раньше)
+                    if (absX > 50) {
                         if (dx < 0) {
                             event.target.classList.add('swipe-left');
                             event.target.classList.remove('swipe-right');
@@ -89,8 +103,8 @@
                     if (rightIcon) rightIcon.classList.remove('visible');
                     card.style.zIndex = '';
 
-                    // Увеличиваем порог срабатывания до 120px
-                    if (absX > 120) {
+                    // Порог срабатывания 100px для удобства
+                    if (absX > 100) {
                         if (dx < 0 && deleteBtn) {
                             // Медленная анимация удаления
                             card.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
@@ -155,6 +169,20 @@
     }
 
     function setupSwipes() {
+        // Отключаем вертикальные свайпы Telegram для предотвращения сворачивания
+        if (window.Telegram?.WebApp) {
+            try {
+                window.Telegram.WebApp.disableVerticalSwipes();
+            } catch (e) {
+                // Fallback через postEvent для старых версий
+                if (window.TelegramWebviewProxy?.postEvent) {
+                    window.TelegramWebviewProxy.postEvent('web_app_setup_swipe_behavior', {
+                        allow_vertical_swipe: false
+                    });
+                }
+            }
+        }
+        
         initSwipeHandler();
         addSwipeIcons();
         
