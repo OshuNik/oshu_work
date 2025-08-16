@@ -109,6 +109,8 @@
     script.src = url;
     script.onload = () => {
       console.log('interact.js загружен с', url, '- тип:', typeof interact);
+      // Уведомляем SwipeHandler о загрузке
+      window.dispatchEvent(new CustomEvent('interactLoaded'));
       callback(true);
     };
     script.onerror = () => {

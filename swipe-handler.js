@@ -175,6 +175,27 @@
         init();
     }
 
+    // Слушаем событие загрузки interact.js
+    window.addEventListener('interactLoaded', () => {
+        console.log('SwipeHandler: получено событие interactLoaded');
+        if (typeof interact !== 'undefined') {
+            console.log('SwipeHandler: interact.js готов к использованию');
+            initSwipeHandler();
+            addSwipeIcons();
+            
+            // Следим за добавлением новых карточек
+            const observer = new MutationObserver(() => {
+                addSwipeIcons();
+                initForNewCards();
+            });
+            
+            // Наблюдаем за изменениями в контейнерах вакансий
+            document.querySelectorAll('.vacancy-list').forEach(list => {
+                observer.observe(list, { childList: true, subtree: true });
+            });
+        }
+    });
+
     // Тестовая инициализация по клику (удалить после тестов)
     window.addEventListener('click', function(e) {
         if (e.target.textContent === 'TEST_SWIPE') {
