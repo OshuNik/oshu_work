@@ -232,14 +232,10 @@
 
     function init() {
         if (typeof interact !== 'undefined') {
-            alert('тест свайпов 1');
             setupSwipes();
         }
     }
 
-    // Алерт при любом обновлении страницы
-    alert('тест свайпов - страница загружена');
-    
     // Запускаем после загрузки DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
