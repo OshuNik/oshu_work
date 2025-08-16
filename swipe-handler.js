@@ -154,38 +154,33 @@
         initSwipeHandler();
     }
 
-    // Инициализация
+    // Главная функция инициализации свайпов
+    function setupSwipes() {
+        console.log('SwipeHandler: настройка свайпов');
+        initSwipeHandler();
+        addSwipeIcons();
+        
+        // Следим за добавлением новых карточек
+        const observer = new MutationObserver(() => {
+            addSwipeIcons();
+            initForNewCards();
+        });
+        
+        // Наблюдаем за изменениями в контейнерах вакансий
+        document.querySelectorAll('.vacancy-list').forEach(list => {
+            observer.observe(list, { childList: true, subtree: true });
+        });
+    }
+
+    // Простая инициализация с проверкой
     function init() {
         console.log('SwipeHandler: инициализация');
-        console.log('SwipeHandler: window.interact =', typeof window.interact);
-        console.log('SwipeHandler: все window keys:', Object.keys(window).filter(k => k.includes('interact')));
+        console.log('SwipeHandler: interact доступен:', typeof interact !== 'undefined');
         
-        // Ждем загрузки interact.js
         if (typeof interact !== 'undefined') {
-            console.log('SwipeHandler: interact.js найден');
-            initSwipeHandler();
-            addSwipeIcons();
-            
-            // Следим за добавлением новых карточек
-            const observer = new MutationObserver(() => {
-                addSwipeIcons();
-                initForNewCards();
-            });
-            
-            // Наблюдаем за изменениями в контейнерах вакансий
-            document.querySelectorAll('.vacancy-list').forEach(list => {
-                observer.observe(list, { childList: true, subtree: true });
-            });
+            setupSwipes();
         } else {
-            console.log('SwipeHandler: ждем interact.js (попытка через', (Date.now() - window.swipeInitTime) + 'мс)');
-            if (!window.swipeInitTime) window.swipeInitTime = Date.now();
-            
-            // Останавливаем попытки через 10 секунд
-            if (Date.now() - window.swipeInitTime < 10000) {
-                setTimeout(init, 200);
-            } else {
-                console.error('SwipeHandler: interact.js не загрузился за 10 секунд');
-            }
+            console.log('SwipeHandler: ждем событие interactLoaded');
         }
     }
 
@@ -201,19 +196,7 @@
         console.log('SwipeHandler: получено событие interactLoaded');
         if (typeof interact !== 'undefined') {
             console.log('SwipeHandler: interact.js готов к использованию');
-            initSwipeHandler();
-            addSwipeIcons();
-            
-            // Следим за добавлением новых карточек
-            const observer = new MutationObserver(() => {
-                addSwipeIcons();
-                initForNewCards();
-            });
-            
-            // Наблюдаем за изменениями в контейнерах вакансий
-            document.querySelectorAll('.vacancy-list').forEach(list => {
-                observer.observe(list, { childList: true, subtree: true });
-            });
+            setupSwipes();
         }
     });
 

@@ -120,11 +120,11 @@
     document.head.appendChild(script);
   }
 
-  // Пробуем разные CDN
+  // Пробуем разные CDN (начинаем с самого стабильного)
   const cdnUrls = [
-    'https://cdn.interactjs.io/v1.10.11/interact.min.js',
     'https://unpkg.com/interactjs@1.10.11/dist/interact.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js'
+    'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js',
+    'https://cdn.interactjs.io/v1.10.11/interact.min.js'
   ];
 
   function tryNextCdn(index = 0) {
