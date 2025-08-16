@@ -33,6 +33,52 @@
 /* === УТИЛИТАРНЫЕ КЛАССЫ === */
 .hidden { display: none !important; }
 
+/* === SWIPE ANIMATIONS === */
+.vacancy-card {
+  touch-action: none;
+  user-select: none;
+  transition: transform var(--transition-normal), opacity var(--transition-normal);
+  will-change: transform;
+}
+
+.vacancy-card.swiping {
+  transition: none;
+}
+
+.vacancy-card.swipe-left {
+  background-color: var(--accent-red);
+  color: white;
+}
+
+.vacancy-card.swipe-right {
+  background-color: var(--accent-green);
+  color: white;
+}
+
+.swipe-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.swipe-icon.left {
+  left: 20px;
+}
+
+.swipe-icon.right {
+  right: 20px;
+}
+
+.swipe-icon.visible {
+  opacity: 1;
+}
+
 body {
     font-family: var(--font-mono);
     background-color: var(--background-color);

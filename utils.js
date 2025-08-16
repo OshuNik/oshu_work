@@ -597,6 +597,18 @@
       stripTags(originalDetailsHtml)
     ].filter(Boolean);
     card.dataset.searchText = searchChunks.join(' ').toLowerCase();
+    
+    // Добавляем иконки для свайпов
+    const leftIcon = document.createElement('div');
+    leftIcon.className = 'swipe-icon left';
+    leftIcon.textContent = '✕';
+    card.appendChild(leftIcon);
+
+    const rightIcon = document.createElement('div');
+    rightIcon.className = 'swipe-icon right';
+    rightIcon.textContent = '★';
+    card.appendChild(rightIcon);
+    
     return card;
   }
   
