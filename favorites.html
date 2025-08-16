@@ -16,10 +16,8 @@
   <link rel="preload" href="utils.min.js" as="script">
   <link rel="preload" href="config.js" as="script">
   
-  <!-- Critical CSS Inline - First Paint Optimization -->
-  <style>
-:root{--background-color:#F0F0F0;--card-color:#FFFFFF;--text-color:#000000;--border-width:2px;--border-color:#000000;--shadow-offset:4px;--box-shadow:var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);--box-shadow-pressed:calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--border-color);--accent-green:#6BCB77;--accent-blue:#41A6FF;--transition-fast:0.1s ease-out;--transition-normal:0.2s ease-out;--font-mono:'Roboto Mono','Courier New',monospace;--font-pixel:'Press Start 2P','Courier New',monospace}.hidden{display:none!important}body{font-family:var(--font-mono);background-color:var(--background-color);color:var(--text-color);margin:0;padding:15px;overflow-x:hidden}.main-wrapper{position:relative;z-index:1;background-color:var(--background-color);padding-bottom:80px;padding-top:20px;transition:transform 0.3s ease-out;will-change:transform}.header{padding-bottom:25px;text-align:center}.header h1{font-family:var(--font-pixel);font-size:28px;color:var(--text-color);margin:0 0 15px 0;letter-spacing:1.5px}.header-actions{display:flex;align-items:center;gap:10px;justify-content:center;position:relative}.header-button{font-size:14px;text-decoration:none;padding:10px 18px;border-radius:12px;background-color:var(--card-color);border:var(--border-width) solid var(--border-color);box-shadow:var(--box-shadow);color:var(--text-color);font-weight:700;font-family:var(--font-mono);cursor:pointer;transition:all var(--transition-fast);letter-spacing:0.5px}.header-button:active{transform:translate(calc(var(--shadow-offset)/2),calc(var(--shadow-offset)/2));box-shadow:var(--box-shadow-pressed)}.search-container{padding:0 0 15px 0}.search-input-wrapper{position:relative}.search-input{width:100%;padding:15px 50px 15px 20px;border:var(--border-width) solid var(--border-color);border-radius:12px;background-color:var(--card-color);font-family:var(--font-mono);font-size:16px;font-weight:500;color:var(--text-color);box-shadow:var(--box-shadow);outline:none;transition:all var(--transition-normal);box-sizing:border-box}.search-clear-btn{position:absolute;right:15px;top:50%;transform:translateY(-50%);width:24px;height:24px;border:none;background:none;cursor:pointer;opacity:0;transition:opacity var(--transition-normal)}.search-clear-btn::before{content:'✕';font-size:16px;color:var(--text-color);font-weight:700}.loader-container{position:fixed;top:0;left:0;right:0;bottom:0;background-color:var(--background-color);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.3s ease-out,visibility 0.3s ease-out}.loader-container.hidden{opacity:0;visibility:hidden}.ptr-bar{box-sizing:border-box;position:absolute;top:-80px;left:15px;right:15px;height:75px;display:flex;align-items:center;justify-content:center;gap:12px;background-color:var(--background-color);border:var(--border-width) solid var(--border-color);border-top:none;border-radius:0 0 12px 12px;box-shadow:var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);color:var(--text-color);font-family:var(--font-mono);font-weight:700;font-size:14px;opacity:0;transition:opacity 0.2s ease-out;will-change:opacity}.ptr-bar.ptr-visible{opacity:1}
-  </style>
+  <!-- Critical CSS для быстрого First Paint -->
+  <link rel="stylesheet" href="critical.css">
   
   <!-- Async CSS Loading for non-critical styles -->
   <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -64,13 +62,13 @@
     <div class="vacancy-card">
     <div class="card-actions">
       <button class="card-action-btn apply" data-element="apply-btn" aria-label="Откликнуться">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
       </button>
       <button class="card-action-btn favorite" data-element="favorite-btn" aria-label="В избранное">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"/></svg>
       </button>
       <button class="card-action-btn delete" data-element="delete-btn" aria-label="Удалить">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
     <div class="card-header">
