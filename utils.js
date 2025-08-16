@@ -597,45 +597,6 @@
       stripTags(originalDetailsHtml)
     ].filter(Boolean);
     card.dataset.searchText = searchChunks.join(' ').toLowerCase();
-    // Добавляем обработчики для анимаций действий
-    const attachActionAnimations = (card) => {
-      const heartBtn = card.querySelector('[data-element="favorite-btn"]');
-      const planeBtn = card.querySelector('[data-element="apply-btn"]');
-      const crossBtn = card.querySelector('[data-element="delete-btn"]');
-      
-      // Анимация сердца (избранное)
-      if (heartBtn) {
-        heartBtn.addEventListener('click', () => {
-          heartBtn.classList.add('animate-heart');
-          setTimeout(() => heartBtn.classList.remove('animate-heart'), 600);
-        });
-      }
-      
-      // Анимация самолетика (отклик)
-      if (planeBtn) {
-        planeBtn.addEventListener('click', () => {
-          planeBtn.classList.add('animate-plane');
-          setTimeout(() => planeBtn.classList.remove('animate-plane'), 600);
-        });
-      }
-      
-      // Анимация крестика (удаление)
-      if (crossBtn) {
-        crossBtn.addEventListener('click', () => {
-          crossBtn.classList.add('animate-cross');
-          setTimeout(() => crossBtn.classList.remove('animate-cross'), 300);
-          
-          // Анимация удаления карточки
-          setTimeout(() => {
-            card.classList.add('animate-card-remove');
-          }, 200);
-        });
-      }
-    };
-    
-    // Применяем анимации к карточке
-    attachActionAnimations(card);
-    
     return card;
   }
   
