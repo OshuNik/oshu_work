@@ -102,21 +102,14 @@
 <script>
 // Fallback загрузка interact.js
 (function() {
-  console.log('Загружаем interact.js...');
-  
   function loadScript(url, callback) {
     const script = document.createElement('script');
     script.src = url;
     script.onload = () => {
-      console.log('interact.js загружен с', url, '- тип:', typeof interact);
-      // Уведомляем SwipeHandler о загрузке
       window.dispatchEvent(new CustomEvent('interactLoaded'));
       callback(true);
     };
-    script.onerror = () => {
-      console.error('Ошибка загрузки interact.js с', url);
-      callback(false);
-    };
+    script.onerror = () => callback(false);
     document.head.appendChild(script);
   }
 
@@ -128,15 +121,9 @@
   ];
 
   function tryNextCdn(index = 0) {
-    if (index >= cdnUrls.length) {
-      console.error('Все CDN interact.js недоступны');
-      return;
-    }
-
+    if (index >= cdnUrls.length) return;
     loadScript(cdnUrls[index], (success) => {
-      if (!success) {
-        tryNextCdn(index + 1);
-      }
+      if (!success) tryNextCdn(index + 1);
     });
   }
 

@@ -10,63 +10,59 @@
             return;
         }
 
-        // Настройка свайпов для карточек
         const cards = document.querySelectorAll('.vacancy-card');
-        console.log('SwipeHandler: найдено карточек:', cards.length);
-        console.log('SwipeHandler: примеры карточек:', cards[0]?.id, cards[1]?.id);
         
         if (cards.length === 0) {
-            console.warn('SwipeHandler: карточки не найдены, попробуем позже');
             setTimeout(() => initSwipeHandler(), 1000);
             return;
         }
 
-        if (isInitialized) {
-            console.log('SwipeHandler: уже инициализирован, пропускаем');
-            return;
-        }
-
-        console.log('SwipeHandler: первая инициализация свайпов');
+        if (isInitialized) return;
         isInitialized = true;
 
         interact('.vacancy-card').draggable({
-            // Разрешить свайп с любого места карточки
             allowFrom: '.vacancy-card',
-            // Игнорировать только кнопки и ссылки
             ignoreFrom: 'button, a, input',
-            // Ограничить движение только по горизонтали
-            startAxis: 'x',
-            lockAxis: 'x',
+            // Убираем строгое ограничение по оси для естественного свайпа
+            startAxis: 'xy',
+            lockAxis: 'start',
+            // Увеличиваем порог для начала свайпа
+            threshold: 15,
             listeners: {
                 start(event) {
-                    console.log('SwipeHandler: начало свайпа');
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
                 },
                 move(event) {
-                    // Используем относительное смещение от начала свайпа
                     const dx = event.pageX - event.x0;
                     const absX = Math.abs(dx);
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
-                    // Ограничиваем максимальное смещение
-                    const maxMove = 120;
-                    const limitedDx = Math.max(-maxMove, Math.min(maxMove, dx));
+                    // Плавное ограничение с затуханием
+                    const maxMove = 150;
+                    const resistance = 0.6;
+                    let limitedDx;
+                    
+                    if (absX <= maxMove) {
+                        limitedDx = dx;
+                    } else {
+                        const excess = absX - maxMove;
+                        const resistedExcess = excess * resistance;
+                        limitedDx = dx > 0 ? maxMove + resistedExcess : -(maxMove + resistedExcess);
+                    }
 
-                    // Двигаем карточку плавно
+                    // Плавная анимация движения
                     event.target.style.transform = `translateX(${limitedDx}px)`;
 
-                    // Показываем иконки и меняем цвет при движении > 40px
-                    if (absX > 40) {
+                    // Показываем индикаторы при движении > 60px
+                    if (absX > 60) {
                         if (dx < 0) {
-                            // Свайп влево - удалить
                             event.target.classList.add('swipe-left');
                             event.target.classList.remove('swipe-right');
                             if (leftIcon) leftIcon.classList.add('visible');
                             if (rightIcon) rightIcon.classList.remove('visible');
                         } else {
-                            // Свайп вправо - в избранное
                             event.target.classList.add('swipe-right');
                             event.target.classList.remove('swipe-left');
                             if (rightIcon) rightIcon.classList.add('visible');
@@ -85,8 +81,6 @@
                     const deleteBtn = card.querySelector('[data-action="delete"]');
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
 
-                    console.log('SwipeHandler: конец свайпа, dx:', dx, 'absX:', absX);
-
                     // Убираем классы
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
                     const leftIcon = card.querySelector('.swipe-icon.left');
@@ -95,34 +89,28 @@
                     if (rightIcon) rightIcon.classList.remove('visible');
                     card.style.zIndex = '';
 
-                    // Если свайп больше 80px - выполняем действие
-                    if (absX > 80) {
+                    // Увеличиваем порог срабатывания до 120px
+                    if (absX > 120) {
                         if (dx < 0 && deleteBtn) {
-                            // Свайп влево - удалить
-                            console.log('SwipeHandler: удаляем карточку');
+                            // Медленная анимация удаления
+                            card.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
                             card.style.transform = 'translateX(-100%)';
                             card.style.opacity = '0';
-                            setTimeout(() => {
-                                console.log('SwipeHandler: кликаем delete кнопку');
-                                deleteBtn.click();
-                            }, 300);
+                            setTimeout(() => deleteBtn.click(), 500);
                         } else if (dx > 0 && favoriteBtn) {
-                            // Свайп вправо - в избранное
-                            console.log('SwipeHandler: добавляем в избранное');
+                            // Медленная анимация добавления в избранное
+                            card.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
                             card.style.transform = 'translateX(100%)';
                             card.style.opacity = '0';
-                            setTimeout(() => {
-                                console.log('SwipeHandler: кликаем favorite кнопку');
-                                favoriteBtn.click();
-                            }, 300);
+                            setTimeout(() => favoriteBtn.click(), 500);
                         } else {
-                            // Возвращаем на место если нет кнопки
-                            console.log('SwipeHandler: кнопка не найдена, возвращаем карточку');
+                            // Плавный возврат на место
+                            card.style.transition = 'transform 0.3s ease-out';
                             card.style.transform = 'translateX(0px)';
                         }
                     } else {
-                        // Возвращаем на место
-                        console.log('SwipeHandler: свайп недостаточный, возвращаем карточку');
+                        // Плавный возврат на место
+                        card.style.transition = 'transform 0.3s ease-out';
                         card.style.transform = 'translateX(0px)';
                     }
                 }
@@ -161,42 +149,28 @@
         });
     }
 
-    // Инициализация свайпов для новых карточек
     function initForNewCards() {
         if (typeof interact === 'undefined') return;
-        
-        console.log('SwipeHandler: добавление свайпов к новым карточкам');
-        // НЕ сбрасываем isInitialized, просто добавляем иконки
         addSwipeIcons();
     }
 
-    // Главная функция инициализации свайпов
     function setupSwipes() {
-        console.log('SwipeHandler: настройка свайпов');
         initSwipeHandler();
         addSwipeIcons();
         
-        // Следим за добавлением новых карточек
         const observer = new MutationObserver(() => {
             addSwipeIcons();
             initForNewCards();
         });
         
-        // Наблюдаем за изменениями в контейнерах вакансий
         document.querySelectorAll('.vacancy-list').forEach(list => {
             observer.observe(list, { childList: true, subtree: true });
         });
     }
 
-    // Простая инициализация с проверкой
     function init() {
-        console.log('SwipeHandler: инициализация');
-        console.log('SwipeHandler: interact доступен:', typeof interact !== 'undefined');
-        
         if (typeof interact !== 'undefined') {
             setupSwipes();
-        } else {
-            console.log('SwipeHandler: ждем событие interactLoaded');
         }
     }
 
@@ -207,32 +181,11 @@
         init();
     }
 
-    // Слушаем событие загрузки interact.js
     window.addEventListener('interactLoaded', () => {
-        console.log('SwipeHandler: получено событие interactLoaded');
         if (typeof interact !== 'undefined') {
-            console.log('SwipeHandler: interact.js готов к использованию');
             setupSwipes();
         }
     });
-
-    // Тестовая инициализация по клику (удалить после тестов)
-    window.addEventListener('click', function(e) {
-        if (e.target.textContent === 'TEST_SWIPE') {
-            console.log('Принудительная реинициализация свайпов');
-            isInitialized = false;
-            interact('.vacancy-card').unset();
-            setupSwipes();
-        }
-    });
-
-    // Добавляем тестовую кнопку
-    setTimeout(() => {
-        const testBtn = document.createElement('button');
-        testBtn.textContent = 'TEST_SWIPE';
-        testBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:5px;';
-        document.body.appendChild(testBtn);
-    }, 2000);
 
     // Экспортируем функции для использования в других модулях
     window.SwipeHandler = {
