@@ -489,7 +489,7 @@
     else card.classList.add('category-other');
     
     // Проверяем, является ли вакансия "новой" (≤ 3 часов)
-    const isNew = isVacancyNew(v.date);
+    const isNew = isVacancyNew(v.timestamp);
     if (isNew) {
       const newBadge = document.createElement('div');
       newBadge.className = 'new-badge';
