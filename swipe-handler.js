@@ -33,24 +33,36 @@
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
                     
-                    // Предотвращаем системные жесты при горизонтальном движении
-                    if (event.originalEvent) {
-                        try {
-                            event.originalEvent.preventDefault();
-                        } catch (e) {}
-                    }
+                    // Блокируем все системные жесты во время свайпа
+                    document.body.style.overscrollBehavior = 'none';
+                    document.documentElement.style.overscrollBehavior = 'none';
+                    
+                    // Сохраняем начальную позицию для точного определения направления
+                    event.target._swipeStartX = event.pageX;
+                    event.target._swipeStartY = event.pageY;
                 },
                 move(event) {
                     const dx = event.pageX - event.x0;
+                    const dy = event.pageY - event.y0;
                     const absX = Math.abs(dx);
+                    const absY = Math.abs(dy);
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
-                    // Предотвращаем вертикальную прокрутку во время свайпа
-                    if (absX > 10 && event.originalEvent) {
+                    // Агрессивно блокируем все touch события если это горизонтальный жест
+                    if (absX > 5) {
+                        // Предотвращаем PTR и системные жесты
                         try {
-                            event.originalEvent.preventDefault();
+                            event.preventDefault();
+                            if (event.originalEvent) {
+                                event.originalEvent.preventDefault();
+                                event.originalEvent.stopPropagation();
+                            }
                         } catch (e) {}
+                        
+                        // Дополнительная блокировка через CSS
+                        document.body.style.touchAction = 'none';
+                        document.body.style.userSelect = 'none';
                     }
 
                     // Плавное ограничение с затуханием
@@ -95,6 +107,12 @@
                     const deleteBtn = card.querySelector('[data-action="delete"]');
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
 
+                    // Восстанавливаем CSS свойства
+                    document.body.style.overscrollBehavior = '';
+                    document.documentElement.style.overscrollBehavior = '';
+                    document.body.style.touchAction = '';
+                    document.body.style.userSelect = '';
+
                     // Убираем классы
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
                     const leftIcon = card.querySelector('.swipe-icon.left');
@@ -103,8 +121,11 @@
                     if (rightIcon) rightIcon.classList.remove('visible');
                     card.style.zIndex = '';
 
-                    // Порог срабатывания 100px для удобства
-                    if (absX > 100) {
+                    // Учитываем скорость для быстрых свайпов - снижаем порог до 70px
+                    const isQuickSwipe = event.speed && event.speed > 0.5;
+                    const threshold = isQuickSwipe ? 70 : 90;
+                    
+                    if (absX > threshold) {
                         if (dx < 0 && deleteBtn) {
                             // Медленная анимация удаления
                             card.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
@@ -166,6 +187,12 @@
     function initForNewCards() {
         if (typeof interact === 'undefined') return;
         addSwipeIcons();
+        
+        // Принудительная реинициализация для обновленных карточек
+        // Это нужно для вкладок где могли остаться старые настройки
+        interact('.vacancy-card').unset();
+        isInitialized = false;
+        initSwipeHandler();
     }
 
     function setupSwipes() {
@@ -173,15 +200,22 @@
         if (window.Telegram?.WebApp) {
             try {
                 window.Telegram.WebApp.disableVerticalSwipes();
+                window.Telegram.WebApp.expand();
             } catch (e) {
                 // Fallback через postEvent для старых версий
                 if (window.TelegramWebviewProxy?.postEvent) {
                     window.TelegramWebviewProxy.postEvent('web_app_setup_swipe_behavior', {
                         allow_vertical_swipe: false
                     });
+                    window.TelegramWebviewProxy.postEvent('web_app_expand', null);
                 }
             }
         }
+
+        // Дополнительная защита от сворачивания на краях
+        document.body.style.position = 'relative';
+        document.body.style.overflow = 'hidden auto';
+        document.documentElement.style.overflow = 'hidden auto';
         
         initSwipeHandler();
         addSwipeIcons();
@@ -198,6 +232,7 @@
 
     function init() {
         if (typeof interact !== 'undefined') {
+            alert('тест свайпов 1');
             setupSwipes();
         }
     }
