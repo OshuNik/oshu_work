@@ -99,7 +99,7 @@
 <!-- Подключение общего template -->
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.interactjs.io/v1.10.11/interact.min.js"></script>
+<script src="https://cdn.interactjs.io/v1.10.11/interact.min.js" onload="console.log('interact.js загружен:', typeof interact)" onerror="console.error('Ошибка загрузки interact.js')"></script>
 <script src="template-loader.js"></script>
 <script src="config.js"></script>
 <script src="constants.js"></script>

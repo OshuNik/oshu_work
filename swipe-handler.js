@@ -136,6 +136,8 @@
     // Инициализация
     function init() {
         console.log('SwipeHandler: инициализация');
+        console.log('SwipeHandler: window.interact =', typeof window.interact);
+        console.log('SwipeHandler: все window keys:', Object.keys(window).filter(k => k.includes('interact')));
         
         // Ждем загрузки interact.js
         if (typeof interact !== 'undefined') {
@@ -154,8 +156,15 @@
                 observer.observe(list, { childList: true, subtree: true });
             });
         } else {
-            console.log('SwipeHandler: ждем interact.js');
-            setTimeout(init, 100);
+            console.log('SwipeHandler: ждем interact.js (попытка через', (Date.now() - window.swipeInitTime) + 'мс)');
+            if (!window.swipeInitTime) window.swipeInitTime = Date.now();
+            
+            // Останавливаем попытки через 10 секунд
+            if (Date.now() - window.swipeInitTime < 10000) {
+                setTimeout(init, 200);
+            } else {
+                console.error('SwipeHandler: interact.js не загрузился за 10 секунд');
+            }
         }
     }
 
