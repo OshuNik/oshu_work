@@ -35,8 +35,18 @@
 
 /* === SWIPE ANIMATIONS === */
 
+.vacancy-card {
+  /* Блокировка PTR и вертикальных жестов согласно документации interact.js */
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .vacancy-card.swiping {
   transition: none;
+  /* Полная блокировка во время свайпа */
+  -ms-touch-action: none;
+  touch-action: none;
 }
 
 .vacancy-card.swipe-left {

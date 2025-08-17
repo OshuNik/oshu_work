@@ -22,37 +22,17 @@
 
         interact('.vacancy-card').draggable({
             allowFrom: '.vacancy-card',
-            ignoreFrom: 'button, a, input',
-            // Менее строгие ограничения для естественного свайпа
-            startAxis: 'xy',
-            lockAxis: 'start',
-            // Уменьшаем порог для лучшей отзывчивости
-            threshold: 10,
+            ignoreFrom: 'button, a, input, .ptr-bar',
+            // Строгий контроль осей для предотвращения PTR
+            startAxis: 'x',
+            lockAxis: 'x', 
+            // Порог для четкого определения горизонтального движения
+            threshold: 15,
             listeners: {
                 start(event) {
+                    // Добавляем класс для активации touch-action: none
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
-                    
-                    // Дополнительная защита от сворачивания для старых версий Telegram
-                    if (window.Telegram?.WebApp) {
-                        try {
-                            // Только expand для версии 6.0
-                            window.Telegram.WebApp.expand();
-                        } catch (e) {}
-                    }
-                    
-                    // Полная блокировка скролла и вертикального движения
-                    document.body.style.overscrollBehavior = 'none';
-                    document.documentElement.style.overscrollBehavior = 'none';
-                    document.body.style.overflow = 'hidden';
-                    document.documentElement.style.overflow = 'hidden';
-                    
-                    // Сохраняем текущую позицию скролла
-                    event.target._savedScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    
-                    // Сохраняем начальную позицию для точного определения направления
-                    event.target._swipeStartX = event.pageX;
-                    event.target._swipeStartY = event.pageY;
                 },
                 move(event) {
                     const dx = event.pageX - event.x0;
@@ -62,18 +42,7 @@
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
-                    // Агрессивная блокировка всех touch событий при любом движении
-                    try {
-                        event.preventDefault();
-                        if (event.originalEvent) {
-                            event.originalEvent.preventDefault();
-                            event.originalEvent.stopPropagation();
-                        }
-                    } catch (e) {}
-                    
-                    // Полная блокировка PTR и других жестов
-                    document.body.style.touchAction = 'none';
-                    document.body.style.userSelect = 'none';
+                    // CSS touch-action уже блокирует PTR, дополнительная блокировка не нужна
 
                     // Плавное ограничение с затуханием
                     const maxMove = 140;
@@ -117,19 +86,7 @@
                     const deleteBtn = card.querySelector('[data-action="delete"]');
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
 
-                    // Восстанавливаем CSS свойства и скролл
-                    document.body.style.overscrollBehavior = '';
-                    document.documentElement.style.overscrollBehavior = '';
-                    document.body.style.touchAction = '';
-                    document.body.style.userSelect = '';
-                    document.body.style.overflow = '';
-                    document.documentElement.style.overflow = '';
-                    
-                    // Восстанавливаем позицию скролла
-                    if (typeof card._savedScrollTop === 'number') {
-                        window.scrollTo(0, card._savedScrollTop);
-                        delete card._savedScrollTop;
-                    }
+                    // CSS touch-action автоматически восстанавливается при удалении класса .swiping
 
                     // Убираем классы
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
@@ -174,20 +131,6 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 document.querySelectorAll('.vacancy-card.swiping').forEach(card => {
-                    // Восстанавливаем все CSS свойства
-                    document.body.style.overscrollBehavior = '';
-                    document.documentElement.style.overscrollBehavior = '';
-                    document.body.style.touchAction = '';
-                    document.body.style.userSelect = '';
-                    document.body.style.overflow = '';
-                    document.documentElement.style.overflow = '';
-                    
-                    // Восстанавливаем позицию скролла
-                    if (typeof card._savedScrollTop === 'number') {
-                        window.scrollTo(0, card._savedScrollTop);
-                        delete card._savedScrollTop;
-                    }
-                    
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
                     card.style.transform = 'translateX(0px)';
                     card.style.zIndex = '';
@@ -235,34 +178,7 @@
             } catch (e) {}
         }
 
-        // Дополнительная защита от сворачивания на краях
-        document.body.style.position = 'relative';
-        document.body.style.overflow = 'hidden auto';
-        document.documentElement.style.overflow = 'hidden auto';
-        
-        // Глобальный блокировщик вертикальных жестов во время свайпа
-        let isSwipeActive = false;
-        
-        // Отслеживаем активные свайпы
-        document.addEventListener('touchstart', (e) => {
-            const target = e.target.closest('.vacancy-card');
-            if (target && target.classList.contains('swiping')) {
-                isSwipeActive = true;
-            }
-        }, true);
-        
-        document.addEventListener('touchmove', (e) => {
-            if (isSwipeActive) {
-                try {
-                    e.preventDefault();
-                    e.stopPropagation();
-                } catch (err) {}
-            }
-        }, { passive: false, capture: true });
-        
-        document.addEventListener('touchend', () => {
-            isSwipeActive = false;
-        }, true);
+        // CSS touch-action обеспечивает всю необходимую блокировку
         
         initSwipeHandler();
         addSwipeIcons();
