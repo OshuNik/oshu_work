@@ -22,12 +22,12 @@
 
         interact('.vacancy-card').draggable({
             allowFrom: '.vacancy-card',
-            ignoreFrom: 'button, a, input, .ptr-bar',
-            // Строгий контроль осей для предотвращения PTR
-            startAxis: 'x',
-            lockAxis: 'x', 
-            // Порог для четкого определения горизонтального движения
-            threshold: 15,
+            ignoreFrom: 'button, a, input, .summary, .info-value, .full-text',
+            // Менее строгие ограничения для плавности на больших экранах
+            startAxis: 'xy',
+            lockAxis: 'start',
+            // Уменьшаем порог для плавности
+            threshold: 8,
             listeners: {
                 start(event) {
                     // Добавляем класс для активации touch-action: none
@@ -42,11 +42,9 @@
                     const leftIcon = event.target.querySelector('.swipe-icon.left');
                     const rightIcon = event.target.querySelector('.swipe-icon.right');
 
-                    // CSS touch-action уже блокирует PTR, дополнительная блокировка не нужна
-
-                    // Плавное ограничение с затуханием
-                    const maxMove = 140;
-                    const resistance = 0.7;
+                    // Плавное ограничение с затуханием - увеличиваем для комфорта
+                    const maxMove = 160;
+                    const resistance = 0.8;
                     let limitedDx;
                     
                     if (absX <= maxMove) {
@@ -57,11 +55,11 @@
                         limitedDx = dx > 0 ? maxMove + resistedExcess : -(maxMove + resistedExcess);
                     }
 
-                    // Плавная анимация движения
-                    event.target.style.transform = `translateX(${limitedDx}px)`;
+                    // Плавная анимация движения с улучшенной производительностью
+                    event.target.style.transform = `translate3d(${limitedDx}px, 0, 0)`;
 
-                    // Показываем индикаторы при движении > 50px (раньше)
-                    if (absX > 50) {
+                    // Показываем индикаторы при движении > 40px (раньше для лучшего UX)
+                    if (absX > 40) {
                         if (dx < 0) {
                             event.target.classList.add('swipe-left');
                             event.target.classList.remove('swipe-right');
@@ -102,26 +100,26 @@
                     
                     if (absX > threshold) {
                         if (dx < 0 && deleteBtn) {
-                            // Анимация удаления
+                            // Анимация удаления с аппаратным ускорением
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-                            card.style.transform = 'translateX(-100%)';
+                            card.style.transform = 'translate3d(-100%, 0, 0)';
                             card.style.opacity = '0';
                             setTimeout(() => deleteBtn.click(), 400);
                         } else if (dx > 0 && favoriteBtn) {
-                            // Анимация добавления в избранное
+                            // Анимация добавления в избранное с аппаратным ускорением
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-                            card.style.transform = 'translateX(100%)';
+                            card.style.transform = 'translate3d(100%, 0, 0)';
                             card.style.opacity = '0';
                             setTimeout(() => favoriteBtn.click(), 400);
                         } else {
-                            // Возврат на место
+                            // Возврат на место с аппаратным ускорением
                             card.style.transition = 'transform 0.3s ease-out';
-                            card.style.transform = 'translateX(0px)';
+                            card.style.transform = 'translate3d(0, 0, 0)';
                         }
                     } else {
-                        // Возврат на место
+                        // Возврат на место с аппаратным ускорением
                         card.style.transition = 'transform 0.3s ease-out';
-                        card.style.transform = 'translateX(0px)';
+                        card.style.transform = 'translate3d(0, 0, 0)';
                     }
                 }
             }
@@ -132,7 +130,7 @@
             if (document.visibilityState === 'hidden') {
                 document.querySelectorAll('.vacancy-card.swiping').forEach(card => {
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
-                    card.style.transform = 'translateX(0px)';
+                    card.style.transform = 'translate3d(0, 0, 0)';
                     card.style.zIndex = '';
                 });
             }
@@ -171,10 +169,18 @@
     }
 
     function setupSwipes() {
-        // Настройка для Telegram WebApp версии 6.0
+        // Настройка для Telegram WebApp - расширенная блокировка
         if (window.Telegram?.WebApp) {
             try {
                 window.Telegram.WebApp.expand();
+                // Блокируем сворачивание для больших экранов
+                if (window.Telegram.WebApp.setHeaderColor) {
+                    window.Telegram.WebApp.setHeaderColor('#F0F0F0');
+                }
+                // Блокируем свайп сверху если поддерживается
+                if (window.Telegram.WebApp.disableVerticalSwipes) {
+                    window.Telegram.WebApp.disableVerticalSwipes();
+                }
             } catch (e) {}
         }
 

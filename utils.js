@@ -876,27 +876,28 @@
        
        startY = touchY;
        
-       // В Mini App активируем PTR мгновенно
-       if (isMiniApp) {
-         setState('pulling');
-         // Сразу показываем плашку
-         ptrBar.classList.add('ptr-visible');
-       }
+       // НЕ активируем PTR мгновенно, даже в Mini App - только запоминаем точку старта
+       // Активация происходит только при движении в handleTouchMove
      };
 
          const handleTouchMove = (e) => {
-       // В браузере активируем PTR при движении
-       if (state === 'waiting' && startY !== 0 && !isMiniApp) {
+       // Активируем PTR при движении для любой платформы
+       if (state === 'waiting' && startY !== 0) {
          const currentY = e.touches[0].clientY;
          const moveDistance = currentY - startY;
          
-         if (moveDistance > 15) {
+         // Для Mini App делаем меньший порог активации для удобства
+         const activationThreshold = isMiniApp ? 10 : 15;
+         
+         if (moveDistance > activationThreshold) {
            setState('pulling');
+           // Сразу показываем плашку после активации
+           ptrBar.classList.add('ptr-visible');
          }
          return;
        }
        
-       // В Mini App PTR уже активен, просто обрабатываем движение
+       // PTR активен, обрабатываем движение
        if (state !== 'pulling') return;
        
        pullDistance = e.touches[0].clientY - startY;

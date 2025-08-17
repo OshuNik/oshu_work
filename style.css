@@ -35,24 +35,62 @@
 
 /* === SWIPE ANIMATIONS === */
 
-/* Блокировка вертикальных жестов для всего контента */
-.content, .vacancy-list, .main-wrapper {
+/* Глобальная блокировка выделения текста */
+body, .main-wrapper, .header, .search-container, .category-tabs {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Разрешаем PTR для основных контейнеров */
+.main-wrapper {
   -ms-touch-action: pan-y;
   touch-action: pan-y;
+  /* Блокируем сворачивание на больших экранах */
+  overscroll-behavior: contain;
+  -webkit-overscroll-behavior: contain;
 }
 
-/* Полная блокировка PTR полоски при обычных кликах */
-.ptr-bar {
-  pointer-events: none !important;
-  opacity: 0 !important;
-  display: none !important;
-}
-
+/* Блокируем горизонтальные жесты только на карточках */
 .vacancy-card {
-  /* Блокировка PTR и вертикальных жестов согласно документации interact.js */
+  /* Разрешаем PTR но блокируем горизонтальные жесты для interact.js */
   -ms-touch-action: pan-y;
   touch-action: pan-y;
   user-select: none;
+  /* Улучшенные зоны касания для больших экранов */
+  position: relative;
+}
+
+.vacancy-card::before,
+.vacancy-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.vacancy-card::before {
+  left: -10px;
+}
+
+.vacancy-card::after {
+  right: -10px;
+}
+
+/* Разрешаем выделение текста только внутри карточек */
+.vacancy-card .summary, 
+.vacancy-card .info-value, 
+.vacancy-card .full-text,
+.search-input {
+  -webkit-user-select: text;
+  -moz-user-select: text;  
+  -ms-user-select: text;
+  user-select: text;
 }
 
 .vacancy-card.swiping {
@@ -60,6 +98,10 @@
   /* Полная блокировка во время свайпа */
   -ms-touch-action: none;
   touch-action: none;
+  /* Оптимизация для плавности свайпов */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .vacancy-card.swipe-left {
@@ -103,6 +145,14 @@ body {
     margin: 0;
     padding: 15px;
     overflow-x: hidden;
+    /* Блокируем сворачивание мини-аппа */
+    overscroll-behavior: contain;
+    -webkit-overscroll-behavior: contain;
+    /* Предотвращаем bounce эффект */
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 /* === Pull-to-Refresh (Финальный Ретро-дизайн) === */

@@ -80,7 +80,7 @@
         }
 
         // Обрабатываем результат
-        await this.processVacanciesResult(key, result, isInitialLoad);
+        await this.processVacanciesResult(key, result, isInitialLoad, isPullToRefresh);
 
       } catch (error) {
         this.handleFetchError(key, error, categoryState.offset);
@@ -94,7 +94,7 @@
     }
 
     // Обработать результат загрузки вакансий
-    async processVacanciesResult(key, result, isInitialLoad) {
+    async processVacanciesResult(key, result, isInitialLoad, isPullToRefresh = false) {
       const { data: items, total } = result;
       const stateManager = window.stateManager;
       const domManager = window.domManager;
@@ -107,7 +107,7 @@
 
       const validItems = items.filter(item => item && typeof item === 'object' && item.id);
 
-      // Обновляем счетчик
+      // Обновляем счетчик всегда когда получаем данные от API
       if (Number.isFinite(total)) {
         stateManager.updateCategoryState(key, { total });
         domManager.updateCounter(key, total);
