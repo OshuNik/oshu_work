@@ -169,19 +169,25 @@
     }
 
     function setupSwipes() {
-        // Настройка для Telegram WebApp - расширенная блокировка
+        // Настройка для Telegram WebApp версии 6.0
         if (window.Telegram?.WebApp) {
             try {
                 window.Telegram.WebApp.expand();
-                // Блокируем сворачивание для больших экранов
-                if (window.Telegram.WebApp.setHeaderColor) {
+                // Проверяем версию перед использованием новых функций
+                const version = parseFloat(window.Telegram.WebApp.version || '6.0');
+                
+                // setHeaderColor доступен с версии 6.1+
+                if (version >= 6.1 && window.Telegram.WebApp.setHeaderColor) {
                     window.Telegram.WebApp.setHeaderColor('#F0F0F0');
                 }
-                // Блокируем свайп сверху если поддерживается
-                if (window.Telegram.WebApp.disableVerticalSwipes) {
+                
+                // disableVerticalSwipes доступен с версии 6.9+
+                if (version >= 6.9 && window.Telegram.WebApp.disableVerticalSwipes) {
                     window.Telegram.WebApp.disableVerticalSwipes();
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.debug('Telegram WebApp API error:', e.message);
+            }
         }
 
         // CSS touch-action обеспечивает всю необходимую блокировку
