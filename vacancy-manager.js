@@ -261,14 +261,7 @@
       try {
         const isFavorite = newStatus === CFG.STATUSES?.FAVORITE;
         
-        // Показываем подтверждение для добавления в избранное
-        if (isFavorite) {
-          const confirmed = await UTIL.showCustomConfirm?.('Добавить в избранное?');
-          if (!confirmed) {
-            return;
-          }
-        }
-
+        // Сразу выполняем действие без подтверждения
         await this.performStatusUpdate(vacancyId, newStatus, isFavorite);
 
       } catch (error) {
