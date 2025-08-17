@@ -521,6 +521,14 @@
     if (pageType === 'main') {
       elements.favoriteBtn.dataset.action = 'favorite';
       elements.favoriteBtn.dataset.id = v.id;
+    } else if (pageType === 'favorites') {
+      // В избранном кнопка "favorite" работает как "вернуть в основные"
+      elements.favoriteBtn.dataset.action = 'favorite';
+      elements.favoriteBtn.dataset.id = v.id;
+      elements.favoriteBtn.title = 'Вернуть в основные';
+      // Меняем иконку на "возврат"
+      const icon = elements.favoriteBtn.querySelector('.icon');
+      if (icon) icon.textContent = '↺';
     } else {
       elements.favoriteBtn.remove();
     }

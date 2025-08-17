@@ -209,7 +209,14 @@
             initForNewCards();
         });
         
-        document.querySelectorAll('.vacancy-list').forEach(list => {
+        // Наблюдаем за изменениями в списках вакансий
+        const listsToObserve = [
+            ...document.querySelectorAll('.vacancy-list'),
+            document.getElementById('favorites-list'),
+            document.getElementById('vacancies-list')
+        ].filter(Boolean);
+        
+        listsToObserve.forEach(list => {
             observer.observe(list, { childList: true, subtree: true });
         });
     }

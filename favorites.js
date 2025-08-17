@@ -132,6 +132,91 @@
   // Предотвращение race conditions в favorites updateStatus
   const updateStatusLocksFav = new Set();
   
+  async function returnToMain(vacancyId) {
+    // Проверяем блокировку
+    if (updateStatusLocksFav.has(vacancyId)) {
+      console.log('returnToMain уже выполняется для ID:', vacancyId);
+      return;
+    }
+
+    // Проверяем rate limit
+    const rateResult = await checkRateLimit('favorite');
+    if (!rateResult.allowed) {
+      uiToast(rateResult.message);
+      return;
+    }
+    
+    // Блокируем операцию
+    updateStatusLocksFav.add(vacancyId);
+    
+    try {
+      const ok = await showCustomConfirm('Вернуть в основной список?');
+      if (!ok) {
+        updateStatusLocksFav.delete(vacancyId);
+        return;
+      }
+
+      const cardElement = document.getElementById(`card-${vacancyId}`);
+      if (!cardElement) {
+        updateStatusLocksFav.delete(vacancyId);
+        return;
+      }
+
+      cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+      cardElement.style.opacity = '0';
+      cardElement.style.maxHeight = '0px';
+      cardElement.style.paddingTop = '0';
+      cardElement.style.paddingBottom = '0';
+      cardElement.style.marginTop = '0';
+      cardElement.style.marginBottom = '0';
+      cardElement.style.borderWidth = '0';
+
+      const onUndo = () => {
+          cardElement.style.opacity = '1';
+          cardElement.style.maxHeight = '500px';
+          cardElement.style.paddingTop = '';
+          cardElement.style.paddingBottom = '';
+          cardElement.style.marginTop = '';
+          cardElement.style.marginBottom = '';
+          cardElement.style.borderWidth = '';
+      };
+
+      uiToast('Возвращено в основной список', {
+          timeout: 5000,
+          onUndo: onUndo,
+          onTimeout: async () => {
+              try {
+                cardElement.remove();
+                const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
+                const resp = await fetchWithRetry(url, {
+                  method: 'PATCH',
+                  headers: createSupabaseHeaders({ prefer: 'return=minimal' }),
+                  body: JSON.stringify({ status: STATUSES.NEW })
+                }, RETRY_OPTIONS);
+
+                if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+                
+                try {
+                    localStorage.setItem('needs-refresh-main', 'true');
+                } catch (storageError) {
+                    console.warn('localStorage недоступен:', storageError);
+                }
+                allFavorites = allFavorites.filter(v => v.id !== vacancyId);
+                renderFilteredFavorites();
+              } catch (e) {
+                safeAlert('Не удалось изменить статус.');
+                onUndo();
+              }
+          }
+      });
+    } catch (error) {
+      console.error('Ошибка в favorites returnToMain:', error);
+      safeAlert('Произошла ошибка при обновлении статуса');
+    } finally {
+      updateStatusLocksFav.delete(vacancyId);
+    }
+  }
+  
   async function updateStatus(vacancyId, newStatus) {
     // Проверяем блокировку - предотвращает двойные клики
     if (updateStatusLocksFav.has(vacancyId)) {
@@ -225,6 +310,7 @@
     const action = btn.dataset.action;
     if (action === 'apply')   openLink(btn.dataset.url);
     if (action === 'delete')  updateStatus(btn.dataset.id, STATUSES.NEW);
+    if (action === 'favorite') returnToMain(btn.dataset.id); // Возврат в основные
   });
 
   const onSearch = debounce(() => renderFilteredFavorites(), 200);
@@ -245,6 +331,13 @@
   setupPullToRefresh({
       onRefresh: () => loadFavorites(),
       refreshEventName: 'favorites:loaded'
+  });
+
+  // Инициализируем свайпы для избранного
+  document.addEventListener('favorites:loaded', () => {
+    if (window.SwipeHandler) {
+      window.SwipeHandler.initForNewCards();
+    }
   });
 
   ensureFavSearchUI();
