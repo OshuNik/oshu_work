@@ -241,7 +241,9 @@
     }
 
     // Обновить статус вакансии
-    async updateVacancyStatus(vacancyId, newStatus) {
+    async updateVacancyStatus(vacancyId, newStatus, isFromSwipe = false) {
+      console.log('🔄 updateVacancyStatus вызван:', { vacancyId, newStatus, isFromSwipe });
+      
       if (!vacancyId) {
         console.warn('ID вакансии не указан');
         return;
@@ -266,8 +268,15 @@
       try {
         const isFavorite = newStatus === CFG.STATUSES?.FAVORITE;
         
-        // Сразу выполняем действие без подтверждения
-        await this.performStatusUpdate(vacancyId, newStatus, isFavorite);
+        // Если это свайп, используем специальную логику с возможностью отмены
+        if (isFromSwipe) {
+          console.log('🔄 Это свайп, используем performSwipeStatusUpdate');
+          await this.performSwipeStatusUpdate(vacancyId, newStatus, isFavorite);
+        } else {
+          console.log('🔄 Это кнопка, используем performStatusUpdate');
+          // Сразу выполняем действие без подтверждения для кнопок
+          await this.performStatusUpdate(vacancyId, newStatus, isFavorite);
+        }
 
       } catch (error) {
         console.error('Ошибка в updateVacancyStatus:', error);
@@ -278,7 +287,88 @@
       }
     }
 
-    // Выполнить обновление статуса
+    // Выполнить обновление статуса для свайпов с возможностью отмены
+    async performSwipeStatusUpdate(vacancyId, newStatus, isFavorite) {
+      console.log('🔄 performSwipeStatusUpdate вызван:', { vacancyId, newStatus, isFavorite });
+      
+      const cardElement = document.querySelector(`#card-${CSS.escape(vacancyId)}`);
+      if (!cardElement) {
+        console.warn('Карточка вакансии не найдена:', vacancyId);
+        return;
+      }
+
+      const parent = cardElement.parentElement;
+      const nextSibling = cardElement.nextElementSibling;
+
+      // Анимация скрытия для свайпа
+      this.animateCardHidingForSwipe(cardElement);
+      console.log('✅ Анимация скрытия применена для свайпа');
+
+      // Функция отмены с transition-анимацией въезда (как в избранном)
+      const onUndo = () => {
+        console.log('🔄 Отмена свайпа для вакансии:', vacancyId);
+        
+        // Возвращаем карточку на место
+        parent.insertBefore(cardElement, nextSibling);
+        
+        requestAnimationFrame(() => {
+          // Убираем все свайп-классы чтобы карточка не была залитой
+          cardElement.classList.remove('swipe-left', 'swipe-right');
+          
+          // Принудительно убираем любые overlays
+          const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
+          overlays.forEach(overlay => {
+            overlay.classList.remove('visible');
+            overlay.style.opacity = '0';
+          });
+          
+          // Анимация возврата карточки
+          cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+          cardElement.style.opacity = '1';
+          cardElement.style.transform = 'scale(1)';
+          cardElement.style.maxHeight = '500px';
+          cardElement.style.paddingTop = '';
+          cardElement.style.paddingBottom = '';
+          cardElement.style.marginTop = '';
+          cardElement.style.marginBottom = '';
+          cardElement.style.borderWidth = '';
+          
+          // Сбрасываем также стили background если они остались
+          cardElement.style.background = '';
+          cardElement.style.backgroundColor = '';
+          cardElement.style.removeProperty('background');
+          cardElement.style.removeProperty('background-color');
+          
+          // Убираем transition после анимации
+          setTimeout(() => {
+            cardElement.style.transition = '';
+            console.log('✅ Анимация возврата завершена для вакансии:', vacancyId);
+          }, 300);
+        });
+      };
+
+      // Показываем toast с возможностью отмены для свайпов
+      const toastMessage = isFavorite ? 'Добавлено в избранное' : 'Вакансия удалена';
+      
+      // Haptic feedback для успешного действия
+      if (isFavorite) {
+        triggerHaptic('notification', 'success');
+      } else {
+        triggerHaptic('impact', 'medium');
+      }
+      
+      console.log('📱 Показываем toast с возможностью отмены для свайпа');
+      UTIL.uiToast?.(toastMessage, {
+        timeout: 5000,
+        onUndo,
+        onTimeout: async () => {
+          console.log('⏰ Таймаут toast для свайпа, финализируем удаление:', vacancyId);
+          await this.finalizeStatusUpdate(vacancyId, newStatus, cardElement, parent);
+        }
+      });
+    }
+
+    // Выполнить обновление статуса для кнопок
     async performStatusUpdate(vacancyId, newStatus, isFavorite) {
       const cardElement = document.querySelector(`#card-${CSS.escape(vacancyId)}`);
       if (!cardElement) {

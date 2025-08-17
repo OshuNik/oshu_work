@@ -160,7 +160,17 @@
                             card.style.opacity = '0';
                             // Средний удар при удалении
                             triggerHaptic('impact', 'medium');
-                            setTimeout(() => deleteBtn.click(), 400);
+                            // Вызываем updateVacancyStatus с флагом isFromSwipe для поддержки отмены
+                            setTimeout(() => {
+                                console.log('🗑️ Свайп влево - удаление вакансии:', deleteBtn.dataset.id);
+                                if (window.vacancyManager && window.vacancyManager.updateVacancyStatus) {
+                                    console.log('✅ Вызываем vacancyManager.updateVacancyStatus с isFromSwipe=true');
+                                    window.vacancyManager.updateVacancyStatus(deleteBtn.dataset.id, 'deleted', true);
+                                } else {
+                                    console.log('⚠️ vacancyManager недоступен, используем fallback');
+                                    deleteBtn.click();
+                                }
+                            }, 400);
                         } else if (dx > 0) {
                             // Свайп вправо - зависит от страницы
                             if (isOnFavoritesPage && favoriteBtn) {
@@ -180,7 +190,17 @@
                                 card.style.opacity = '0';
                                 // Успешное уведомление при добавлении в избранное
                                 triggerHaptic('notification', 'success');
-                                setTimeout(() => favoriteBtn.click(), 400);
+                                // Вызываем updateVacancyStatus с флагом isFromSwipe для поддержки отмены
+                                setTimeout(() => {
+                                    console.log('❤️ Свайп вправо - добавление в избранное:', favoriteBtn.dataset.id);
+                                    if (window.vacancyManager && window.vacancyManager.updateVacancyStatus) {
+                                        console.log('✅ Вызываем vacancyManager.updateVacancyStatus с isFromSwipe=true');
+                                        window.vacancyManager.updateVacancyStatus(favoriteBtn.dataset.id, 'favorite', true);
+                                    } else {
+                                        console.log('⚠️ vacancyManager недоступен, используем fallback');
+                                        favoriteBtn.click();
+                                    }
+                                }, 400);
                             } else {
                                 // Возврат на место если нет подходящей кнопки
                                 card.style.transition = 'transform 0.3s ease-out';
