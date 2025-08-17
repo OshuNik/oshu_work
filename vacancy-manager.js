@@ -306,6 +306,9 @@
 
     // Анимация показа карточки
     animateCardShowing(cardElement) {
+      // Убираем все свайп-классы чтобы карточка не была залитой
+      cardElement.classList.remove('swipe-left', 'swipe-right');
+      
       cardElement.style.opacity = '1';
       cardElement.style.transform = 'scale(1)';
       cardElement.style.maxHeight = '500px';
@@ -314,6 +317,10 @@
       cardElement.style.marginTop = '';
       cardElement.style.marginBottom = '';
       cardElement.style.borderWidth = '';
+      
+      // Сбрасываем также стили background если они остались
+      cardElement.style.background = '';
+      cardElement.style.backgroundColor = '';
     }
 
     // Финализировать обновление статуса
