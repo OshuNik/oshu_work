@@ -142,6 +142,27 @@
         const frag = document.createDocumentFragment();
         allFavorites.forEach(v => {
           const card = createVacancyCard(v, { pageType: 'favorites' });
+          
+          // Убеждаемся, что кнопка favorite существует для свайпов
+          let favoriteBtn = card.querySelector('[data-action="favorite"]');
+          if (!favoriteBtn) {
+            // Создаем кнопку favorite если её нет
+            favoriteBtn = document.createElement('button');
+            favoriteBtn.className = 'action-btn favorite';
+            favoriteBtn.dataset.action = 'favorite';
+            favoriteBtn.dataset.id = v.id;
+            favoriteBtn.title = 'Вернуть в основные';
+            favoriteBtn.innerHTML = '<span class="icon">↺</span>';
+            
+            // Добавляем кнопку в контейнер действий
+            const actionsContainer = card.querySelector('.card-actions') || card.querySelector('.vacancy-card-footer');
+            if (actionsContainer) {
+              actionsContainer.appendChild(favoriteBtn);
+            } else {
+              card.appendChild(favoriteBtn);
+            }
+          }
+          
           frag.appendChild(card);
         });
         container.appendChild(frag);
@@ -208,14 +229,31 @@
       uiToast('Возвращено в основной список', {
           timeout: 5000,
           onUndo: () => {
-            cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+            // Убираем все свайп-классы чтобы карточка не была залитой
+            cardElement.classList.remove('swipe-left', 'swipe-right');
+            
+            // Принудительно убираем любые overlays
+            const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
+            overlays.forEach(overlay => {
+              overlay.classList.remove('visible');
+              overlay.style.opacity = '0';
+            });
+            
+            cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
             cardElement.style.opacity = '1';
-            cardElement.style.maxHeight = 'none';
+            cardElement.style.transform = 'scale(1)';
+            cardElement.style.maxHeight = '500px';
             cardElement.style.paddingTop = '';
             cardElement.style.paddingBottom = '';
             cardElement.style.marginTop = '';
             cardElement.style.marginBottom = '';
             cardElement.style.borderWidth = '';
+            
+            // Сбрасываем также стили background если они остались
+            cardElement.style.background = '';
+            cardElement.style.backgroundColor = '';
+            cardElement.style.removeProperty('background');
+            cardElement.style.removeProperty('background-color');
             
             // Убираем transition после анимации
             setTimeout(() => {
@@ -296,14 +334,31 @@
       uiToast('Вакансия удалена', {
           timeout: 5000,
           onUndo: () => {
-            cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+            // Убираем все свайп-классы чтобы карточка не была залитой
+            cardElement.classList.remove('swipe-left', 'swipe-right');
+            
+            // Принудительно убираем любые overlays
+            const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
+            overlays.forEach(overlay => {
+              overlay.classList.remove('visible');
+              overlay.style.opacity = '0';
+            });
+            
+            cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
             cardElement.style.opacity = '1';
-            cardElement.style.maxHeight = 'none';
+            cardElement.style.transform = 'scale(1)';
+            cardElement.style.maxHeight = '500px';
             cardElement.style.paddingTop = '';
             cardElement.style.paddingBottom = '';
             cardElement.style.marginTop = '';
             cardElement.style.marginBottom = '';
             cardElement.style.borderWidth = '';
+            
+            // Сбрасываем также стили background если они остались
+            cardElement.style.background = '';
+            cardElement.style.backgroundColor = '';
+            cardElement.style.removeProperty('background');
+            cardElement.style.removeProperty('background-color');
             
             // Убираем transition после анимации
             setTimeout(() => {
