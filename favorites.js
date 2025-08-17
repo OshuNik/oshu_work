@@ -32,6 +32,27 @@
     checkRateLimit
   } = UTIL;
 
+  // Haptic Feedback для Telegram WebApp
+  function triggerHaptic(type, style) {
+    try {
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        switch (type) {
+          case 'impact':
+            window.Telegram.WebApp.HapticFeedback.impactOccurred(style || 'light');
+            break;
+          case 'notification':
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred(style || 'success');
+            break;
+          case 'selection':
+            window.Telegram.WebApp.HapticFeedback.selectionChanged();
+            break;
+        }
+      }
+    } catch (e) {
+      console.debug('Haptic feedback unavailable:', e.message);
+    }
+  }
+
   const container = document.getElementById('favorites-list');
   const searchInputFav = document.getElementById('search-input-fav');
   const searchClearBtnFav = document.getElementById('search-clear-btn-fav');
@@ -181,6 +202,9 @@
           cardElement.style.borderWidth = '';
       };
 
+      // Haptic feedback для возврата в основные
+      triggerHaptic('notification', 'success');
+      
       uiToast('Возвращено в основной список', {
           timeout: 5000,
           onUndo: onUndo,
@@ -211,6 +235,7 @@
       });
     } catch (error) {
       console.error('Ошибка в favorites returnToMain:', error);
+      triggerHaptic('notification', 'error');
       safeAlert('Произошла ошибка при обновлении статуса');
     } finally {
       updateStatusLocksFav.delete(vacancyId);
@@ -266,6 +291,9 @@
         cardElement.style.borderWidth = '';
     };
 
+    // Haptic feedback для удаления
+    triggerHaptic('impact', 'medium');
+    
     uiToast('Удалено из избранного', {
         timeout: 5000,
         onUndo: onUndo,
@@ -297,6 +325,7 @@
     });
     } catch (error) {
       console.error('Ошибка в favorites updateStatus:', error);
+      triggerHaptic('notification', 'error');
       safeAlert('Произошла ошибка при обновлении статуса');
     } finally {
       // Всегда снимаем блокировку

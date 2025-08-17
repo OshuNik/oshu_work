@@ -4,6 +4,27 @@
 
     let isInitialized = false;
 
+    // Haptic Feedback для Telegram WebApp
+    function triggerHaptic(type, style) {
+        try {
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                switch (type) {
+                    case 'impact':
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred(style || 'light');
+                        break;
+                    case 'notification':
+                        window.Telegram.WebApp.HapticFeedback.notificationOccurred(style || 'success');
+                        break;
+                    case 'selection':
+                        window.Telegram.WebApp.HapticFeedback.selectionChanged();
+                        break;
+                }
+            }
+        } catch (e) {
+            console.debug('Haptic feedback unavailable:', e.message);
+        }
+    }
+
     function initSwipeHandler() {
         if (typeof interact === 'undefined') {
             console.warn('interact.js не загружен');
@@ -33,6 +54,8 @@
                     // Добавляем класс для активации touch-action: none
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
+                    // Легкая тактильная отдача при начале свайпа
+                    triggerHaptic('selection');
                 },
                 move(event) {
                     const dx = event.pageX - event.x0;
@@ -108,6 +131,8 @@
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translate3d(-100%, 0, 0)';
                             card.style.opacity = '0';
+                            // Средний удар при удалении
+                            triggerHaptic('impact', 'medium');
                             setTimeout(() => deleteBtn.click(), 400);
                         } else if (dx > 0 && favoriteBtn) {
                             // Показываем overlay избранного на время анимации
@@ -115,6 +140,8 @@
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translate3d(100%, 0, 0)';
                             card.style.opacity = '0';
+                            // Успешное уведомление при добавлении в избранное
+                            triggerHaptic('notification', 'success');
                             setTimeout(() => favoriteBtn.click(), 400);
                         } else {
                             // Возврат на место с аппаратным ускорением

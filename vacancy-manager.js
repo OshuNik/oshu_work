@@ -7,6 +7,27 @@
   const CONST = window.APP_CONSTANTS || {};
   const UTIL = window.utils || {};
 
+  // Haptic Feedback для Telegram WebApp
+  function triggerHaptic(type, style) {
+    try {
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        switch (type) {
+          case 'impact':
+            window.Telegram.WebApp.HapticFeedback.impactOccurred(style || 'light');
+            break;
+          case 'notification':
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred(style || 'success');
+            break;
+          case 'selection':
+            window.Telegram.WebApp.HapticFeedback.selectionChanged();
+            break;
+        }
+      }
+    } catch (e) {
+      console.debug('Haptic feedback unavailable:', e.message);
+    }
+  }
+
   class VacancyManager {
     constructor() {
       this.updateStatusLocks = new Set();
@@ -83,6 +104,7 @@
         await this.processVacanciesResult(key, result, isInitialLoad, isPullToRefresh);
 
       } catch (error) {
+        triggerHaptic('notification', 'error');
         this.handleFetchError(key, error, categoryState.offset);
       } finally {
         stateManager.setCategoryBusy(key, false);
@@ -251,6 +273,7 @@
 
       } catch (error) {
         console.error('Ошибка в updateVacancyStatus:', error);
+        triggerHaptic('notification', 'error');
         UTIL.safeAlert?.('Произошла ошибка при обновлении статуса');
       } finally {
         this.updateStatusLocks.delete(vacancyId);
@@ -281,6 +304,13 @@
 
       // Показываем toast с возможностью отмены
       const toastMessage = isFavorite ? 'Добавлено в избранное' : 'Вакансия удалена';
+      
+      // Haptic feedback для успешного действия
+      if (isFavorite) {
+        triggerHaptic('notification', 'success');
+      } else {
+        triggerHaptic('impact', 'medium');
+      }
       
       UTIL.uiToast?.(toastMessage, {
         timeout: 5000,
