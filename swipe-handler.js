@@ -69,6 +69,11 @@
                     const absY = Math.abs(dy);
                     const deleteOverlay = event.target.querySelector('.swipe-action-overlay.delete');
                     const favoriteOverlay = event.target.querySelector('.swipe-action-overlay.favorite');
+                    const unfavoriteOverlay = event.target.querySelector('.swipe-action-overlay.unfavorite');
+
+                    // Проверяем, находимся ли мы на странице избранного
+                    const isOnFavoritesPage = window.location.pathname.includes('favorites.html') || 
+                                            document.querySelector('#favorites-list') !== null;
 
                     // Плавное ограничение с затуханием - увеличиваем для комфорта
                     const maxMove = 160;
@@ -89,23 +94,34 @@
                     // Показываем overlays при движении > 60px для четкого визуала
                     if (absX > 60) {
                         if (dx < 0) {
-                            // Свайп влево - показываем overlay удаления
+                            // Свайп влево - всегда удаление
                             event.target.classList.add('swipe-left');
                             event.target.classList.remove('swipe-right');
                             if (deleteOverlay) deleteOverlay.classList.add('visible');
                             if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
+                            if (unfavoriteOverlay) unfavoriteOverlay.classList.remove('visible');
                         } else {
-                            // Свайп вправо - показываем overlay избранного
+                            // Свайп вправо - зависит от страницы
                             event.target.classList.add('swipe-right');
                             event.target.classList.remove('swipe-left');
-                            if (favoriteOverlay) favoriteOverlay.classList.add('visible');
                             if (deleteOverlay) deleteOverlay.classList.remove('visible');
+                            
+                            if (isOnFavoritesPage) {
+                                // На странице избранного - убрать из избранного
+                                if (unfavoriteOverlay) unfavoriteOverlay.classList.add('visible');
+                                if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
+                            } else {
+                                // На главной странице - добавить в избранное
+                                if (favoriteOverlay) favoriteOverlay.classList.add('visible');
+                                if (unfavoriteOverlay) unfavoriteOverlay.classList.remove('visible');
+                            }
                         }
                     } else {
                         // Скрываем все overlays
                         event.target.classList.remove('swipe-left', 'swipe-right');
                         if (deleteOverlay) deleteOverlay.classList.remove('visible');
                         if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
+                        if (unfavoriteOverlay) unfavoriteOverlay.classList.remove('visible');
                     }
                 },
                 end(event) {
@@ -116,6 +132,11 @@
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
                     const deleteOverlay = card.querySelector('.swipe-action-overlay.delete');
                     const favoriteOverlay = card.querySelector('.swipe-action-overlay.favorite');
+                    const unfavoriteOverlay = card.querySelector('.swipe-action-overlay.unfavorite');
+
+                    // Проверяем, находимся ли мы на странице избранного
+                    const isOnFavoritesPage = window.location.pathname.includes('favorites.html') || 
+                                            document.querySelector('#favorites-list') !== null;
 
                     // CSS touch-action автоматически восстанавливается при удалении класса .swiping
 
@@ -123,6 +144,7 @@
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
                     if (deleteOverlay) deleteOverlay.classList.remove('visible');
                     if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
+                    if (unfavoriteOverlay) unfavoriteOverlay.classList.remove('visible');
                     card.style.zIndex = '';
 
                     // Определяем действие ТОЛЬКО после отпускания пальца
@@ -131,7 +153,7 @@
                     
                     if (absX > threshold) {
                         if (dx < 0 && deleteBtn) {
-                            // Показываем overlay удаления на время анимации
+                            // Свайп влево - всегда удаление
                             if (deleteOverlay) deleteOverlay.classList.add('visible');
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translate3d(-100%, 0, 0)';
@@ -139,15 +161,31 @@
                             // Средний удар при удалении
                             triggerHaptic('impact', 'medium');
                             setTimeout(() => deleteBtn.click(), 400);
-                        } else if (dx > 0 && favoriteBtn) {
-                            // Показываем overlay избранного на время анимации
-                            if (favoriteOverlay) favoriteOverlay.classList.add('visible');
-                            card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-                            card.style.transform = 'translate3d(100%, 0, 0)';
-                            card.style.opacity = '0';
-                            // Успешное уведомление при добавлении в избранное
-                            triggerHaptic('notification', 'success');
-                            setTimeout(() => favoriteBtn.click(), 400);
+                        } else if (dx > 0) {
+                            // Свайп вправо - зависит от страницы
+                            if (isOnFavoritesPage && favoriteBtn) {
+                                // На странице избранного - убрать из избранного (возврат в основные)
+                                if (unfavoriteOverlay) unfavoriteOverlay.classList.add('visible');
+                                card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
+                                card.style.transform = 'translate3d(100%, 0, 0)';
+                                card.style.opacity = '0';
+                                // Успешное уведомление при возврате в основные
+                                triggerHaptic('notification', 'success');
+                                setTimeout(() => favoriteBtn.click(), 400); // На странице избранного кнопка favorite возвращает в основные
+                            } else if (!isOnFavoritesPage && favoriteBtn) {
+                                // На главной странице - добавить в избранное
+                                if (favoriteOverlay) favoriteOverlay.classList.add('visible');
+                                card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
+                                card.style.transform = 'translate3d(100%, 0, 0)';
+                                card.style.opacity = '0';
+                                // Успешное уведомление при добавлении в избранное
+                                triggerHaptic('notification', 'success');
+                                setTimeout(() => favoriteBtn.click(), 400);
+                            } else {
+                                // Возврат на место если нет подходящей кнопки
+                                card.style.transition = 'transform 0.3s ease-out';
+                                card.style.transform = 'translate3d(0, 0, 0)';
+                            }
                         } else {
                             // Возврат на место с аппаратным ускорением
                             card.style.transition = 'transform 0.3s ease-out';
@@ -188,13 +226,21 @@
             deleteOverlay.appendChild(deleteIcon);
             card.appendChild(deleteOverlay);
 
-            // Overlay для избранного (свайп вправо)
+            // Overlay для избранного (свайп вправо на главной странице)
             const favoriteOverlay = document.createElement('div');
             favoriteOverlay.className = 'swipe-action-overlay favorite';
             const favoriteIcon = document.createElement('div');
             favoriteIcon.className = 'pixel-icon favorite';
             favoriteOverlay.appendChild(favoriteIcon);
             card.appendChild(favoriteOverlay);
+
+            // Overlay для убрать из избранного (свайп вправо на странице избранного)
+            const unfavoriteOverlay = document.createElement('div');
+            unfavoriteOverlay.className = 'swipe-action-overlay unfavorite';
+            const unfavoriteIcon = document.createElement('div');
+            unfavoriteIcon.className = 'pixel-icon unfavorite';
+            unfavoriteOverlay.appendChild(unfavoriteIcon);
+            card.appendChild(unfavoriteOverlay);
         });
     }
 
