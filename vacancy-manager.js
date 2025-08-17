@@ -7,24 +7,29 @@
   const CONST = window.APP_CONSTANTS || {};
   const UTIL = window.utils || {};
 
-  // Haptic Feedback для Telegram WebApp
+  // Haptic Feedback для Telegram WebApp (требует Bot API 6.1+)
   function triggerHaptic(type, style) {
     try {
-      if (window.Telegram?.WebApp?.HapticFeedback) {
-        switch (type) {
-          case 'impact':
-            window.Telegram.WebApp.HapticFeedback.impactOccurred(style || 'light');
-            break;
-          case 'notification':
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred(style || 'success');
-            break;
-          case 'selection':
-            window.Telegram.WebApp.HapticFeedback.selectionChanged();
-            break;
-        }
+      const webApp = window.Telegram?.WebApp;
+      if (!webApp?.HapticFeedback) return;
+      
+      // Проверяем версию (HapticFeedback доступен с версии 6.1+)
+      const version = parseFloat(webApp.version || '6.0');
+      if (version < 6.1) return;
+      
+      switch (type) {
+        case 'impact':
+          webApp.HapticFeedback.impactOccurred(style || 'light');
+          break;
+        case 'notification':
+          webApp.HapticFeedback.notificationOccurred(style || 'success');
+          break;
+        case 'selection':
+          webApp.HapticFeedback.selectionChanged();
+          break;
       }
     } catch (e) {
-      console.debug('Haptic feedback unavailable:', e.message);
+      // Тихо игнорируем ошибки - не все версии поддерживают
     }
   }
 
