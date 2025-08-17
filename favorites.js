@@ -176,18 +176,13 @@
     updateStatusLocksFav.add(vacancyId);
     
     try {
-      const ok = await showCustomConfirm('Вернуть в основной список?');
-      if (!ok) {
-        updateStatusLocksFav.delete(vacancyId);
-        return;
-      }
-
       const cardElement = document.getElementById(`card-${vacancyId}`);
       if (!cardElement) {
         updateStatusLocksFav.delete(vacancyId);
         return;
       }
 
+      // Анимация скрытия
       cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
       cardElement.style.opacity = '0';
       cardElement.style.maxHeight = '0px';
@@ -265,69 +260,64 @@
     updateStatusLocksFav.add(vacancyId);
     
     try {
-      const ok = await showCustomConfirm('Удалить из избранного?');
-      if (!ok) {
+      const cardElement = document.getElementById(`card-${vacancyId}`);
+      if (!cardElement) {
         updateStatusLocksFav.delete(vacancyId);
         return;
       }
 
-    const cardElement = document.getElementById(`card-${vacancyId}`);
-    if (!cardElement) {
-      updateStatusLocksFav.delete(vacancyId);
-      return;
-    }
+      // Анимация скрытия
+      cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+      cardElement.style.opacity = '0';
+      cardElement.style.maxHeight = '0px';
+      cardElement.style.paddingTop = '0';
+      cardElement.style.paddingBottom = '0';
+      cardElement.style.marginTop = '0';
+      cardElement.style.marginBottom = '0';
+      cardElement.style.borderWidth = '0';
 
-    cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
-    cardElement.style.opacity = '0';
-    cardElement.style.maxHeight = '0px';
-    cardElement.style.paddingTop = '0';
-    cardElement.style.paddingBottom = '0';
-    cardElement.style.marginTop = '0';
-    cardElement.style.marginBottom = '0';
-    cardElement.style.borderWidth = '0';
+      const onUndo = () => {
+          cardElement.style.opacity = '1';
+          cardElement.style.maxHeight = '500px';
+          cardElement.style.paddingTop = '';
+          cardElement.style.paddingBottom = '';
+          cardElement.style.marginTop = '';
+          cardElement.style.marginBottom = '';
+          cardElement.style.borderWidth = '';
+      };
 
-    const onUndo = () => {
-        cardElement.style.opacity = '1';
-        cardElement.style.maxHeight = '500px';
-        cardElement.style.paddingTop = '';
-        cardElement.style.paddingBottom = '';
-        cardElement.style.marginTop = '';
-        cardElement.style.marginBottom = '';
-        cardElement.style.borderWidth = '';
-    };
-
-    // Haptic feedback для удаления
-    triggerHaptic('impact', 'medium');
-    
-    uiToast('Удалено из избранного', {
-        timeout: 5000,
-        onUndo: onUndo,
-        onTimeout: async () => {
-            try {
-              cardElement.remove();
-              const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
-              const resp = await fetchWithRetry(url, {
-                method: 'PATCH',
-                headers: createSupabaseHeaders({ prefer: 'return=minimal' }),
-                body: JSON.stringify({ status: newStatus })
-              }, RETRY_OPTIONS);
-
-              if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
-              
+      // Haptic feedback для удаления
+      triggerHaptic('impact', 'medium');
+      
+      uiToast('Вакансия удалена', {
+          timeout: 5000,
+          onUndo: onUndo,
+          onTimeout: async () => {
               try {
-                  localStorage.setItem('needs-refresh-main', 'true');
-              } catch (storageError) {
-                  console.warn('localStorage недоступен:', storageError);
-                  // Продолжаем работу без localStorage
+                cardElement.remove();
+                const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
+                const resp = await fetchWithRetry(url, {
+                  method: 'PATCH',
+                  headers: createSupabaseHeaders({ prefer: 'return=minimal' }),
+                  body: JSON.stringify({ status: newStatus })
+                }, RETRY_OPTIONS);
+
+                if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+                
+                try {
+                    localStorage.setItem('needs-refresh-main', 'true');
+                } catch (storageError) {
+                    console.warn('localStorage недоступен:', storageError);
+                    // Продолжаем работу без localStorage
+                }
+                allFavorites = allFavorites.filter(v => v.id !== vacancyId);
+                renderFilteredFavorites();
+              } catch (e) {
+                safeAlert('Не удалось изменить статус.');
+                onUndo();
               }
-              allFavorites = allFavorites.filter(v => v.id !== vacancyId);
-              renderFilteredFavorites();
-            } catch (e) {
-              safeAlert('Не удалось изменить статус.');
-              onUndo();
-            }
-        }
-    });
+          }
+      });
     } catch (error) {
       console.error('Ошибка в favorites updateStatus:', error);
       triggerHaptic('notification', 'error');
