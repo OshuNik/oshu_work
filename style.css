@@ -35,6 +35,19 @@
 
 /* === SWIPE ANIMATIONS === */
 
+/* Блокировка вертикальных жестов для всего контента */
+.content, .vacancy-list, .main-wrapper {
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+/* Полная блокировка PTR полоски при обычных кликах */
+.ptr-bar {
+  pointer-events: none !important;
+  opacity: 0 !important;
+  display: none !important;
+}
+
 .vacancy-card {
   /* Блокировка PTR и вертикальных жестов согласно документации interact.js */
   -ms-touch-action: pan-y;

@@ -96,30 +96,30 @@
                     if (rightIcon) rightIcon.classList.remove('visible');
                     card.style.zIndex = '';
 
-                    // Учитываем скорость для быстрых свайпов - снижаем порог до 70px
+                    // Определяем действие ТОЛЬКО после отпускания пальца
                     const isQuickSwipe = event.speed && event.speed > 0.5;
                     const threshold = isQuickSwipe ? 70 : 90;
                     
                     if (absX > threshold) {
                         if (dx < 0 && deleteBtn) {
-                            // Простая анимация удаления
+                            // Анимация удаления
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translateX(-100%)';
                             card.style.opacity = '0';
                             setTimeout(() => deleteBtn.click(), 400);
                         } else if (dx > 0 && favoriteBtn) {
-                            // Простая анимация добавления в избранное
+                            // Анимация добавления в избранное
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translateX(100%)';
                             card.style.opacity = '0';
                             setTimeout(() => favoriteBtn.click(), 400);
                         } else {
-                            // Плавный возврат на место
+                            // Возврат на место
                             card.style.transition = 'transform 0.3s ease-out';
                             card.style.transform = 'translateX(0px)';
                         }
                     } else {
-                        // Плавный возврат на место
+                        // Возврат на место
                         card.style.transition = 'transform 0.3s ease-out';
                         card.style.transform = 'translateX(0px)';
                     }
