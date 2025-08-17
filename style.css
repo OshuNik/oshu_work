@@ -489,6 +489,7 @@ details > summary::-webkit-details-marker {
   stroke-width: 2.5;
 }
 .card-action-btn.favorite svg { stroke: var(--accent-blue); fill: none; }
+.card-action-btn.unfavorite svg { stroke: var(--accent-blue); fill: none; }
 .card-action-btn.apply svg { stroke: var(--accent-green); fill: none; }
 .card-action-btn.delete svg {
   stroke: var(--accent-red);

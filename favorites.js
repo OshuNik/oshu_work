@@ -148,11 +148,16 @@
           if (!favoriteBtn) {
             // Создаем кнопку favorite если её нет
             favoriteBtn = document.createElement('button');
-            favoriteBtn.className = 'action-btn favorite';
+            favoriteBtn.className = 'card-action-btn favorite unfavorite';
             favoriteBtn.dataset.action = 'favorite';
             favoriteBtn.dataset.id = v.id;
             favoriteBtn.title = 'Вернуть в основные';
-            favoriteBtn.innerHTML = '<span class="icon">↺</span>';
+            favoriteBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <path d="M3 3l18 18" stroke-width="2"/>
+              </svg>
+            `;
             
             // Добавляем кнопку в контейнер действий
             const actionsContainer = card.querySelector('.card-actions') || card.querySelector('.vacancy-card-footer');
