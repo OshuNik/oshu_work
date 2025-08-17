@@ -163,14 +163,6 @@
                             setTimeout(() => deleteBtn.click(), 400);
                         } else if (dx > 0) {
                             // Свайп вправо - зависит от страницы
-                            console.log('Right swipe detected:', {
-                                isOnFavoritesPage,
-                                favoriteBtn: !!favoriteBtn,
-                                favoriteAction: favoriteBtn?.dataset?.action,
-                                pathname: window.location.pathname,
-                                hasFavoritesList: !!document.querySelector('#favorites-list')
-                            });
-                            
                             if (isOnFavoritesPage && favoriteBtn) {
                                 // На странице избранного - убрать из избранного (возврат в основные)
                                 if (unfavoriteOverlay) unfavoriteOverlay.classList.add('visible');
@@ -179,10 +171,7 @@
                                 card.style.opacity = '0';
                                 // Успешное уведомление при возврате в основные
                                 triggerHaptic('notification', 'success');
-                                setTimeout(() => {
-                                    console.log('Clicking favorite button on favorites page');
-                                    favoriteBtn.click();
-                                }, 400); // На странице избранного кнопка favorite возвращает в основные
+                                setTimeout(() => favoriteBtn.click(), 400); // На странице избранного кнопка favorite возвращает в основные
                             } else if (!isOnFavoritesPage && favoriteBtn) {
                                 // На главной странице - добавить в избранное
                                 if (favoriteOverlay) favoriteOverlay.classList.add('visible');
@@ -194,7 +183,6 @@
                                 setTimeout(() => favoriteBtn.click(), 400);
                             } else {
                                 // Возврат на место если нет подходящей кнопки
-                                console.log('No matching button found, returning to place');
                                 card.style.transition = 'transform 0.3s ease-out';
                                 card.style.transform = 'translate3d(0, 0, 0)';
                             }
