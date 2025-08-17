@@ -451,6 +451,19 @@
       cardElement.style.borderWidth = '0';
     }
 
+    // Анимация скрытия карточки для свайпов
+    animateCardHidingForSwipe(cardElement) {
+      cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+      cardElement.style.opacity = '0';
+      cardElement.style.transform = 'scale(0.95)';
+      cardElement.style.maxHeight = '0px';
+      cardElement.style.paddingTop = '0';
+      cardElement.style.paddingBottom = '0';
+      cardElement.style.marginTop = '0';
+      cardElement.style.marginBottom = '0';
+      cardElement.style.borderWidth = '0';
+    }
+
     // Анимация показа карточки с transition
     animateCardShowing(cardElement) {
       // Убираем все свайп-классы чтобы карточка не была залитой
