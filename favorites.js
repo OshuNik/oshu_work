@@ -207,7 +207,21 @@
       
       uiToast('Возвращено в основной список', {
           timeout: 5000,
-          onUndo: onUndo,
+          onUndo: () => {
+            cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+            cardElement.style.opacity = '1';
+            cardElement.style.maxHeight = 'none';
+            cardElement.style.paddingTop = '';
+            cardElement.style.paddingBottom = '';
+            cardElement.style.marginTop = '';
+            cardElement.style.marginBottom = '';
+            cardElement.style.borderWidth = '';
+            
+            // Убираем transition после анимации
+            setTimeout(() => {
+              cardElement.style.transition = '';
+            }, 300);
+          },
           onTimeout: async () => {
               try {
                 cardElement.remove();
@@ -276,22 +290,26 @@
       cardElement.style.marginBottom = '0';
       cardElement.style.borderWidth = '0';
 
-      const onUndo = () => {
-          cardElement.style.opacity = '1';
-          cardElement.style.maxHeight = '500px';
-          cardElement.style.paddingTop = '';
-          cardElement.style.paddingBottom = '';
-          cardElement.style.marginTop = '';
-          cardElement.style.marginBottom = '';
-          cardElement.style.borderWidth = '';
-      };
-
       // Haptic feedback для удаления
       triggerHaptic('impact', 'medium');
       
       uiToast('Вакансия удалена', {
           timeout: 5000,
-          onUndo: onUndo,
+          onUndo: () => {
+            cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+            cardElement.style.opacity = '1';
+            cardElement.style.maxHeight = 'none';
+            cardElement.style.paddingTop = '';
+            cardElement.style.paddingBottom = '';
+            cardElement.style.marginTop = '';
+            cardElement.style.marginBottom = '';
+            cardElement.style.borderWidth = '';
+            
+            // Убираем transition после анимации
+            setTimeout(() => {
+              cardElement.style.transition = '';
+            }, 300);
+          },
           onTimeout: async () => {
               try {
                 cardElement.remove();
