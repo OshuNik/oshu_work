@@ -361,7 +361,7 @@
       cardElement.style.borderWidth = '0';
     }
 
-    // Анимация показа карточки
+    // Анимация показа карточки с transition
     animateCardShowing(cardElement) {
       // Убираем все свайп-классы чтобы карточка не была залитой
       cardElement.classList.remove('swipe-left', 'swipe-right');
@@ -373,6 +373,7 @@
         overlay.style.opacity = '0';
       });
       
+      cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
       cardElement.style.opacity = '1';
       cardElement.style.transform = 'scale(1)';
       cardElement.style.maxHeight = '500px';
@@ -387,6 +388,11 @@
       cardElement.style.backgroundColor = '';
       cardElement.style.removeProperty('background');
       cardElement.style.removeProperty('background-color');
+      
+      // Убираем transition после анимации
+      setTimeout(() => {
+        cardElement.style.transition = '';
+      }, 300);
     }
 
     // Финализировать обновление статуса
