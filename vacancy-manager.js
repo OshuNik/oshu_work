@@ -322,10 +322,10 @@
             overlay.style.opacity = '0';
           });
           
-          // Анимация возврата карточки
+          // Анимация возврата карточки для свайпов (как в избранном)
           cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
           cardElement.style.opacity = '1';
-          cardElement.style.transform = 'scale(1)';
+          cardElement.style.transform = 'translate3d(0, 0, 0)'; // Возврат на место (как в избранном для свайпов)
           cardElement.style.maxHeight = '500px';
           cardElement.style.paddingTop = '';
           cardElement.style.paddingBottom = '';
@@ -438,11 +438,11 @@
       });
     }
 
-    // Анимация скрытия карточки
+    // Анимация скрытия карточки для кнопок (как в избранном)
     animateCardHiding(cardElement) {
-      cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+      // БЕЗ transform - только плавное исчезновение (как в избранном для кнопок)
+      cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
       cardElement.style.opacity = '0';
-      cardElement.style.transform = 'scale(0.95)';
       cardElement.style.maxHeight = '0px';
       cardElement.style.paddingTop = '0';
       cardElement.style.paddingBottom = '0';
@@ -451,11 +451,12 @@
       cardElement.style.borderWidth = '0';
     }
 
-    // Анимация скрытия карточки для свайпов
+    // Анимация скрытия карточки для свайпов (как в избранном для свайпов)
     animateCardHidingForSwipe(cardElement) {
-      cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
+      // НЕ перезаписываем transform - он уже установлен в swipe-handler
+      // Добавляем только opacity и maxHeight для плавного исчезновения
+      cardElement.style.transition = 'opacity .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
       cardElement.style.opacity = '0';
-      cardElement.style.transform = 'scale(0.95)';
       cardElement.style.maxHeight = '0px';
       cardElement.style.paddingTop = '0';
       cardElement.style.paddingBottom = '0';
