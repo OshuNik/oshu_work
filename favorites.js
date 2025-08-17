@@ -219,13 +219,36 @@
       cardElement.style.borderWidth = '0';
 
       const onUndo = () => {
+          // Убираем все свайп-классы чтобы карточка не была залитой
+          cardElement.classList.remove('swipe-left', 'swipe-right');
+          
+          // Принудительно убираем любые overlays
+          const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
+          overlays.forEach(overlay => {
+            overlay.classList.remove('visible');
+            overlay.style.opacity = '0';
+          });
+          
+          cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
           cardElement.style.opacity = '1';
+          cardElement.style.transform = 'scale(1)';
           cardElement.style.maxHeight = '500px';
           cardElement.style.paddingTop = '';
           cardElement.style.paddingBottom = '';
           cardElement.style.marginTop = '';
           cardElement.style.marginBottom = '';
           cardElement.style.borderWidth = '';
+          
+          // Сбрасываем также стили background если они остались
+          cardElement.style.background = '';
+          cardElement.style.backgroundColor = '';
+          cardElement.style.removeProperty('background');
+          cardElement.style.removeProperty('background-color');
+          
+          // Убираем transition после анимации
+          setTimeout(() => {
+            cardElement.style.transition = '';
+          }, 300);
       };
 
       // Haptic feedback для возврата в основные
