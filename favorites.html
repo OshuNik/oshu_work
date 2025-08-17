@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: raw.githubusercontent.com; connect-src 'self' *.supabase.co;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org https://cdn.interactjs.io https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: raw.githubusercontent.com; connect-src 'self' *.supabase.co;">
   <title>Избранное</title>
   <!-- Preload критических ресурсов для быстрого First Paint -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,9 +60,41 @@
 <!-- Подключение общего template -->
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+// Fallback загрузка interact.js
+(function() {
+  function loadScript(url, callback) {
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = () => {
+      window.dispatchEvent(new CustomEvent('interactLoaded'));
+      callback(true);
+    };
+    script.onerror = () => callback(false);
+    document.head.appendChild(script);
+  }
+
+  // Пробуем разные CDN (начинаем с самого стабильного)
+  const cdnUrls = [
+    'https://unpkg.com/interactjs@1.10.11/dist/interact.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js',
+    'https://cdn.interactjs.io/v1.10.11/interact.min.js'
+  ];
+
+  function tryNextCdn(index = 0) {
+    if (index >= cdnUrls.length) return;
+    loadScript(cdnUrls[index], (success) => {
+      if (!success) tryNextCdn(index + 1);
+    });
+  }
+
+  tryNextCdn();
+})();
+</script>
 <script src="template-loader.js"></script>
 <script src="config.js"></script>
 <script src="utils.min.js"></script>
+<script src="swipe-handler.js"></script>
 <script src="favorites.js"></script>
 </body>
 </html>
