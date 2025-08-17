@@ -114,28 +114,72 @@ body, .main-wrapper, .header, .search-container, .category-tabs {
   color: white;
 }
 
-.swipe-icon {
+/* === SWIPE ACTION OVERLAYS === */
+
+.swipe-action-overlay {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-  font-weight: bold;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
-  transition: opacity var(--transition-fast);
   pointer-events: none;
-  z-index: 10;
+  z-index: 5;
+  transition: opacity var(--transition-normal);
 }
 
-.swipe-icon.left {
-  left: 20px;
+.swipe-action-overlay.delete {
+  background: linear-gradient(135deg, var(--accent-red) 0%, #d94444 100%);
 }
 
-.swipe-icon.right {
-  right: 20px;
+.swipe-action-overlay.favorite {
+  background: linear-gradient(135deg, var(--accent-green) 0%, #5ba865 100%);
 }
 
-.swipe-icon.visible {
+.swipe-action-overlay.visible {
   opacity: 1;
+}
+
+/* Пиксельные иконки в ретро стиле */
+.pixel-icon {
+  width: 64px;
+  height: 64px;
+  background-size: 64px 64px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  animation: pixelBounce 0.6s ease-out;
+}
+
+.pixel-icon.delete {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3E.pixel%7Bfill:%23ffffff%7D%3C/style%3E%3Cg%3E%3Crect class='pixel' x='8' y='8' width='8' height='8'/%3E%3Crect class='pixel' x='16' y='16' width='8' height='8'/%3E%3Crect class='pixel' x='24' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='32' width='8' height='8'/%3E%3Crect class='pixel' x='40' y='40' width='8' height='8'/%3E%3Crect class='pixel' x='48' y='48' width='8' height='8'/%3E%3Crect class='pixel' x='48' y='8' width='8' height='8'/%3E%3Crect class='pixel' x='40' y='16' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='24' y='32' width='8' height='8'/%3E%3Crect class='pixel' x='16' y='40' width='8' height='8'/%3E%3Crect class='pixel' x='8' y='48' width='8' height='8'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.pixel-icon.favorite {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3E.pixel%7Bfill:%23ffffff%7D%3C/style%3E%3Cg%3E%3Crect class='pixel' x='24' y='8' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='8' width='8' height='8'/%3E%3Crect class='pixel' x='16' y='16' width='8' height='8'/%3E%3Crect class='pixel' x='24' y='16' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='16' width='8' height='8'/%3E%3Crect class='pixel' x='40' y='16' width='8' height='8'/%3E%3Crect class='pixel' x='8' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='16' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='24' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='40' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='48' y='24' width='8' height='8'/%3E%3Crect class='pixel' x='16' y='32' width='8' height='8'/%3E%3Crect class='pixel' x='24' y='32' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='32' width='8' height='8'/%3E%3Crect class='pixel' x='40' y='32' width='8' height='8'/%3E%3Crect class='pixel' x='24' y='40' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='40' width='8' height='8'/%3E%3Crect class='pixel' x='32' y='48' width='8' height='8'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+@keyframes pixelBounce {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Старые иконки для совместимости */
+.swipe-icon {
+  display: none;
 }
 
 body {

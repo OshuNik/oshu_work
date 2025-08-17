@@ -39,8 +39,8 @@
                     const dy = event.pageY - event.y0;
                     const absX = Math.abs(dx);
                     const absY = Math.abs(dy);
-                    const leftIcon = event.target.querySelector('.swipe-icon.left');
-                    const rightIcon = event.target.querySelector('.swipe-icon.right');
+                    const deleteOverlay = event.target.querySelector('.swipe-action-overlay.delete');
+                    const favoriteOverlay = event.target.querySelector('.swipe-action-overlay.favorite');
 
                     // Плавное ограничение с затуханием - увеличиваем для комфорта
                     const maxMove = 160;
@@ -58,23 +58,26 @@
                     // Плавная анимация движения с улучшенной производительностью
                     event.target.style.transform = `translate3d(${limitedDx}px, 0, 0)`;
 
-                    // Показываем индикаторы при движении > 40px (раньше для лучшего UX)
-                    if (absX > 40) {
+                    // Показываем overlays при движении > 60px для четкого визуала
+                    if (absX > 60) {
                         if (dx < 0) {
+                            // Свайп влево - показываем overlay удаления
                             event.target.classList.add('swipe-left');
                             event.target.classList.remove('swipe-right');
-                            if (leftIcon) leftIcon.classList.add('visible');
-                            if (rightIcon) rightIcon.classList.remove('visible');
+                            if (deleteOverlay) deleteOverlay.classList.add('visible');
+                            if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
                         } else {
+                            // Свайп вправо - показываем overlay избранного
                             event.target.classList.add('swipe-right');
                             event.target.classList.remove('swipe-left');
-                            if (rightIcon) rightIcon.classList.add('visible');
-                            if (leftIcon) leftIcon.classList.remove('visible');
+                            if (favoriteOverlay) favoriteOverlay.classList.add('visible');
+                            if (deleteOverlay) deleteOverlay.classList.remove('visible');
                         }
                     } else {
+                        // Скрываем все overlays
                         event.target.classList.remove('swipe-left', 'swipe-right');
-                        if (leftIcon) leftIcon.classList.remove('visible');
-                        if (rightIcon) rightIcon.classList.remove('visible');
+                        if (deleteOverlay) deleteOverlay.classList.remove('visible');
+                        if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
                     }
                 },
                 end(event) {
@@ -83,15 +86,15 @@
                     const absX = Math.abs(dx);
                     const deleteBtn = card.querySelector('[data-action="delete"]');
                     const favoriteBtn = card.querySelector('[data-action="favorite"]');
+                    const deleteOverlay = card.querySelector('.swipe-action-overlay.delete');
+                    const favoriteOverlay = card.querySelector('.swipe-action-overlay.favorite');
 
                     // CSS touch-action автоматически восстанавливается при удалении класса .swiping
 
-                    // Убираем классы
+                    // Убираем классы и overlays
                     card.classList.remove('swiping', 'swipe-left', 'swipe-right');
-                    const leftIcon = card.querySelector('.swipe-icon.left');
-                    const rightIcon = card.querySelector('.swipe-icon.right');
-                    if (leftIcon) leftIcon.classList.remove('visible');
-                    if (rightIcon) rightIcon.classList.remove('visible');
+                    if (deleteOverlay) deleteOverlay.classList.remove('visible');
+                    if (favoriteOverlay) favoriteOverlay.classList.remove('visible');
                     card.style.zIndex = '';
 
                     // Определяем действие ТОЛЬКО после отпускания пальца
@@ -100,13 +103,15 @@
                     
                     if (absX > threshold) {
                         if (dx < 0 && deleteBtn) {
-                            // Анимация удаления с аппаратным ускорением
+                            // Показываем overlay удаления на время анимации
+                            if (deleteOverlay) deleteOverlay.classList.add('visible');
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translate3d(-100%, 0, 0)';
                             card.style.opacity = '0';
                             setTimeout(() => deleteBtn.click(), 400);
                         } else if (dx > 0 && favoriteBtn) {
-                            // Анимация добавления в избранное с аппаратным ускорением
+                            // Показываем overlay избранного на время анимации
+                            if (favoriteOverlay) favoriteOverlay.classList.add('visible');
                             card.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
                             card.style.transform = 'translate3d(100%, 0, 0)';
                             card.style.opacity = '0';
@@ -137,29 +142,33 @@
         });
     }
 
-    // Добавляем иконки к карточкам
-    function addSwipeIcons() {
+    // Добавляем overlay для действий свайпов
+    function addSwipeOverlays() {
         document.querySelectorAll('.vacancy-card').forEach(card => {
-            // Проверяем, есть ли уже иконки
-            if (card.querySelector('.swipe-icon')) return;
+            // Проверяем, есть ли уже overlays
+            if (card.querySelector('.swipe-action-overlay')) return;
 
-            // Левая иконка (удалить)
-            const leftIcon = document.createElement('div');
-            leftIcon.className = 'swipe-icon left';
-            leftIcon.textContent = '✕';
-            card.appendChild(leftIcon);
+            // Overlay для удаления (свайп влево)
+            const deleteOverlay = document.createElement('div');
+            deleteOverlay.className = 'swipe-action-overlay delete';
+            const deleteIcon = document.createElement('div');
+            deleteIcon.className = 'pixel-icon delete';
+            deleteOverlay.appendChild(deleteIcon);
+            card.appendChild(deleteOverlay);
 
-            // Правая иконка (избранное)
-            const rightIcon = document.createElement('div');
-            rightIcon.className = 'swipe-icon right';
-            rightIcon.textContent = '★';
-            card.appendChild(rightIcon);
+            // Overlay для избранного (свайп вправо)
+            const favoriteOverlay = document.createElement('div');
+            favoriteOverlay.className = 'swipe-action-overlay favorite';
+            const favoriteIcon = document.createElement('div');
+            favoriteIcon.className = 'pixel-icon favorite';
+            favoriteOverlay.appendChild(favoriteIcon);
+            card.appendChild(favoriteOverlay);
         });
     }
 
     function initForNewCards() {
         if (typeof interact === 'undefined') return;
-        addSwipeIcons();
+        addSwipeOverlays();
         
         // Принудительная реинициализация для обновленных карточек
         // Это нужно для вкладок где могли остаться старые настройки
@@ -193,10 +202,10 @@
         // CSS touch-action обеспечивает всю необходимую блокировку
         
         initSwipeHandler();
-        addSwipeIcons();
+        addSwipeOverlays();
         
         const observer = new MutationObserver(() => {
-            addSwipeIcons();
+            addSwipeOverlays();
             initForNewCards();
         });
         
@@ -227,7 +236,7 @@
     // Экспортируем функции для использования в других модулях
     window.SwipeHandler = {
         init: initSwipeHandler,
-        addIcons: addSwipeIcons,
+        addOverlays: addSwipeOverlays,
         initForNewCards: initForNewCards
     };
 })();
