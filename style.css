@@ -629,11 +629,11 @@ mark.highlight {
 }
 
 .retro-header h1 {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 700;
+  font-family: var(--font-pixel);
+  font-size: 22px;
+  font-weight: 400;
   margin: 0 0 12px 0;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
 /* Пиксельный счетчик */
