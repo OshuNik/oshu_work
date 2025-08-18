@@ -302,6 +302,10 @@
           },
           onTimeout: async () => {
               try {
+                // Мгновенно обновляем счетчик при удалении
+                const currentCount = container.querySelectorAll('.vacancy-card').length - 1;
+                updateFavoritesCount(currentCount > 0 ? currentCount : 0);
+                
                 cardElement.remove();
                 const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
                 const resp = await fetchWithRetry(url, {
@@ -407,6 +411,10 @@
           },
           onTimeout: async () => {
               try {
+                // Мгновенно обновляем счетчик при удалении
+                const currentCount = container.querySelectorAll('.vacancy-card').length - 1;
+                updateFavoritesCount(currentCount > 0 ? currentCount : 0);
+                
                 cardElement.remove();
                 const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
                 const resp = await fetchWithRetry(url, {
