@@ -84,6 +84,18 @@
     if (!favStatsEl) return;
     const q = (searchInputFav?.value || '').trim();
     favStatsEl.textContent = q ? (visible===0 ? 'Ничего не найдено' : `Найдено: ${visible} из ${total}`) : '';
+    
+    // Обновляем счетчик в заголовке
+    updateFavoritesCount(total);
+  }
+  
+  function updateFavoritesCount(count) {
+    const countEl = document.getElementById('favorites-count');
+    if (countEl) {
+      countEl.textContent = count;
+      countEl.classList.add('updating');
+      setTimeout(() => countEl.classList.remove('updating'), 200);
+    }
   }
 
   function renderFilteredFavorites() {
