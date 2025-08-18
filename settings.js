@@ -259,13 +259,20 @@
       });
       
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
+        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       console.log('Ключевые слова успешно сохранены:', keywordsString);
     } catch (error) {
       console.error('Ошибка сохранения ключевых слов:', error);
-      safeAlert('Ошибка сохранения ключевых слов. Проверьте подключение к интернету.');
+      if (error.message.includes('авторизации')) {
+        safeAlert(error.message);
+      } else {
+        safeAlert('Ошибка сохранения ключевых слов. Проверьте подключение к интернету.');
+      }
     }
   }
 
@@ -280,7 +287,14 @@
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
         headers: createSupabaseHeaders()
       });
-      if (!response.ok) throw new Error('Network response was not ok');
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const data = await response.json();
       const keywords = data.length > 0 ? data[0].keywords : '';
       
@@ -290,7 +304,11 @@
       displayKeywordTags();
     } catch (error) {
       console.error('loadKeywords: произошла ошибка', error);
-      keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
+      if (error.message.includes('авторизации')) {
+        keywordsTagsContainer.innerHTML = `<div class="loading-indicator error-indicator">${error.message}</div>`;
+      } else {
+        keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
+      }
     } finally {
       saveBtn.disabled = false;
     }
@@ -444,7 +462,14 @@
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?select=*`, {
         headers: createSupabaseHeaders()
       });
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       channelsListContainer.innerHTML = '';
       if (data && data.length > 0) {
@@ -454,7 +479,11 @@
       }
     } catch (error) {
       console.error('loadChannels: произошла ошибка', error);
-      channelsListContainer.innerHTML = '<p class="empty-list">Не удалось загрузить каналы.</p>';
+      if (error.message.includes('авторизации')) {
+        channelsListContainer.innerHTML = `<p class="empty-list error-list">${error.message}</p>`;
+      } else {
+        channelsListContainer.innerHTML = '<p class="empty-list">Не удалось загрузить каналы.</p>';
+      }
     }
   }
 
