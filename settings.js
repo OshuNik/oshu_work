@@ -165,6 +165,7 @@
 
   // Хранилище текущих ключевых слов
   let currentKeywords = [];
+  let saveTimeout = null;
 
   function createKeywordTag(keyword) {
     const tag = document.createElement('div');
@@ -212,7 +213,7 @@
     }
     
     currentKeywords.push(trimmed);
-    updateKeywordsInDatabase();
+    debouncedSave();
     displayKeywordTags();
     return true;
   }
@@ -226,15 +227,24 @@
         tagElement.classList.add('removing');
         setTimeout(() => {
           currentKeywords.splice(index, 1);
-          updateKeywordsInDatabase();
+          debouncedSave();
           displayKeywordTags();
         }, 200);
       } else {
         currentKeywords.splice(index, 1);
-        updateKeywordsInDatabase();
+        debouncedSave();
         displayKeywordTags();
       }
     }
+  }
+
+  function debouncedSave() {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+    }
+    saveTimeout = setTimeout(() => {
+      updateKeywordsInDatabase();
+    }, 300); // Задержка 300мс для группировки изменений
   }
 
   async function updateKeywordsInDatabase() {
@@ -242,13 +252,20 @@
     keywordsInput.value = keywordsString;
     
     try {
-      await fetch(API_ENDPOINTS.SETTINGS, {
+      const response = await fetch(API_ENDPOINTS.SETTINGS, {
         method: 'POST',
         headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
         body: JSON.stringify({ update_key: 1, keywords: keywordsString })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      console.log('Ключевые слова успешно сохранены:', keywordsString);
     } catch (error) {
       console.error('Ошибка сохранения ключевых слов:', error);
+      safeAlert('Ошибка сохранения ключевых слов. Проверьте подключение к интернету.');
     }
   }
 
