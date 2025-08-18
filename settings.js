@@ -337,17 +337,42 @@
       // Обновляем текущие ключевые слова из textarea
       currentKeywords = kws ? kws.split(',').map(k => k.trim()).filter(k => k) : [];
       
-      await fetch(API_ENDPOINTS.SETTINGS, {
-        method: 'POST',
-        headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
-        body: JSON.stringify({ update_key: 1, keywords: kws })
+      // Используем PATCH для обновления как в updateKeywordsInDatabase
+      const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
+        method: 'PATCH',
+        headers: createSupabaseHeaders(),
+        body: JSON.stringify({ keywords: kws })
       });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ. Очистите кэш браузера (Ctrl+Shift+R) и перезагрузите страницу.');
+        }
+        if (response.status === 404) {
+          // Если записи нет, пробуем создать новую через POST
+          const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
+            method: 'POST',
+            headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
+            body: JSON.stringify({ update_key: 1, keywords: kws })
+          });
+          
+          if (!postResponse.ok) {
+            throw new Error(`POST failed: HTTP ${postResponse.status}: ${postResponse.statusText}`);
+          }
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
       
       displayKeywordTags();
       uiToast(MESSAGES.SUCCESS.KEYWORDS_SAVED);
     } catch (error) {
       console.error('saveKeywords: произошла ошибка', error);
-      safeAlert('Не удалось сохранить настройки. Проверьте подключение к интернету.');
+      if (error.message.includes('авторизации')) {
+        safeAlert(error.message);
+      } else {
+        safeAlert('Не удалось сохранить настройки. Проверьте подключение к интернету.');
+      }
     } finally {
       saveBtn.disabled = false;
     }
