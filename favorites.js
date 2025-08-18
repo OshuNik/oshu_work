@@ -115,16 +115,18 @@
     const stepTime = duration / steps;
     const increment = targetCount / steps;
     
-    countEl.classList.add('counting');
+    // Начинаем с желтого и плавно переходим к зеленому
+    countEl.classList.add('counting-up');
     
     const counter = setInterval(() => {
       currentCount += increment;
       if (currentCount >= targetCount) {
         currentCount = targetCount;
         countEl.textContent = targetCount;
-        countEl.classList.remove('counting');
-        countEl.classList.add('updating');
-        setTimeout(() => countEl.classList.remove('updating'), 200);
+        countEl.classList.remove('counting-up');
+        // Переход от зеленого к желтому
+        countEl.classList.add('counting-complete');
+        setTimeout(() => countEl.classList.remove('counting-complete'), 400);
         clearInterval(counter);
       } else {
         countEl.textContent = Math.floor(currentCount);

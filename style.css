@@ -675,8 +675,12 @@ mark.highlight {
   animation: retroFlash 0.4s ease-out;
 }
 
-.favorites-count.counting {
-  animation: counterPulse 0.8s ease-in-out;
+.favorites-count.counting-up {
+  animation: countingUp 0.8s ease-in-out;
+}
+
+.favorites-count.counting-complete {
+  animation: countingComplete 0.4s ease-out;
 }
 
 /* Анимации */
@@ -699,19 +703,28 @@ mark.highlight {
   100% { background: var(--accent-yellow); transform: scale(1); }
 }
 
-@keyframes counterPulse {
+@keyframes countingUp {
   0% { 
-    transform: scale(1);
     background: var(--accent-yellow);
+    transform: scale(1);
   }
-  50% { 
-    transform: scale(1.15);
+  100% { 
     background: var(--accent-green);
+    transform: scale(1.1);
+    box-shadow: 3px 3px 0px var(--text-color);
+  }
+}
+
+@keyframes countingComplete {
+  0% { 
+    background: var(--accent-green);
+    transform: scale(1.1);
     box-shadow: 3px 3px 0px var(--text-color);
   }
   100% { 
-    transform: scale(1);
     background: var(--accent-yellow);
+    transform: scale(1);
+    box-shadow: 2px 2px 0px var(--text-color);
   }
 }
 
