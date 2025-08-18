@@ -622,6 +622,28 @@ mark.highlight {
   font-weight: 700;
 }
 
+/* Счетчик избранного в заголовке */
+.favorites-count {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  background: rgba(255, 217, 61, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 2px solid var(--accent-yellow);
+  margin-left: 8px;
+  vertical-align: middle;
+  transition: all 0.2s ease-out;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.favorites-count.updating {
+  transform: scale(1.1);
+  background: var(--accent-yellow);
+  color: var(--text-color);
+}
+
 .vacancy-list, .settings-tab-content { display: none; }
 .vacancy-list.active, .settings-tab-content.active {
     display: block !important;
