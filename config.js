@@ -3,7 +3,7 @@
 window.APP_CONFIG = {
   // 👉 Supabase конфигурация (используем переменные окружения если доступны)
   SUPABASE_URL: window.SUPABASE_URL || 'https://lwfhtwnfqmdjwzrdznvv.supabase.co',
-  SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY || 'sb_publishable_j2pTEm1MIJTXyAeluGHocQ_w16iaDj4',
+  SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Zmh0d25mcW1kandrcmR6bnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY2ODY3ODksImV4cCI6MjA0MjI2Mjc4OX0.X_bQgfwKlEGjN8M-y6EQ6f-6jfkcQ4S1VQvG7q0Ct4o',
 
   // Порции на главной
   PAGE_SIZE_MAIN: 10,
