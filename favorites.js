@@ -80,13 +80,17 @@
     favStatsEl.className = 'search-stats';
     searchInputWrapperFav.insertAdjacentElement('afterend', favStatsEl);
   }
-  function updateFavStats(total, visible) {
+  function updateFavStats(total, visible, isInitialLoad = false) {
     if (!favStatsEl) return;
     const q = (searchInputFav?.value || '').trim();
     favStatsEl.textContent = q ? (visible===0 ? 'Ничего не найдено' : `Найдено: ${visible} из ${total}`) : '';
     
     // Обновляем счетчик в заголовке
-    updateFavoritesCount(total);
+    if (isInitialLoad) {
+      animateCounterFromZero(total);
+    } else {
+      updateFavoritesCount(total);
+    }
   }
   
   function updateFavoritesCount(count) {
@@ -97,8 +101,38 @@
       setTimeout(() => countEl.classList.remove('updating'), 200);
     }
   }
+  
+  function animateCounterFromZero(targetCount) {
+    const countEl = document.getElementById('favorites-count');
+    if (!countEl || targetCount === 0) {
+      updateFavoritesCount(targetCount);
+      return;
+    }
+    
+    let currentCount = 0;
+    const duration = 800; // Длительность анимации в мс
+    const steps = Math.min(targetCount, 20); // Максимум 20 шагов для плавности
+    const stepTime = duration / steps;
+    const increment = targetCount / steps;
+    
+    countEl.classList.add('counting');
+    
+    const counter = setInterval(() => {
+      currentCount += increment;
+      if (currentCount >= targetCount) {
+        currentCount = targetCount;
+        countEl.textContent = targetCount;
+        countEl.classList.remove('counting');
+        countEl.classList.add('updating');
+        setTimeout(() => countEl.classList.remove('updating'), 200);
+        clearInterval(counter);
+      } else {
+        countEl.textContent = Math.floor(currentCount);
+      }
+    }, stepTime);
+  }
 
-  function renderFilteredFavorites() {
+  function renderFilteredFavorites(isInitialLoad = false) {
     const query = (searchInputFav?.value || '').trim().toLowerCase();
     
     let visibleCount = 0;
@@ -127,7 +161,7 @@
         container.prepend(div.firstElementChild);
     }
     
-    updateFavStats(allFavorites.length, visibleCount);
+    updateFavStats(allFavorites.length, visibleCount, isInitialLoad);
   }
 
   async function loadFavorites(query = '') {
@@ -184,7 +218,7 @@
         });
         container.appendChild(frag);
       }
-      renderFilteredFavorites(); 
+      renderFilteredFavorites(true); // true = первоначальная загрузка
       document.dispatchEvent(new CustomEvent('favorites:loaded'));
     } catch (e) {
       console.error(e);

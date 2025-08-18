@@ -675,6 +675,10 @@ mark.highlight {
   animation: retroFlash 0.4s ease-out;
 }
 
+.favorites-count.counting {
+  animation: counterPulse 0.8s ease-in-out;
+}
+
 /* Анимации */
 @keyframes pixelPulse {
   0%, 100% { 
@@ -693,6 +697,22 @@ mark.highlight {
   50% { background: var(--accent-blue); }
   75% { background: var(--accent-green); }
   100% { background: var(--accent-yellow); transform: scale(1); }
+}
+
+@keyframes counterPulse {
+  0% { 
+    transform: scale(1);
+    background: var(--accent-yellow);
+  }
+  50% { 
+    transform: scale(1.15);
+    background: var(--accent-green);
+    box-shadow: 3px 3px 0px var(--text-color);
+  }
+  100% { 
+    transform: scale(1);
+    background: var(--accent-yellow);
+  }
 }
 
 .vacancy-list, .settings-tab-content { display: none; }
