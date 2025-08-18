@@ -533,7 +533,7 @@ mark.highlight {
     color: var(--hint-color);
     border: var(--border-width) solid var(--border-color);
     border-bottom: none;
-    padding: 8px 5px;
+    padding: 10px 12px;
     font-weight: 700;
     border-radius: 8px 8px 0 0;
     cursor: pointer;
@@ -548,7 +548,7 @@ mark.highlight {
     user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
-    overflow: hidden; /* Нужно для псевдоэлемента длинного тапа */
+    overflow: visible; /* Для абсолютно позиционированных счетчиков */
 }
 /* Анимация длинного тапа для вкладок */
 .tab-button::after {
@@ -569,21 +569,25 @@ mark.highlight {
 
 .tab-label { font-size: 13px; }
 .tab-count { 
-  font-size: 10px; 
-  font-weight: 700;
-  margin-top: 4px; 
-  margin-left: 6px;
-  /* Для неактивных табов - нейтральный стиль */
-  background: var(--text-color);
-  color: var(--background-color);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 2px 6px;
-  min-width: 18px;
+  font-size: 11px; 
+  font-weight: 600;
+  /* Абсолютное позиционирование в правом верхнем углу */
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  /* Для неактивных табов - легкий прозрачный стиль */
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--hint-color);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 2px 7px;
+  min-width: 20px;
   text-align: center;
   display: inline-block;
-  line-height: 1.2;
+  line-height: 1.3;
   transition: all 0.2s ease-out;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Анимация при обновлении счетчика */
