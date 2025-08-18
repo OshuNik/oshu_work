@@ -129,7 +129,7 @@
     updateCounter(key, count) {
       const counter = this.getElement(`counts.${key}`);
       if (counter) {
-        counter.textContent = `(${count})`;
+        counter.textContent = count;
       }
     }
 
