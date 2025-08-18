@@ -252,20 +252,35 @@
     keywordsInput.value = keywordsString;
     
     try {
-      const response = await fetch(API_ENDPOINTS.SETTINGS, {
-        method: 'POST',
-        headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
-        body: JSON.stringify({ update_key: 1, keywords: keywordsString })
+      // Пробуем PATCH для обновления существующей записи
+      const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
+        method: 'PATCH',
+        headers: createSupabaseHeaders(),
+        body: JSON.stringify({ keywords: keywordsString })
       });
       
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
+          throw new Error('Ошибка авторизации: недействительный API ключ. Очистите кэш браузера (Ctrl+Shift+R) и перезагрузите страницу.');
+        }
+        if (response.status === 404) {
+          // Если записи нет, пробуем создать новую через POST
+          const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
+            method: 'POST',
+            headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
+            body: JSON.stringify({ update_key: 1, keywords: keywordsString })
+          });
+          
+          if (!postResponse.ok) {
+            throw new Error(`POST failed: HTTP ${postResponse.status}: ${postResponse.statusText}`);
+          }
+          console.log('Ключевые слова успешно созданы:', keywordsString);
+          return;
         }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      console.log('Ключевые слова успешно сохранены:', keywordsString);
+      console.log('Ключевые слова успешно обновлены:', keywordsString);
     } catch (error) {
       console.error('Ошибка сохранения ключевых слов:', error);
       if (error.message.includes('авторизации')) {
