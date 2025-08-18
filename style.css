@@ -622,26 +622,75 @@ mark.highlight {
   font-weight: 700;
 }
 
-/* Счетчик избранного в заголовке */
-.favorites-count {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-color);
-  background: var(--accent-green);
-  padding: 4px 12px;
-  border-radius: 8px;
-  border: 2px solid var(--text-color);
-  margin-left: 12px;
-  vertical-align: middle;
-  transition: all 0.2s ease-out;
-  box-shadow: 4px 4px 0px var(--text-color);
-  min-width: 24px;
+/* Ретро заголовок избранного */
+.retro-header {
   text-align: center;
 }
 
+.retro-header h1 {
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  margin: 0 0 8px 0;
+  letter-spacing: 2px;
+}
+
+/* Пиксельный счетчик */
+.pixel-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+}
+
+.pixel-bar {
+  color: var(--accent-green);
+  animation: pixelPulse 2s infinite ease-in-out;
+  letter-spacing: 1px;
+}
+
+.pixel-bar:last-child {
+  animation-delay: 0.5s;
+}
+
+.favorites-count {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-color);
+  background: var(--accent-yellow);
+  padding: 4px 8px;
+  border: 2px solid var(--text-color);
+  box-shadow: 2px 2px 0px var(--text-color);
+  min-width: 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
 .favorites-count.updating {
-  transform: scale(1.1);
+  animation: retroFlash 0.4s ease-out;
+}
+
+/* Анимации */
+@keyframes pixelPulse {
+  0%, 100% { 
+    color: var(--accent-green);
+    transform: scale(1);
+  }
+  50% { 
+    color: var(--accent-blue);
+    transform: scale(1.1);
+  }
+}
+
+@keyframes retroFlash {
+  0% { background: var(--accent-yellow); }
+  25% { background: var(--accent-red); transform: scale(1.1); }
+  50% { background: var(--accent-blue); }
+  75% { background: var(--accent-green); }
+  100% { background: var(--accent-yellow); transform: scale(1); }
 }
 
 .vacancy-list, .settings-tab-content { display: none; }
