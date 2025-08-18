@@ -625,11 +625,12 @@ mark.highlight {
 /* Ретро заголовок избранного */
 .retro-header {
   text-align: center;
+  margin-bottom: 16px;
 }
 
 .retro-header h1 {
   font-family: var(--font-mono);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0 0 12px 0;
   letter-spacing: 1px;
