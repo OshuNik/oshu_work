@@ -50,11 +50,20 @@
     <div id="tab-keywords" class="settings-tab-content active">
       <div class="current-keywords-container">
         <p class="current-keywords-label">Текущие ключевые слова:</p>
-        <p id="current-keywords-display" class="current-keywords-list">Загрузка...</p>
+        <div id="current-keywords-tags" class="keywords-tags-container">
+          <div class="loading-indicator">Загрузка...</div>
+        </div>
+      </div>
+      <div class="add-keyword-section">
+        <label for="new-keyword-input">Добавить ключевое слово:</label>
+        <div class="add-keyword-form">
+          <input type="text" id="new-keyword-input" placeholder="например: монтаж" maxlength="30">
+          <button id="add-keyword-btn" type="button">+</button>
+        </div>
       </div>
       <div class="settings-form">
-        <label for="keywords-input">Изменить список (через запятую):</label>
-        <textarea id="keywords-input" rows="5" placeholder="монтаж, рилс, анимация..."></textarea>
+        <label for="keywords-input">Или изменить весь список (через запятую):</label>
+        <textarea id="keywords-input" rows="4" placeholder="монтаж, рилс, анимация..."></textarea>
       </div>
     </div>
 

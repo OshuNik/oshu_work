@@ -53,6 +53,9 @@
   const settingsTabContents = document.querySelectorAll('.settings-tab-content');
   const keywordsInput = document.getElementById('keywords-input');
   const keywordsDisplay = document.getElementById('current-keywords-display');
+  const keywordsTagsContainer = document.getElementById('current-keywords-tags');
+  const newKeywordInput = document.getElementById('new-keyword-input');
+  const addKeywordBtn = document.getElementById('add-keyword-btn');
   const saveBtn = document.getElementById('save-button');
   const loadDefaultsBtn = document.getElementById('load-defaults-btn');
   const addChannelBtn = document.getElementById('add-channel-btn');
@@ -160,13 +163,102 @@
     });
   });
 
+  // Хранилище текущих ключевых слов
+  let currentKeywords = [];
+
+  function createKeywordTag(keyword) {
+    const tag = document.createElement('div');
+    tag.className = 'keyword-tag';
+    tag.innerHTML = `
+      <span class="keyword-tag-text">${escapeHtml(keyword)}</span>
+      <button class="keyword-tag-remove" type="button" data-keyword="${escapeHtml(keyword)}">×</button>
+    `;
+    
+    // Добавляем обработчик удаления
+    const removeBtn = tag.querySelector('.keyword-tag-remove');
+    removeBtn.addEventListener('click', () => removeKeyword(keyword));
+    
+    return tag;
+  }
+
+  function displayKeywordTags() {
+    if (!keywordsTagsContainer) return;
+    
+    keywordsTagsContainer.innerHTML = '';
+    
+    if (currentKeywords.length === 0) {
+      keywordsTagsContainer.innerHTML = '<div class="loading-indicator">-- ключевые слова не заданы --</div>';
+      return;
+    }
+    
+    currentKeywords.forEach(keyword => {
+      if (keyword.trim()) {
+        const tag = createKeywordTag(keyword.trim());
+        keywordsTagsContainer.appendChild(tag);
+      }
+    });
+  }
+
+  function addKeyword(keyword) {
+    const trimmed = keyword.trim().toLowerCase();
+    if (!trimmed || trimmed.length > 30) {
+      safeAlert('Ключевое слово должно содержать от 1 до 30 символов');
+      return false;
+    }
+    
+    if (currentKeywords.map(k => k.toLowerCase()).includes(trimmed)) {
+      safeAlert('Такое ключевое слово уже существует');
+      return false;
+    }
+    
+    currentKeywords.push(trimmed);
+    updateKeywordsInDatabase();
+    displayKeywordTags();
+    return true;
+  }
+
+  function removeKeyword(keyword) {
+    const index = currentKeywords.findIndex(k => k.toLowerCase() === keyword.toLowerCase());
+    if (index > -1) {
+      // Анимация удаления
+      const tagElement = keywordsTagsContainer.querySelector(`[data-keyword="${escapeHtml(keyword)}"]`)?.parentElement;
+      if (tagElement) {
+        tagElement.classList.add('removing');
+        setTimeout(() => {
+          currentKeywords.splice(index, 1);
+          updateKeywordsInDatabase();
+          displayKeywordTags();
+        }, 200);
+      } else {
+        currentKeywords.splice(index, 1);
+        updateKeywordsInDatabase();
+        displayKeywordTags();
+      }
+    }
+  }
+
+  async function updateKeywordsInDatabase() {
+    const keywordsString = currentKeywords.join(', ');
+    keywordsInput.value = keywordsString;
+    
+    try {
+      await fetch(API_ENDPOINTS.SETTINGS, {
+        method: 'POST',
+        headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
+        body: JSON.stringify({ update_key: 1, keywords: keywordsString })
+      });
+    } catch (error) {
+      console.error('Ошибка сохранения ключевых слов:', error);
+    }
+  }
+
   async function loadKeywords() {
-    if (!keywordsDisplay) {
-        console.error('loadKeywords: элемент keywordsDisplay не найден');
+    if (!keywordsTagsContainer) {
+        console.error('loadKeywords: элемент keywordsTagsContainer не найден');
         return;
     }
     saveBtn.disabled = true;
-    keywordsDisplay.textContent = 'Загрузка...';
+    keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Загрузка...</div>';
     try {
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
         headers: createSupabaseHeaders()
@@ -174,11 +266,14 @@
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       const keywords = data.length > 0 ? data[0].keywords : '';
+      
+      // Парсим ключевые слова
+      currentKeywords = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
       keywordsInput.value = keywords;
-      keywordsDisplay.textContent = keywords || '-- не заданы --';
+      displayKeywordTags();
     } catch (error) {
       console.error('loadKeywords: произошла ошибка', error);
-      keywordsDisplay.textContent = 'Ошибка загрузки';
+      keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
     } finally {
       saveBtn.disabled = false;
     }
@@ -189,12 +284,16 @@
     const kws = keywordsInput.value.trim();
     saveBtn.disabled = true;
     try {
+      // Обновляем текущие ключевые слова из textarea
+      currentKeywords = kws ? kws.split(',').map(k => k.trim()).filter(k => k) : [];
+      
       await fetch(API_ENDPOINTS.SETTINGS, {
         method: 'POST',
         headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
         body: JSON.stringify({ update_key: 1, keywords: kws })
       });
-      keywordsDisplay.textContent = kws || '-- не заданы --';
+      
+      displayKeywordTags();
       uiToast(MESSAGES.SUCCESS.KEYWORDS_SAVED);
     } catch (error) {
       console.error('saveKeywords: произошла ошибка', error);
@@ -394,6 +493,28 @@
       deleteAllBtn.disabled = false;
     }
   });
+
+  // Обработчики для визуальных тегов ключевых слов
+  if (addKeywordBtn) {
+    addKeywordBtn.addEventListener('click', () => {
+      const keyword = newKeywordInput?.value?.trim();
+      if (keyword && addKeyword(keyword)) {
+        newKeywordInput.value = '';
+      }
+    });
+  }
+
+  if (newKeywordInput) {
+    newKeywordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const keyword = newKeywordInput.value.trim();
+        if (keyword && addKeyword(keyword)) {
+          newKeywordInput.value = '';
+        }
+      }
+    });
+  }
 
   // Инициализация приложения
   loadKeywords();
