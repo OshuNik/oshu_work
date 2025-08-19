@@ -54,37 +54,37 @@
 /* Темная тема */
 [data-theme="dark"], 
 .dark-theme {
-    /* Основные цвета для темной темы */
-    --background-color: #1A1A1A;
-    --card-color: #2D2D2D;
-    --text-color: #FFFFFF;
-    --hint-color: #888888;
-    --border-color: #404040;
-    --input-bg: #2D2D2D;
-    --input-border: #404040;
-    --secondary-bg: #252525;
-    --header-bg: #2D2D2D;
-    --button-bg: #3D3D3D;
-    --button-text: #FFFFFF;
-    --destructive-color: #FF6B6B;
-    --link-color: #5FB3FF;
-    --section-separator: #404040;
+    /* Основные цвета для темной темы - улучшенная схема */
+    --background-color: #0F0F0F;          /* Очень темный фон для лучшего контраста */
+    --card-color: #1E1E1E;                /* Карточки немного светлее фона */
+    --text-color: #F5F5F5;                /* Почти белый текст для максимальной читаемости */
+    --hint-color: #A0A0A0;                /* Более светлые подсказки */
+    --border-color: #3A3A3A;              /* Границы с достаточным контрастом */
+    --input-bg: #2A2A2A;                  /* Поля ввода с хорошим контрастом */
+    --input-border: #4A4A4A;              /* Границы полей ввода */
+    --secondary-bg: #161616;              /* Вторичный фон */
+    --header-bg: #1E1E1E;                 /* Фон заголовка */
+    --button-bg: #2D2D2D;                 /* Фон кнопок */
+    --button-text: #F5F5F5;               /* Текст кнопок */
+    --destructive-color: #FF6B6B;         /* Цвет удаления */
+    --link-color: #64B5F6;                /* Более яркие ссылки */
+    --section-separator: #2A2A2A;         /* Разделители секций */
     
-    /* Темные акцентные цвета (более мягкие для темной темы) */
-    --accent-red: #FF6B6B;
-    --accent-yellow: #FFE066;
-    --accent-green: #7ED87E;
-    --accent-blue: #5FB3FF;
+    /* Улучшенные акцентные цвета для темной темы */
+    --accent-red: #FF6B6B;                /* Красный с хорошим контрастом */
+    --accent-yellow: #FFD54F;             /* Желтый с улучшенной видимостью */
+    --accent-green: #81C784;              /* Зеленый с достаточным контрастом */
+    --accent-blue: #64B5F6;               /* Синий с хорошей видимостью */
     
-    /* Темные тени */
-    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.3);
-    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.3);
+    /* Улучшенные тени для темной темы */
+    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.4);
+    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.4);
 }
 
 /* Автоматическая темная тема (следует системным настройкам) */
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        /* Основные цвета для темной темы */
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+        /* Основные цвета для темной темы - только для авто-режима */
         --background-color: #1A1A1A;
         --card-color: #2D2D2D;
         --text-color: #FFFFFF;
@@ -110,6 +110,34 @@
         --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.3);
         --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.3);
     }
+}
+
+/* Принудительная светлая тема */
+[data-theme="light"] {
+    --background-color: #F0F0F0;
+    --card-color: #FFFFFF;
+    --text-color: #000000;
+    --hint-color: #666666;
+    --border-color: #000000;
+    --input-bg: #FFFFFF;
+    --input-border: #CCCCCC;
+    --secondary-bg: #E8E8E8;
+    --header-bg: #FFFFFF;
+    --button-bg: #FFFFFF;
+    --button-text: #000000;
+    --destructive-color: #FF5C5C;
+    --link-color: #41A6FF;
+    --section-separator: #E0E0E0;
+    
+    /* Светлые акцентные цвета */
+    --accent-red: #FF5C5C;
+    --accent-yellow: #FFD93D;
+    --accent-green: #6BCB77;
+    --accent-blue: #41A6FF;
+    
+    /* Светлые тени */
+    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--border-color);
 }
 
 /* === УТИЛИТАРНЫЕ КЛАССЫ === */
@@ -1851,4 +1879,165 @@ body.high-contrast[data-theme="dark"] {
   --accent-green: #66FF66;
   --accent-red: #FF6666;
   --accent-yellow: #FFCC66;
+}
+
+/* Дополнительные стили для улучшения читаемости в темной теме */
+[data-theme="dark"] .vacancy-card {
+  background-color: var(--card-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .header {
+  background-color: var(--header-bg);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .search-input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .search-input::placeholder {
+  color: var(--hint-color);
+}
+
+[data-theme="dark"] .category-tab {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .category-tab.active {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+[data-theme="dark"] .settings-tab-button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .settings-tab-button.active {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+[data-theme="dark"] .settings-form input,
+[data-theme="dark"] .settings-form textarea {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .settings-form input::placeholder,
+[data-theme="dark"] .settings-form textarea::placeholder {
+  color: var(--hint-color);
+}
+
+[data-theme="dark"] .button-load-defaults,
+[data-theme="dark"] .button-delete {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .button-load-defaults:hover,
+[data-theme="dark"] .button-delete:hover {
+  background-color: var(--secondary-bg);
+}
+
+/* Улучшенные стили для переключателей в темной теме */
+[data-theme="dark"] .toggle-slider {
+  background-color: var(--hint-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .toggle-slider:before {
+  background-color: var(--card-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .toggle-switch input:checked + .toggle-slider {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+[data-theme="dark"] .toggle-switch input:checked + .toggle-slider:before {
+  background-color: white;
+  border-color: var(--accent-green);
+}
+
+/* Стили для светлой темы */
+[data-theme="light"] .vacancy-card {
+  background-color: var(--card-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+[data-theme="light"] .header {
+  background-color: var(--header-bg);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="light"] .search-input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-color);
+}
+
+[data-theme="light"] .search-input::placeholder {
+  color: var(--hint-color);
+}
+
+[data-theme="light"] .category-tab {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .category-tab.active {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+[data-theme="light"] .settings-tab-button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .settings-tab-button.active {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+[data-theme="light"] .settings-form input,
+[data-theme="light"] .settings-form textarea {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-color);
+}
+
+[data-theme="light"] .settings-form input::placeholder,
+[data-theme="light"] .settings-form textarea::placeholder {
+  color: var(--hint-color);
+}
+
+[data-theme="light"] .button-load-defaults,
+[data-theme="light"] .button-delete {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .button-load-defaults:hover,
+[data-theme="light"] .button-delete:hover {
+  background-color: var(--secondary-bg);
 }

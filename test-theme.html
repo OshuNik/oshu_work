@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест тем</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-card {
+            background-color: var(--card-color);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+        }
+        .test-button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: 2px solid var(--border-color);
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+        }
+        .test-input {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid var(--input-border);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            width: 100%;
+            font-family: var(--font-mono);
+        }
+        .theme-info {
+            background-color: var(--secondary-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="color: var(--text-color);">Тест переключения тем</h1>
+        
+        <div class="theme-info">
+            <h3>Текущая тема: <span id="current-theme">Авто</span></h3>
+            <p>Цвет фона: <span id="bg-color">-</span></p>
+            <p>Цвет текста: <span id="text-color">-</span></p>
+        </div>
+        
+        <div class="test-card">
+            <h3 style="color: var(--text-color);">Тестовая карточка</h3>
+            <p style="color: var(--hint-color);">Это тестовая карточка для проверки цветов темы</p>
+            <input type="text" class="test-input" placeholder="Тестовое поле ввода">
+            <button class="test-button">Тестовая кнопка</button>
+        </div>
+        
+        <div class="test-card">
+            <h3 style="color: var(--text-color);">Переключатели тем</h3>
+            <button class="test-button" onclick="setTheme('auto')">Авто</button>
+            <button class="test-button" onclick="setTheme('light')">Светлая</button>
+            <button class="test-button" onclick="setTheme('dark')">Темная</button>
+        </div>
+        
+        <div class="test-card">
+            <h3 style="color: var(--text-color);">Акцентные цвета</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="background-color: var(--accent-red); color: white; padding: 10px; border-radius: 8px;">Красный</div>
+                <div style="background-color: var(--accent-yellow); color: black; padding: 10px; border-radius: 8px;">Желтый</div>
+                <div style="background-color: var(--accent-green); color: white; padding: 10px; border-radius: 8px;">Зеленый</div>
+                <div style="background-color: var(--accent-blue); color: white; padding: 10px; border-radius: 8px;">Синий</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="theme-manager.js"></script>
+    <script>
+        function setTheme(theme) {
+            if (window.ThemeManager) {
+                window.ThemeManager.setTheme(theme);
+                updateThemeInfo();
+            }
+        }
+        
+        function updateThemeInfo() {
+            const currentTheme = localStorage.getItem('app-theme') || 'auto';
+            const themeNames = { auto: 'Авто', light: 'Светлая', dark: 'Темная' };
+            
+            document.getElementById('current-theme').textContent = themeNames[currentTheme] || currentTheme;
+            document.getElementById('bg-color').textContent = getComputedStyle(document.documentElement).getPropertyValue('--background-color');
+            document.getElementById('text-color').textContent = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
+        }
+        
+        // Обновляем информацию при загрузке
+        document.addEventListener('DOMContentLoaded', updateThemeInfo);
+        
+        // Обновляем информацию при смене темы
+        const observer = new MutationObserver(updateThemeInfo);
+        observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+    </script>
+</body>
+</html>

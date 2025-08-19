@@ -730,7 +730,13 @@
   themeRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
       if (e.target.checked) {
-        setTheme(e.target.value);
+        const selectedTheme = e.target.value;
+        console.log('Переключение темы на:', selectedTheme);
+        setTheme(selectedTheme);
+        
+        // Обновляем состояние всех радиокнопок
+        themeRadios.forEach(r => r.checked = false);
+        e.target.checked = true;
       }
     });
   });

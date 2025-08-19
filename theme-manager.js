@@ -38,15 +38,99 @@
     switch (theme) {
       case 'dark':
         body.setAttribute('data-theme', 'dark');
+        // Принудительно применяем темную тему
+        applyDarkTheme();
         break;
       case 'light':
         body.setAttribute('data-theme', 'light');
+        // Принудительно применяем светлую тему
+        applyLightTheme();
         break;
       case 'auto':
       default:
         // Авто-тема использует CSS @media (prefers-color-scheme)
+        // Убираем принудительные стили
+        removeForcedTheme();
         break;
     }
+  }
+  
+  // Принудительное применение темной темы
+  function applyDarkTheme() {
+    const root = document.documentElement;
+    const darkColors = {
+      '--background-color': '#0F0F0F',
+      '--card-color': '#1E1E1E',
+      '--text-color': '#F5F5F5',
+      '--hint-color': '#A0A0A0',
+      '--border-color': '#3A3A3A',
+      '--input-bg': '#2A2A2A',
+      '--input-border': '#4A4A4A',
+      '--secondary-bg': '#161616',
+      '--header-bg': '#1E1E1E',
+      '--button-bg': '#2D2D2D',
+      '--button-text': '#F5F5F5',
+      '--destructive-color': '#FF6B6B',
+      '--link-color': '#64B5F6',
+      '--section-separator': '#2A2A2A',
+      '--accent-red': '#FF6B6B',
+      '--accent-yellow': '#FFD54F',
+      '--accent-green': '#81C784',
+      '--accent-blue': '#64B5F6',
+      '--box-shadow': '4px 4px 0px rgba(0, 0, 0, 0.4)',
+      '--box-shadow-pressed': '2px 2px 0px rgba(0, 0, 0, 0.4)'
+    };
+    
+    Object.entries(darkColors).forEach(([property, value]) => {
+      root.style.setProperty(property, value);
+    });
+  }
+  
+  // Принудительное применение светлой темы
+  function applyLightTheme() {
+    const root = document.documentElement;
+    const lightColors = {
+      '--background-color': '#F0F0F0',
+      '--card-color': '#FFFFFF',
+      '--text-color': '#000000',
+      '--hint-color': '#666666',
+      '--border-color': '#000000',
+      '--input-bg': '#FFFFFF',
+      '--input-border': '#CCCCCC',
+      '--secondary-bg': '#E8E8E8',
+      '--header-bg': '#FFFFFF',
+      '--button-bg': '#FFFFFF',
+      '--button-text': '#000000',
+      '--destructive-color': '#FF5C5C',
+      '--link-color': '#41A6FF',
+      '--section-separator': '#E0E0E0',
+      '--accent-red': '#FF5C5C',
+      '--accent-yellow': '#FFD93D',
+      '--accent-green': '#6BCB77',
+      '--accent-blue': '#41A6FF',
+      '--box-shadow': '4px 4px 0px #000000',
+      '--box-shadow-pressed': '2px 2px 0px #000000'
+    };
+    
+    Object.entries(lightColors).forEach(([property, value]) => {
+      root.style.setProperty(property, value);
+    });
+  }
+  
+  // Убираем принудительные стили для авто-темы
+  function removeForcedTheme() {
+    const root = document.documentElement;
+    const allColorProperties = [
+      '--background-color', '--card-color', '--text-color', '--hint-color',
+      '--border-color', '--input-bg', '--input-border', '--secondary-bg',
+      '--header-bg', '--button-bg', '--button-text', '--destructive-color',
+      '--link-color', '--section-separator', '--accent-red', '--accent-yellow',
+      '--accent-green', '--accent-blue', '--box-shadow', '--box-shadow-pressed'
+    ];
+    
+    allColorProperties.forEach(property => {
+      root.style.removeProperty(property);
+    });
   }
   
   function applyTelegramTheme(themeParams) {
