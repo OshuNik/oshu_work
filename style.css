@@ -1116,7 +1116,7 @@ mark.highlight {
   font-weight: 400;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -1125,7 +1125,7 @@ mark.highlight {
   gap: 8px;
   min-height: 80px;
   justify-content: center;
-  will-change: transform, background-color;
+  will-change: transform, background-color, box-shadow;
   
   /* Ретро-эффект: пиксельные границы */
   image-rendering: pixelated;
@@ -1133,22 +1133,23 @@ mark.highlight {
 }
 
 .settings-tab-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 6px 6px 0px var(--border-color);
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 0px var(--border-color);
   background: var(--secondary-bg);
 }
 
 .settings-tab-button:active {
-  transform: translateY(0px);
+  transform: translateY(1px);
   box-shadow: var(--box-shadow-pressed);
+  animation: pressGlitch 0.15s ease-out;
 }
 
 .settings-tab-button.active {
   background: var(--accent-blue);
   color: white;
   border-color: var(--accent-blue);
-  box-shadow: 6px 6px 0px rgba(65, 166, 255, 0.4);
-  transform: translateY(-2px);
+  box-shadow: 5px 5px 0px rgba(65, 166, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 /* Иконки вкладок */
@@ -1217,13 +1218,37 @@ mark.highlight {
 
 /* Эффект глитча при переключении */
 .settings-tab-button.switching {
-  animation: glitch 0.2s ease-in-out;
+  animation: glitch 0.15s ease-out;
 }
 
 @keyframes glitch {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-2px); }
   75% { transform: translateX(2px); }
+}
+
+/* Новый глитч-эффект при нажатии */
+@keyframes pressGlitch {
+  0% {
+    transform: translateY(1px) scale(0.98);
+    filter: brightness(0.95);
+  }
+  25% {
+    transform: translateY(1px) scale(0.99) translateX(-1px);
+    filter: brightness(0.97);
+  }
+  50% {
+    transform: translateY(1px) scale(0.98) translateX(1px);
+    filter: brightness(0.95);
+  }
+  75% {
+    transform: translateY(1px) scale(0.99) translateX(-0.5px);
+    filter: brightness(0.97);
+  }
+  100% {
+    transform: translateY(1px) scale(1);
+    filter: brightness(1);
+  }
 }
 .settings-form { display: flex; flex-direction: column; gap: 15px; }
 .settings-form label { font-weight: 700; margin-top: 10px; }

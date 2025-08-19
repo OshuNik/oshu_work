@@ -760,7 +760,7 @@
         // Убираем эффект глитча
         setTimeout(() => {
           this.classList.remove('switching');
-        }, 200);
+        }, 150);
         
         // Добавляем звуковой эффект (если доступен)
         if (window.AudioContext || window.webkitAudioContext) {
