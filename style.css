@@ -768,6 +768,16 @@ mark.highlight {
   animation: countingComplete 0.4s ease-out;
 }
 
+/* Специальные стили для заголовка настроек */
+.header-centered h1 {
+  font-family: var(--font-pixel);
+  font-size: 33px;
+  font-weight: 400;
+  margin: 0 0 12px 0;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
 /* Иконка настроек в заголовке */
 .settings-icon {
   font-family: var(--font-pixel);
