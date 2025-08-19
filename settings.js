@@ -189,6 +189,8 @@
     
     if (currentKeywords.length === 0) {
       keywordsTagsContainer.innerHTML = '<div class="loading-indicator">-- ключевые слова не заданы --</div>';
+      // Обновляем счетчик и предварительный просмотр
+      updateKeywordsCount();
       return;
     }
     
@@ -198,6 +200,9 @@
         keywordsTagsContainer.appendChild(tag);
       }
     });
+    
+    // Обновляем счетчик и предварительный просмотр
+    updateKeywordsCount();
   }
 
   function addKeyword(keyword) {
@@ -383,6 +388,13 @@
     channelItem.className = 'channel-item';
     channelItem.dataset.dbId = channel.id;
     
+    // Добавляем чекбокс для выбора
+    const selectContainer = document.createElement('div');
+    selectContainer.className = 'channel-item-toggle';
+    const selectInput = document.createElement('input');
+    selectInput.type = 'checkbox';
+    selectInput.className = 'channel-select-checkbox';
+    
     const infoDiv = document.createElement('div');
     infoDiv.className = 'channel-item-info';
     
@@ -398,6 +410,7 @@
     idLink.href = `https://t.me/${cleanId}`;
     idLink.target = '_blank';
     idLink.rel = 'noopener noreferrer';
+    
     const toggleContainer = document.createElement('div');
     toggleContainer.className = 'channel-item-toggle';
     const toggleLabel = document.createElement('label');
@@ -407,62 +420,81 @@
     toggleInput.checked = channel.is_enabled;
     const toggleSlider = document.createElement('span');
     toggleSlider.className = 'toggle-slider';
+    
     const deleteButton = document.createElement('button');
     deleteButton.className = 'channel-item-delete';
     deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-    // Создаем обработчики как отдельные функции для возможности cleanup
-          const deleteHandler = async () => {
-        const dbId = channelItem.dataset.dbId;
-        if (!dbId) return;
-        const ok = await showCustomConfirm('Удалить этот канал?');
-        if (!ok) return;
-        channelItem.style.opacity = '0.5';
-        try {
-          const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
-            method: 'DELETE',
-            headers: createSupabaseHeaders()
-          });
-          if (!response.ok) throw new Error('Ошибка ответа сети');
-          channelItem.remove();
-          uiToast(MESSAGES.SUCCESS.CHANNEL_DELETED);
-        } catch (error) {
-          console.error('Ошибка удаления канала:', error);
-          safeAlert(MESSAGES.ERRORS.DELETE_FAILED);
-          channelItem.style.opacity = '1';
-        }
-      };
     
-          const toggleHandler = async (event) => {
-        const dbId = channelItem.dataset.dbId;
-        const is_enabled = event.target.checked;
-        if (!dbId) return;
-        try {
-          const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
-            method: 'PATCH',
-            headers: createSupabaseHeaders(),
-            body: JSON.stringify({ is_enabled: is_enabled })
-          });
-          if (!response.ok) throw new Error('Ошибка ответа сети');
-          uiToast(is_enabled ? MESSAGES.SUCCESS.CHANNEL_TOGGLED : MESSAGES.SUCCESS.CHANNEL_DISABLED);
-        } catch (error) {
-          console.error('Ошибка обновления статуса канала:', error);
-          safeAlert(MESSAGES.ERRORS.UPDATE_FAILED);
-          event.target.checked = !is_enabled;
-        }
-      };
+    // Создаем обработчики как отдельные функции для возможности cleanup
+    const deleteHandler = async () => {
+      const dbId = channelItem.dataset.dbId;
+      if (!dbId) return;
+      const ok = await showCustomConfirm('Удалить этот канал?');
+      if (!ok) return;
+      channelItem.style.opacity = '0.5';
+      try {
+        const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+          method: 'DELETE',
+          headers: createSupabaseHeaders()
+        });
+        if (!response.ok) throw new Error('Ошибка ответа сети');
+        channelItem.remove();
+        uiToast(MESSAGES.SUCCESS.CHANNEL_DELETED);
+        // Обновляем состояние кнопки удаления выбранных
+        updateDeleteSelectedButton();
+      } catch (error) {
+        console.error('Ошибка удаления канала:', error);
+        safeAlert(MESSAGES.ERRORS.DELETE_FAILED);
+        channelItem.style.opacity = '1';
+      }
+    };
+    
+    const toggleHandler = async (event) => {
+      const dbId = channelItem.dataset.dbId;
+      const is_enabled = event.target.checked;
+      if (!dbId) return;
+      try {
+        const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+          method: 'PATCH',
+          headers: createSupabaseHeaders(),
+          body: JSON.stringify({ is_enabled: is_enabled })
+        });
+        if (!response.ok) throw new Error('Ошибка ответа сети');
+        uiToast(is_enabled ? MESSAGES.SUCCESS.CHANNEL_TOGGLED : MESSAGES.SUCCESS.CHANNEL_DISABLED);
+      } catch (error) {
+        console.error('Ошибка обновления статуса канала:', error);
+        safeAlert(MESSAGES.ERRORS.UPDATE_FAILED);
+        event.target.checked = !is_enabled;
+      }
+    };
+
+    // Обработчик для чекбокса выбора
+    const selectHandler = () => {
+      if (selectInput.checked) {
+        channelItem.classList.add('selected');
+      } else {
+        channelItem.classList.remove('selected');
+      }
+      updateDeleteSelectedButton();
+    };
     
     deleteButton.addEventListener('click', deleteHandler);
     toggleInput.addEventListener('change', toggleHandler);
+    selectInput.addEventListener('change', selectHandler);
     
     // Сохраняем cleanup функцию на элементе
     channelItem.cleanup = () => {
       deleteButton.removeEventListener('click', deleteHandler);
       toggleInput.removeEventListener('change', toggleHandler);
+      selectInput.removeEventListener('change', selectHandler);
     };
+    
+    selectContainer.appendChild(selectInput);
     infoDiv.append(titleSpan, idLink);
     toggleLabel.append(toggleInput, toggleSlider);
     toggleContainer.append(toggleLabel);
-    channelItem.append(infoDiv, toggleContainer, deleteButton);
+    channelItem.append(selectContainer, infoDiv, toggleContainer, deleteButton);
+    
     const emptyListMessage = channelsListContainer.querySelector('.empty-list');
     if (emptyListMessage) emptyListMessage.remove();
     channelsListContainer.appendChild(channelItem);
@@ -517,6 +549,9 @@
       } else {
           channelsListContainer.innerHTML = '<p class="empty-list">-- Список каналов пуст --</p>';
       }
+      
+      // Обновляем состояние кнопки удаления выбранных
+      updateDeleteSelectedButton();
     } catch (error) {
       console.error('loadChannels: произошла ошибка', error);
       if (error.message.includes('авторизации')) {
@@ -868,7 +903,7 @@
     const batchInput = document.getElementById('batch-keywords-input');
     const clearBatchBtn = document.getElementById('clear-batch-btn');
 
-    // Загружаем ключевые слова
+    // Загружаем ключевые слова из базы данных
     loadKeywords();
 
     // Разворачивание/сворачивание секции
@@ -930,44 +965,32 @@
     updateKeywordsCount();
   }
 
-  // Загрузка ключевых слов
-  function loadKeywords() {
-    const keywordsContainer = document.getElementById('current-keywords-tags');
-    if (!keywordsContainer) return;
-
-    const keywords = localStorage.getItem('keywords') || '';
-    const keywordsList = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
+  // Обновление счетчика ключевых слов
+  function updateKeywordsCount() {
+    const keywordsTags = document.querySelectorAll('#current-keywords-tags .keyword-tag');
+    const countBadge = document.getElementById('keywords-count');
+    const previewTags = document.getElementById('keywords-preview-tags');
     
-    if (keywordsList.length === 0) {
-      keywordsContainer.innerHTML = '<div class="empty-state">Нет ключевых слов</div>';
-    } else {
-      keywordsContainer.innerHTML = keywordsList.map(keyword => `
-        <div class="keyword-tag">
-          <span class="keyword-tag-text">${keyword}</span>
-          <button class="keyword-tag-remove" data-keyword="${keyword}">×</button>
-        </div>
-      `).join('');
-      
-      // Добавляем обработчики удаления
-      document.querySelectorAll('.keyword-tag-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const keyword = btn.getAttribute('data-keyword');
-          removeKeyword(keyword);
-        });
-      });
+    if (countBadge) {
+      countBadge.textContent = keywordsTags.length;
     }
-    
-    updateKeywordsCount();
-  }
 
-  // Удаление ключевого слова
-  function removeKeyword(keyword) {
-    const keywords = localStorage.getItem('keywords') || '';
-    const keywordsList = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
-    const filteredKeywords = keywordsList.filter(k => k !== keyword);
-    
-    localStorage.setItem('keywords', filteredKeywords.join(','));
-    loadKeywords();
+    // Обновляем предварительный просмотр
+    if (previewTags) {
+      if (keywordsTags.length === 0) {
+        previewTags.innerHTML = '<span class="no-keywords">Нет ключевых слов</span>';
+      } else {
+        const previewHTML = Array.from(keywordsTags.slice(0, 3))
+          .map(tag => {
+            const text = tag.querySelector('.keyword-tag-text')?.textContent || '';
+            return `<span class="preview-tag">${text}</span>`;
+          })
+          .join('');
+        
+        const remaining = keywordsTags.length > 3 ? `+${keywordsTags.length - 3}` : '';
+        previewTags.innerHTML = previewHTML + (remaining ? `<span class="preview-more">${remaining}</span>` : '');
+      }
+    }
   }
 
   // === СЕКЦИЯ КАНАЛОВ ===
@@ -978,7 +1001,7 @@
     const exampleBtns = document.querySelectorAll('.example-btn');
     const channelInput = document.getElementById('channel-input');
 
-    // Загружаем каналы
+    // Загружаем каналы из базы данных
     loadChannels();
 
     // Выбор всех каналов
@@ -1059,82 +1082,6 @@
 
     // Инициализация состояния кнопки удаления
     updateDeleteSelectedButton();
-  }
-
-  // Загрузка каналов
-  function loadChannels() {
-    const channelsList = document.getElementById('channels-list');
-    if (!channelsList) return;
-
-    const channels = localStorage.getItem('channels') || '';
-    const channelsListData = channels ? channels.split(',').map(c => c.trim()).filter(c => c) : [];
-    
-    if (channelsListData.length === 0) {
-      channelsList.innerHTML = '<div class="empty-state">Нет добавленных каналов</div>';
-    } else {
-      channelsList.innerHTML = channelsListData.map(channel => `
-        <div class="channel-item">
-          <div class="channel-item-toggle">
-            <input type="checkbox" />
-          </div>
-          <div class="channel-item-info">
-            <div class="channel-item-title">${channel}</div>
-            <a href="https://t.me/${channel.replace('@', '')}" class="channel-item-id" target="_blank">${channel}</a>
-          </div>
-          <button class="channel-item-delete" data-channel="${channel}">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 6L6 18M6 6L18 18"/>
-            </svg>
-          </button>
-        </div>
-      `).join('');
-      
-      // Добавляем обработчики удаления
-      document.querySelectorAll('.channel-item-delete').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const channel = btn.getAttribute('data-channel');
-          removeChannel(channel);
-        });
-      });
-    }
-  }
-
-  // Удаление канала
-  function removeChannel(channel) {
-    const channels = localStorage.getItem('channels') || '';
-    const channelsList = channels ? channels.split(',').map(c => c.trim()).filter(c => c) : [];
-    const filteredChannels = channelsList.filter(c => c !== channel);
-    
-    localStorage.setItem('channels', filteredChannels.join(','));
-    loadChannels();
-  }
-
-  // Обновление счетчика ключевых слов
-  function updateKeywordsCount() {
-    const keywordsTags = document.querySelectorAll('#current-keywords-tags .keyword-tag');
-    const countBadge = document.getElementById('keywords-count');
-    const previewTags = document.getElementById('keywords-preview-tags');
-    
-    if (countBadge) {
-      countBadge.textContent = keywordsTags.length;
-    }
-
-    // Обновляем предварительный просмотр
-    if (previewTags) {
-      if (keywordsTags.length === 0) {
-        previewTags.innerHTML = '<span class="no-keywords">Нет ключевых слов</span>';
-      } else {
-        const previewHTML = Array.from(keywordsTags.slice(0, 3))
-          .map(tag => {
-            const text = tag.querySelector('.keyword-tag-text')?.textContent || '';
-            return `<span class="preview-tag">${text}</span>`;
-          })
-          .join('');
-        
-        const remaining = keywordsTags.length > 3 ? `+${keywordsTags.length - 3}` : '';
-        previewTags.innerHTML = previewHTML + (remaining ? `<span class="preview-more">${remaining}</span>` : '');
-      }
-    }
   }
 
   // Обновление состояния кнопки удаления выбранных
@@ -1287,4 +1234,94 @@
     `;
     document.head.appendChild(style);
   });
+
+  // === ДОПОЛНИТЕЛЬНЫЕ ОБРАБОТЧИКИ ДЛЯ НОВОГО ИНТЕРФЕЙСА ===
+
+  // Обработчик для добавления ключевого слова по одному
+  if (addKeywordBtn) {
+    addKeywordBtn.addEventListener('click', () => {
+      const keyword = newKeywordInput?.value?.trim();
+      if (keyword && addKeyword(keyword)) {
+        newKeywordInput.value = '';
+        // Обновляем счетчик и предварительный просмотр
+        setTimeout(() => {
+          updateKeywordsCount();
+        }, 100);
+      }
+    });
+  }
+
+  // Обработчик для добавления ключевых слов пачкой
+  const addBatchBtn = document.getElementById('add-batch-btn');
+  if (addBatchBtn) {
+    addBatchBtn.addEventListener('click', () => {
+      const batchInput = document.getElementById('batch-keywords-input');
+      if (batchInput && batchInput.value.trim()) {
+        const keywords = batchInput.value
+          .split(/[,\n\s]+/)
+          .map(k => k.trim())
+          .filter(k => k);
+        
+        if (keywords.length > 0) {
+          keywords.forEach(keyword => {
+            if (keyword) addKeyword(keyword);
+          });
+          
+          batchInput.value = '';
+          uiToast(`Добавлено ${keywords.length} ключевых слов`);
+          
+          // Обновляем счетчик и предварительный просмотр
+          setTimeout(() => {
+            updateKeywordsCount();
+          }, 100);
+        }
+      }
+    });
+  }
+
+  // Обработчик для добавления канала
+  if (addChannelBtn) {
+    addChannelBtn.addEventListener('click', async () => {
+      const channelId = validateAndFormatChannelId(channelInput?.value);
+      if (channelId) {
+        await addChannel();
+        // Обновляем интерфейс после добавления
+        setTimeout(() => {
+          updateDeleteSelectedButton();
+        }, 100);
+      }
+    });
+  }
+
+  // Обработчик для Enter в поле добавления ключевого слова
+  if (newKeywordInput) {
+    newKeywordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const keyword = newKeywordInput.value.trim();
+        if (keyword && addKeyword(keyword)) {
+          newKeywordInput.value = '';
+          setTimeout(() => {
+            updateKeywordsCount();
+          }, 100);
+        }
+      }
+    });
+  }
+
+  // Обработчик для Enter в поле добавления канала
+  if (channelInput) {
+    channelInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const channelId = validateAndFormatChannelId(channelInput.value);
+        if (channelId) {
+          addChannel();
+          setTimeout(() => {
+            updateDeleteSelectedButton();
+          }, 100);
+        }
+      }
+    });
+  }
 })();

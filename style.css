@@ -3254,3 +3254,60 @@ body.high-contrast[data-theme="dark"] {
 [data-theme="dark"] .theme-preview-card.dark-theme {
   background: var(--background-color);
 }
+
+/* Чекбокс для выбора */
+.channel-item-toggle .channel-select-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent-blue);
+  margin: 0;
+}
+
+/* Переключатель для включения/выключения канала */
+.channel-item-toggle .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  margin-left: 12px;
+}
+
+.channel-item-toggle .toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.channel-item-toggle .toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 24px;
+  transition: .2s;
+}
+
+.channel-item-toggle .toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 50%;
+  transition: .2s;
+}
+
+.channel-item-toggle input:checked + .toggle-slider {
+  background-color: var(--accent-green);
+}
+
+.channel-item-toggle input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
