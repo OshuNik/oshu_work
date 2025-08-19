@@ -596,6 +596,59 @@
   });
 
   loadDefaultsBtn?.addEventListener('click', async () => {
+    const activeTab = document.querySelector('.settings-tab-content.active');
+    
+    if (activeTab.id === 'tab-keywords') {
+      // Загружаем стандартные ключевые слова
+      await loadDefaultKeywords();
+    } else if (activeTab.id === 'tab-channels') {
+      // Загружаем стандартные каналы
+      await loadDefaultChannels();
+    }
+  });
+
+  // Функция загрузки стандартных ключевых слов
+  async function loadDefaultKeywords() {
+    loadDefaultsBtn.disabled = true;
+    try {
+      // Стандартные ключевые слова для фриланса
+      const defaultKeywords = [
+        'монтаж', 'анимация', 'дизайн', 'разработка', 'копирайтинг',
+        'перевод', 'фото', 'видео', 'звук', '3d', 'веб', 'мобильное'
+      ];
+      
+      // Добавляем стандартные ключевые слова, если их нет
+      const newKeywords = defaultKeywords.filter(keyword => 
+        !currentKeywords.includes(keyword.toLowerCase())
+      );
+      
+      if (newKeywords.length === 0) {
+        safeAlert('Все стандартные ключевые слова уже добавлены!');
+        return;
+      }
+      
+      // Добавляем новые ключевые слова
+      newKeywords.forEach(keyword => {
+        currentKeywords.push(keyword.toLowerCase());
+      });
+      
+      // Обновляем интерфейс
+      displayKeywordTags();
+      
+      // Сохраняем в базу данных
+      await updateKeywordsInDatabase();
+      
+      uiToast(`Добавлено ${newKeywords.length} стандартных ключевых слов`);
+    } catch (error) {
+      console.error('Ошибка загрузки стандартных ключевых слов:', error);
+      safeAlert('Не удалось добавить стандартные ключевые слова. Проверьте подключение к интернету.');
+    } finally {
+      loadDefaultsBtn.disabled = false;
+    }
+  }
+
+  // Функция загрузки стандартных каналов
+  async function loadDefaultChannels() {
     loadDefaultsBtn.disabled = true;
     try {
       const response = await fetch(`${API_ENDPOINTS.DEFAULT_CHANNELS}?select=channel_id`, {
@@ -618,7 +671,7 @@
     } finally {
       loadDefaultsBtn.disabled = false;
     }
-  });
+  }
 
   deleteAllBtn?.addEventListener('click', async () => {
     const message = 'Удалить все каналы из базы? Это действие необратимо.';
@@ -1008,15 +1061,16 @@
       } else {
         // Преобразуем NodeList в массив для использования slice
         const keywordsArray = Array.from(keywordsTags);
-        const previewHTML = keywordsArray.slice(0, 3)
-          .map(tag => {
-            const text = tag.querySelector('.keyword-tag-text')?.textContent || '';
-            return `<span class="preview-tag">${text}</span>`;
-          })
-          .join('');
         
-        const remaining = keywordsArray.length > 3 ? `+${keywordsArray.length - 3}` : '';
-        previewTags.innerHTML = previewHTML + (remaining ? `<span class="preview-more">${remaining}</span>` : '');
+        // Показываем только первое ключевое слово
+        const firstKeyword = keywordsArray[0];
+        const text = firstKeyword.querySelector('.keyword-tag-text')?.textContent || '';
+        
+        if (keywordsArray.length === 1) {
+          previewTags.innerHTML = `<span class="preview-tag">${text}</span>`;
+        } else {
+          previewTags.innerHTML = `<span class="preview-tag">${text}</span><span class="preview-more">+${keywordsArray.length - 1}</span>`;
+        }
       }
     }
   }

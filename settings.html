@@ -121,11 +121,21 @@
             <span class="keywords-count-badge" id="keywords-count">0</span>
             <h3 class="keywords-summary-title">Ключевые слова</h3>
           </div>
-          <button class="keywords-expand-btn" id="keywords-expand-btn" aria-label="Развернуть ключевые слова">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </button>
+          <div class="keywords-header-actions">
+            <button id="load-defaults-btn" class="button-load-defaults compact">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Стандартные
+            </button>
+            <button class="keywords-expand-btn" id="keywords-expand-btn" aria-label="Развернуть ключевые слова">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+          </div>
         </div>
         
         <!-- Свернутый предварительный просмотр -->
@@ -198,14 +208,6 @@
           <h3>Каналы для мониторинга</h3>
           <p class="channels-description">Управляйте списком каналов для поиска вакансий</p>
         </div>
-        <button id="load-defaults-btn" class="button-load-defaults">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Загрузить стандартные
-        </button>
       </div>
       
       <!-- Улучшенная форма добавления канала -->
@@ -252,81 +254,48 @@
 
     <div id="tab-appearance" class="settings-tab-content">
       <div class="appearance-header">
-        <h3>Настройки внешнего вида</h3>
-        <p class="appearance-description">Персонализируйте интерфейс под свои предпочтения</p>
+        <h3>🎨 Тема оформления</h3>
+        <p class="appearance-description">Выберите предпочитаемую тему интерфейса</p>
       </div>
       
-      <!-- Современный селектор темы -->
-      <div class="appearance-section">
-        <div class="section-header">
-          <h4 class="section-title">🎨 Тема оформления</h4>
-          <div class="theme-toggle-container">
-            <span class="theme-label-text">Светлая</span>
-            <div class="theme-toggle-switch">
-              <input type="checkbox" id="theme-toggle" />
-              <label for="theme-toggle" class="theme-toggle-slider">
-                <span class="toggle-icon light">☀️</span>
-                <span class="toggle-icon dark">🌙</span>
-                <span class="toggle-thumb"></span>
-              </label>
-            </div>
-            <span class="theme-label-text">Темная</span>
+      <!-- Ретро переключатель темы -->
+      <div class="retro-theme-toggle">
+        <div class="theme-toggle-container">
+          <span class="theme-label-text">☀️ Светлая</span>
+          <div class="retro-toggle-switch">
+            <input type="checkbox" id="theme-toggle" />
+            <label for="theme-toggle" class="retro-toggle-slider">
+              <span class="toggle-thumb"></span>
+            </label>
           </div>
+          <span class="theme-label-text">🌙 Темная</span>
         </div>
         
-        <!-- Предварительный просмотр темы -->
-        <div class="theme-preview-container">
-          <div class="theme-preview-card light-theme" id="light-preview">
-            <div class="preview-header">
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
+        <!-- Ретро предварительный просмотр темы -->
+        <div class="retro-theme-preview">
+          <div class="retro-preview-card light-theme" id="light-preview">
+            <div class="retro-preview-header">
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
             </div>
-            <div class="preview-content">
-              <div class="preview-line short"></div>
-              <div class="preview-line medium"></div>
-              <div class="preview-line long"></div>
-            </div>
-          </div>
-          <div class="theme-preview-card dark-theme" id="dark-preview">
-            <div class="preview-header">
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-            </div>
-            <div class="preview-content">
-              <div class="preview-line short"></div>
-              <div class="preview-line medium"></div>
-              <div class="preview-line long"></div>
+            <div class="retro-preview-content">
+              <div class="retro-line short"></div>
+              <div class="retro-line medium"></div>
+              <div class="retro-line long"></div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Дополнительные настройки -->
-      <div class="appearance-section">
-        <h4 class="section-title">⚡ Дополнительные настройки</h4>
-        <div class="settings-grid">
-          <div class="setting-item">
-            <div class="setting-info">
-              <strong>Уменьшить анимации</strong>
-              <small>Снижает количество анимаций для экономии батареи</small>
+          <div class="retro-preview-card dark-theme" id="dark-preview">
+            <div class="retro-preview-header">
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
             </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="reduce-animations" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          
-          <div class="setting-item">
-            <div class="setting-info">
-              <strong>Высокий контраст</strong>
-              <small>Увеличивает контрастность для лучшей читаемости</small>
+            <div class="retro-preview-content">
+              <div class="retro-line short"></div>
+              <div class="retro-line medium"></div>
+              <div class="retro-line long"></div>
             </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="high-contrast" />
-              <span class="toggle-slider"></span>
-            </label>
           </div>
         </div>
       </div>
