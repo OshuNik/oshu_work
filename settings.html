@@ -114,89 +114,219 @@
 
   <main class="content">
     <div id="tab-keywords" class="settings-tab-content active">
-      <div class="current-keywords-container">
-        <p class="current-keywords-label">Текущие ключевые слова:</p>
-        <div id="current-keywords-tags" class="keywords-tags-container">
-          <div class="loading-indicator">Загрузка...</div>
+      <!-- Компактный блок с текущими ключевыми словами -->
+      <div class="keywords-summary-card">
+        <div class="keywords-summary-header">
+          <div class="keywords-summary-info">
+            <span class="keywords-count-badge" id="keywords-count">0</span>
+            <h3 class="keywords-summary-title">Ключевые слова</h3>
+          </div>
+          <button class="keywords-expand-btn" id="keywords-expand-btn" aria-label="Развернуть ключевые слова">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
         </div>
-      </div>
-      <div class="add-keyword-section">
-        <label for="new-keyword-input">Добавить ключевое слово:</label>
-        <div class="add-keyword-form">
-          <input type="text" id="new-keyword-input" placeholder="например: монтаж" maxlength="30">
-          <button id="add-keyword-btn" type="button">+</button>
+        
+        <!-- Свернутый предварительный просмотр -->
+        <div class="keywords-preview" id="keywords-preview">
+          <div class="keywords-preview-tags" id="keywords-preview-tags">
+            <div class="loading-indicator">Загрузка...</div>
+          </div>
         </div>
-      </div>
-      <div class="settings-form">
-        <label for="keywords-input">Или изменить весь список (через запятую):</label>
-        <textarea id="keywords-input" rows="4" placeholder="монтаж, рилс, анимация..."></textarea>
+        
+        <!-- Развернутый список для редактирования -->
+        <div class="keywords-expanded" id="keywords-expanded" style="display: none;">
+          <div class="keywords-tags-container" id="current-keywords-tags">
+            <div class="loading-indicator">Загрузка...</div>
+          </div>
+          
+          <!-- Улучшенная форма добавления -->
+          <div class="keywords-add-section">
+            <div class="keywords-add-header">
+              <h4>Добавить ключевые слова</h4>
+              <div class="keywords-add-tabs">
+                <button class="add-tab-btn active" data-tab="single">По одному</button>
+                <button class="add-tab-btn" data-tab="batch">Пачкой</button>
+              </div>
+            </div>
+            
+            <!-- Форма добавления по одному -->
+            <div class="add-tab-content active" id="add-single">
+              <div class="keyword-input-group">
+                <input type="text" id="new-keyword-input" placeholder="Введите ключевое слово..." maxlength="30">
+                <button id="add-keyword-btn" type="button" class="keyword-add-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="keyword-suggestions" id="keyword-suggestions">
+                <span class="suggestion-label">Популярные:</span>
+                <div class="suggestion-tags">
+                  <button class="suggestion-tag" data-keyword="монтаж">монтаж</button>
+                  <button class="suggestion-tag" data-keyword="анимация">анимация</button>
+                  <button class="suggestion-tag" data-keyword="дизайн">дизайн</button>
+                  <button class="suggestion-tag" data-keyword="разработка">разработка</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Форма добавления пачкой -->
+            <div class="add-tab-content" id="add-batch">
+              <div class="batch-input-group">
+                <textarea id="batch-keywords-input" rows="3" placeholder="Введите ключевые слова через запятую, пробел или с новой строки..."></textarea>
+                <div class="batch-controls">
+                  <button id="add-batch-btn" type="button" class="batch-add-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Добавить все
+                  </button>
+                  <button id="clear-batch-btn" type="button" class="batch-clear-btn">Очистить</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div id="tab-channels" class="settings-tab-content">
-      <div class="settings-form">
-        <button id="load-defaults-btn" class="button-load-defaults">Загрузить стандартные каналы</button>
-        <label for="channel-input">Добавить новый канал:</label>
-        <div class="add-channel-form">
-          <input type="text" id="channel-input" placeholder="@username или https://t.me/..." aria-label="Адрес канала для добавления">
-          <button id="add-channel-btn" aria-label="Добавить канал">+</button>
+      <div class="channels-header">
+        <div class="channels-info">
+          <h3>Каналы для мониторинга</h3>
+          <p class="channels-description">Управляйте списком каналов для поиска вакансий</p>
+        </div>
+        <button id="load-defaults-btn" class="button-load-defaults">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Загрузить стандартные
+        </button>
+      </div>
+      
+      <!-- Улучшенная форма добавления канала -->
+      <div class="channel-add-card">
+        <div class="channel-add-header">
+          <h4>Добавить новый канал</h4>
+          <div class="channel-input-examples">
+            <span class="example-label">Примеры:</span>
+            <button class="example-btn" data-example="@username">@username</button>
+            <button class="example-btn" data-example="https://t.me/channel">t.me/channel</button>
+          </div>
+        </div>
+        <div class="channel-input-group">
+          <input type="text" id="channel-input" placeholder="Введите @username или ссылку на канал..." aria-label="Адрес канала для добавления">
+          <button id="add-channel-btn" aria-label="Добавить канал" class="channel-add-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Улучшенный список каналов -->
+      <div class="channels-list-container">
+        <div class="channels-list-header">
+          <h4>Текущие каналы</h4>
+          <div class="channels-controls">
+            <button id="channels-select-all" class="control-btn secondary">Выбрать все</button>
+            <button id="channels-deselect-all" class="control-btn secondary">Снять выбор</button>
+            <button id="delete-selected-btn" class="control-btn destructive" disabled>Удалить выбранные</button>
+          </div>
         </div>
         <div id="channels-list" class="channels-list"></div>
-        <button id="delete-all-btn" class="button-delete">Удалить все каналы</button>
+        <div class="channels-actions">
+          <button id="delete-all-btn" class="button-delete">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            Удалить все каналы
+          </button>
+        </div>
       </div>
     </div>
 
     <div id="tab-appearance" class="settings-tab-content">
-      <div class="settings-form">
-        <div class="appearance-section">
-          <h3 class="section-title">🎨 Тема оформления</h3>
-          <div class="theme-selector">
-            <label class="theme-option">
-              <input type="radio" name="theme" value="light" checked>
-              <span class="theme-option-content">
-                <span class="theme-preview theme-preview-light"></span>
-                <span class="theme-label">
-                  <strong>Светлая</strong>
-                  <small>Белый фон, черный текст</small>
-                </span>
-              </span>
-            </label>
-            
-            <label class="theme-option">
-              <input type="radio" name="theme" value="dark">
-              <span class="theme-option-content">
-                <span class="theme-preview theme-preview-dark"></span>
-                <span class="theme-label">
-                  <strong>Темная</strong>
-                  <small>Темный фон, светлый текст</small>
-                </span>
-              </span>
-            </label>
+      <div class="appearance-header">
+        <h3>Настройки внешнего вида</h3>
+        <p class="appearance-description">Персонализируйте интерфейс под свои предпочтения</p>
+      </div>
+      
+      <!-- Современный селектор темы -->
+      <div class="appearance-section">
+        <div class="section-header">
+          <h4 class="section-title">🎨 Тема оформления</h4>
+          <div class="theme-toggle-container">
+            <span class="theme-label-text">Светлая</span>
+            <div class="theme-toggle-switch">
+              <input type="checkbox" id="theme-toggle" />
+              <label for="theme-toggle" class="theme-toggle-slider">
+                <span class="toggle-icon light">☀️</span>
+                <span class="toggle-icon dark">🌙</span>
+                <span class="toggle-thumb"></span>
+              </label>
+            </div>
+            <span class="theme-label-text">Темная</span>
           </div>
         </div>
+        
+        <!-- Предварительный просмотр темы -->
+        <div class="theme-preview-container">
+          <div class="theme-preview-card light-theme" id="light-preview">
+            <div class="preview-header">
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+            </div>
+            <div class="preview-content">
+              <div class="preview-line short"></div>
+              <div class="preview-line medium"></div>
+              <div class="preview-line long"></div>
+            </div>
+          </div>
+          <div class="theme-preview-card dark-theme" id="dark-preview">
+            <div class="preview-header">
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+            </div>
+            <div class="preview-content">
+              <div class="preview-line short"></div>
+              <div class="preview-line medium"></div>
+              <div class="preview-line long"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div class="appearance-section">
-          <h3 class="section-title">⚡ Дополнительные настройки</h3>
+      <!-- Дополнительные настройки -->
+      <div class="appearance-section">
+        <h4 class="section-title">⚡ Дополнительные настройки</h4>
+        <div class="settings-grid">
           <div class="setting-item">
-            <label class="toggle-switch">
-              <input type="checkbox" id="reduce-animations" />
-              <span class="toggle-slider"></span>
-            </label>
             <div class="setting-info">
               <strong>Уменьшить анимации</strong>
               <small>Снижает количество анимаций для экономии батареи</small>
             </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="reduce-animations" />
+              <span class="toggle-slider"></span>
+            </label>
           </div>
           
           <div class="setting-item">
-            <label class="toggle-switch">
-              <input type="checkbox" id="high-contrast" />
-              <span class="toggle-slider"></span>
-            </label>
             <div class="setting-info">
               <strong>Высокий контраст</strong>
               <small>Увеличивает контрастность для лучшей читаемости</small>
             </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="high-contrast" />
+              <span class="toggle-slider"></span>
+            </label>
           </div>
         </div>
       </div>

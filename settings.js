@@ -850,9 +850,441 @@
     });
   }
   
-  // Инициализация приложения
-  initTheme();
-  loadKeywords();
-  loadChannels();
-  initRetroTabs(); // Инициализируем ретро-вкладки
+  // Инициализация улучшенных секций настроек
+  function initEnhancedSettings() {
+    initKeywordsSection();
+    initChannelsSection();
+    initAppearanceSection();
+  }
+
+  // === СЕКЦИЯ КЛЮЧЕВЫХ СЛОВ ===
+  function initKeywordsSection() {
+    const expandBtn = document.getElementById('keywords-expand-btn');
+    const keywordsExpanded = document.getElementById('keywords-expanded');
+    const keywordsPreview = document.getElementById('keywords-preview');
+    const addTabBtns = document.querySelectorAll('.add-tab-btn');
+    const addTabContents = document.querySelectorAll('.add-tab-content');
+    const suggestionTags = document.querySelectorAll('.suggestion-tag');
+    const batchInput = document.getElementById('batch-keywords-input');
+    const clearBatchBtn = document.getElementById('clear-batch-btn');
+
+    // Загружаем ключевые слова
+    loadKeywords();
+
+    // Разворачивание/сворачивание секции
+    if (expandBtn && keywordsExpanded) {
+      expandBtn.addEventListener('click', () => {
+        const isExpanded = keywordsExpanded.style.display !== 'none';
+        
+        if (isExpanded) {
+          keywordsExpanded.style.display = 'none';
+          expandBtn.classList.remove('expanded');
+          expandBtn.setAttribute('aria-label', 'Развернуть ключевые слова');
+        } else {
+          keywordsExpanded.style.display = 'block';
+          expandBtn.classList.add('expanded');
+          expandBtn.setAttribute('aria-label', 'Свернуть ключевые слова');
+        }
+      });
+    }
+
+    // Переключение вкладок добавления
+    addTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        
+        // Обновляем активные состояния
+        addTabBtns.forEach(b => b.classList.remove('active'));
+        addTabContents.forEach(c => c.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(`add-${targetTab}`).classList.add('active');
+      });
+    });
+
+    // Подсказки ключевых слов
+    suggestionTags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        const keyword = tag.getAttribute('data-keyword');
+        const input = document.getElementById('new-keyword-input');
+        input.value = keyword;
+        input.focus();
+        
+        // Анимация нажатия
+        tag.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          tag.style.transform = '';
+        }, 150);
+      });
+    });
+
+    // Очистка формы пачкового добавления
+    if (clearBatchBtn && batchInput) {
+      clearBatchBtn.addEventListener('click', () => {
+        batchInput.value = '';
+        batchInput.focus();
+      });
+    }
+
+    // Обновление счетчика ключевых слов
+    updateKeywordsCount();
+  }
+
+  // Загрузка ключевых слов
+  function loadKeywords() {
+    const keywordsContainer = document.getElementById('current-keywords-tags');
+    if (!keywordsContainer) return;
+
+    const keywords = localStorage.getItem('keywords') || '';
+    const keywordsList = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
+    
+    if (keywordsList.length === 0) {
+      keywordsContainer.innerHTML = '<div class="empty-state">Нет ключевых слов</div>';
+    } else {
+      keywordsContainer.innerHTML = keywordsList.map(keyword => `
+        <div class="keyword-tag">
+          <span class="keyword-tag-text">${keyword}</span>
+          <button class="keyword-tag-remove" data-keyword="${keyword}">×</button>
+        </div>
+      `).join('');
+      
+      // Добавляем обработчики удаления
+      document.querySelectorAll('.keyword-tag-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const keyword = btn.getAttribute('data-keyword');
+          removeKeyword(keyword);
+        });
+      });
+    }
+    
+    updateKeywordsCount();
+  }
+
+  // Удаление ключевого слова
+  function removeKeyword(keyword) {
+    const keywords = localStorage.getItem('keywords') || '';
+    const keywordsList = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
+    const filteredKeywords = keywordsList.filter(k => k !== keyword);
+    
+    localStorage.setItem('keywords', filteredKeywords.join(','));
+    loadKeywords();
+  }
+
+  // === СЕКЦИЯ КАНАЛОВ ===
+  function initChannelsSection() {
+    const selectAllBtn = document.getElementById('channels-select-all');
+    const deselectAllBtn = document.getElementById('channels-deselect-all');
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const exampleBtns = document.querySelectorAll('.example-btn');
+    const channelInput = document.getElementById('channel-input');
+
+    // Загружаем каналы
+    loadChannels();
+
+    // Выбор всех каналов
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.channel-item input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+          cb.checked = true;
+          cb.closest('.channel-item').classList.add('selected');
+        });
+        updateDeleteSelectedButton();
+      });
+    }
+
+    // Снятие выбора со всех каналов
+    if (deselectAllBtn) {
+      deselectAllBtn.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.channel-item input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+          cb.checked = false;
+          cb.closest('.channel-item').classList.remove('selected');
+        });
+        updateDeleteSelectedButton();
+      });
+    }
+
+    // Удаление выбранных каналов
+    if (deleteSelectedBtn) {
+      deleteSelectedBtn.addEventListener('click', () => {
+        const selectedChannels = document.querySelectorAll('.channel-item input[type="checkbox"]:checked');
+        if (selectedChannels.length > 0) {
+          showConfirmDialog(
+            `Удалить ${selectedChannels.length} выбранных каналов?`,
+            () => {
+              selectedChannels.forEach(cb => {
+                const channelItem = cb.closest('.channel-item');
+                channelItem.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                  channelItem.remove();
+                  updateDeleteSelectedButton();
+                }, 300);
+              });
+            }
+          );
+        }
+      });
+    }
+
+    // Примеры форматов каналов
+    exampleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const example = btn.getAttribute('data-example');
+        if (channelInput) {
+          channelInput.value = example;
+          channelInput.focus();
+          
+          // Анимация нажатия
+          btn.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            btn.style.transform = '';
+          }, 150);
+        }
+      });
+    });
+
+    // Обработка выбора отдельных каналов
+    document.addEventListener('change', (e) => {
+      if (e.target.type === 'checkbox' && e.target.closest('.channel-item')) {
+        const channelItem = e.target.closest('.channel-item');
+        if (e.target.checked) {
+          channelItem.classList.add('selected');
+        } else {
+          channelItem.classList.remove('selected');
+        }
+        updateDeleteSelectedButton();
+      }
+    });
+
+    // Инициализация состояния кнопки удаления
+    updateDeleteSelectedButton();
+  }
+
+  // Загрузка каналов
+  function loadChannels() {
+    const channelsList = document.getElementById('channels-list');
+    if (!channelsList) return;
+
+    const channels = localStorage.getItem('channels') || '';
+    const channelsListData = channels ? channels.split(',').map(c => c.trim()).filter(c => c) : [];
+    
+    if (channelsListData.length === 0) {
+      channelsList.innerHTML = '<div class="empty-state">Нет добавленных каналов</div>';
+    } else {
+      channelsList.innerHTML = channelsListData.map(channel => `
+        <div class="channel-item">
+          <div class="channel-item-toggle">
+            <input type="checkbox" />
+          </div>
+          <div class="channel-item-info">
+            <div class="channel-item-title">${channel}</div>
+            <a href="https://t.me/${channel.replace('@', '')}" class="channel-item-id" target="_blank">${channel}</a>
+          </div>
+          <button class="channel-item-delete" data-channel="${channel}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6L18 18"/>
+            </svg>
+          </button>
+        </div>
+      `).join('');
+      
+      // Добавляем обработчики удаления
+      document.querySelectorAll('.channel-item-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const channel = btn.getAttribute('data-channel');
+          removeChannel(channel);
+        });
+      });
+    }
+  }
+
+  // Удаление канала
+  function removeChannel(channel) {
+    const channels = localStorage.getItem('channels') || '';
+    const channelsList = channels ? channels.split(',').map(c => c.trim()).filter(c => c) : [];
+    const filteredChannels = channelsList.filter(c => c !== channel);
+    
+    localStorage.setItem('channels', filteredChannels.join(','));
+    loadChannels();
+  }
+
+  // Обновление счетчика ключевых слов
+  function updateKeywordsCount() {
+    const keywordsTags = document.querySelectorAll('#current-keywords-tags .keyword-tag');
+    const countBadge = document.getElementById('keywords-count');
+    const previewTags = document.getElementById('keywords-preview-tags');
+    
+    if (countBadge) {
+      countBadge.textContent = keywordsTags.length;
+    }
+
+    // Обновляем предварительный просмотр
+    if (previewTags) {
+      if (keywordsTags.length === 0) {
+        previewTags.innerHTML = '<span class="no-keywords">Нет ключевых слов</span>';
+      } else {
+        const previewHTML = Array.from(keywordsTags.slice(0, 3))
+          .map(tag => {
+            const text = tag.querySelector('.keyword-tag-text')?.textContent || '';
+            return `<span class="preview-tag">${text}</span>`;
+          })
+          .join('');
+        
+        const remaining = keywordsTags.length > 3 ? `+${keywordsTags.length - 3}` : '';
+        previewTags.innerHTML = previewHTML + (remaining ? `<span class="preview-more">${remaining}</span>` : '');
+      }
+    }
+  }
+
+  // Обновление состояния кнопки удаления выбранных
+  function updateDeleteSelectedButton() {
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const selectedCount = document.querySelectorAll('.channel-item input[type="checkbox"]:checked').length;
+    
+    if (deleteSelectedBtn) {
+      deleteSelectedBtn.disabled = selectedCount === 0;
+      deleteSelectedBtn.textContent = `Удалить выбранные (${selectedCount})`;
+    }
+  }
+
+  // === СЕКЦИЯ ВНЕШНЕГО ВИДА ===
+  function initAppearanceSection() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const lightPreview = document.getElementById('light-preview');
+    const darkPreview = document.getElementById('dark-preview');
+
+    // Переключатель темы
+    if (themeToggle) {
+      // Устанавливаем начальное состояние
+      const currentTheme = localStorage.getItem('app-theme') || 'light';
+      themeToggle.checked = currentTheme === 'dark';
+      updateThemePreviews(currentTheme);
+
+      // Обработка переключения
+      themeToggle.addEventListener('change', () => {
+        const newTheme = themeToggle.checked ? 'dark' : 'light';
+        setTheme(newTheme);
+        updateThemePreviews(newTheme);
+        
+        // Анимация переключения
+        themeToggle.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          themeToggle.style.transform = '';
+        }, 200);
+      });
+    }
+
+    // Предварительный просмотр тем
+    if (lightPreview && darkPreview) {
+      lightPreview.addEventListener('click', () => {
+        if (themeToggle && !themeToggle.checked) return;
+        themeToggle.checked = false;
+        setTheme('light');
+        updateThemePreviews('light');
+      });
+
+      darkPreview.addEventListener('click', () => {
+        if (themeToggle && themeToggle.checked) return;
+        themeToggle.checked = true;
+        setTheme('dark');
+        updateThemePreviews('dark');
+      });
+    }
+  }
+
+  // Обновление предварительного просмотра тем
+  function updateThemePreviews(activeTheme) {
+    const lightPreview = document.getElementById('light-preview');
+    const darkPreview = document.getElementById('dark-preview');
+    
+    if (lightPreview && darkPreview) {
+      lightPreview.classList.toggle('active', activeTheme === 'light');
+      darkPreview.classList.toggle('active', activeTheme === 'dark');
+    }
+  }
+
+  // === ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ===
+
+  // Показ диалога подтверждения
+  function showConfirmDialog(message, onConfirm) {
+    const overlay = document.getElementById('custom-confirm-overlay');
+    const text = document.getElementById('custom-confirm-text');
+    const confirmBtn = document.getElementById('confirm-btn-ok');
+    const cancelBtn = document.getElementById('confirm-btn-cancel');
+    
+    if (overlay && text && confirmBtn && cancelBtn) {
+      text.textContent = message;
+      overlay.classList.remove('hidden');
+      
+      // Обработчики кнопок
+      const handleConfirm = () => {
+        overlay.classList.add('hidden');
+        onConfirm();
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', handleCancel);
+      };
+      
+      const handleCancel = () => {
+        overlay.classList.add('hidden');
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', handleCancel);
+      };
+      
+      confirmBtn.addEventListener('click', handleConfirm);
+      cancelBtn.addEventListener('click', handleCancel);
+    }
+  }
+
+  // Анимация появления элементов
+  function animateElement(element, animation) {
+    element.style.animation = 'none';
+    element.offsetHeight; // Trigger reflow
+    element.style.animation = animation;
+  }
+
+  // Инициализация при загрузке страницы
+  document.addEventListener('DOMContentLoaded', function() {
+    initTheme();
+    initRetroTabs();
+    initEnhancedSettings();
+    
+    // Добавляем CSS анимации
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+      }
+      
+      .preview-tag {
+        background: var(--accent-blue);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: var(--font-mono);
+      }
+      
+      .preview-more {
+        background: var(--hint-color);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: var(--font-mono);
+      }
+      
+      .no-keywords {
+        color: var(--hint-color);
+        font-style: italic;
+        font-size: 14px;
+      }
+    `;
+    document.head.appendChild(style);
+  });
 })();
