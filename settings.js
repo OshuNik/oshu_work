@@ -740,8 +740,19 @@
   
   // Ретро-анимация для вкладок настроек
   function initRetroTabs() {
+    const settingsTabs = document.querySelector('.settings-tabs');
     const tabButtons = document.querySelectorAll('.settings-tab-button');
     const tabContents = document.querySelectorAll('.settings-tab-content');
+    
+    // Добавляем класс для анимации появления только при первой загрузке
+    if (settingsTabs) {
+      settingsTabs.classList.add('initial-load');
+      
+      // Убираем класс после завершения анимации
+      setTimeout(() => {
+        settingsTabs.classList.remove('initial-load');
+      }, 1000);
+    }
     
     tabButtons.forEach(button => {
       button.addEventListener('click', function() {
