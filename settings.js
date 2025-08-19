@@ -626,17 +626,18 @@
 
   addChannelBtn?.addEventListener('click', addChannel);
 
-  saveBtn?.addEventListener('click', () => {
-    const activeTab = document.querySelector('.settings-tab-content.active');
-    if (activeTab.id === 'tab-keywords') {
-      // Сохраняем ключевые слова в базу данных
-      updateKeywordsInDatabase();
-    } else if (activeTab.id === 'tab-channels') {
-      safeAlert('Изменения в каналах сохраняются автоматически!');
-    } else if (activeTab.id === 'tab-appearance') {
-      safeAlert('Настройки внешнего вида сохраняются автоматически!');
-    }
-  });
+  // Убираем кнопку "Сохранить" - все сохраняется автоматически
+  // saveBtn?.addEventListener('click', () => {
+  //   const activeTab = document.querySelector('.settings-tab-content.active');
+  //   if (activeTab.id === 'tab-keywords') {
+  //     // Сохраняем ключевые слова в базу данных
+  //     updateKeywordsInDatabase();
+  //   } else if (activeTab.id === 'tab-channels') {
+  //     safeAlert('Изменения в каналах сохраняются автоматически!');
+  //   } else if (activeTab.id === 'tab-appearance') {
+  //     safeAlert('Настройки внешнего вида сохраняются автоматически!');
+  //   }
+  // });
 
   loadDefaultsBtn?.addEventListener('click', async () => {
     const activeTab = document.querySelector('.settings-tab-content.active');
