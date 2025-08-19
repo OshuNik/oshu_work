@@ -81,36 +81,8 @@
     --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.4);
 }
 
-/* Автоматическая темная тема (следует системным настройкам) */
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]):not([data-theme="dark"]) {
-        /* Основные цвета для темной темы - только для авто-режима */
-        --background-color: #1A1A1A;
-        --card-color: #2D2D2D;
-        --text-color: #FFFFFF;
-        --hint-color: #888888;
-        --border-color: #404040;
-        --input-bg: #2D2D2D;
-        --input-border: #404040;
-        --secondary-bg: #252525;
-        --header-bg: #2D2D2D;
-        --button-bg: #3D3D3D;
-        --button-text: #FFFFFF;
-        --destructive-color: #FF6B6B;
-        --link-color: #5FB3FF;
-        --section-separator: #404040;
-        
-        /* Темные акцентные цвета */
-        --accent-red: #FF6B6B;
-        --accent-yellow: #FFE066;
-        --accent-green: #7ED87E;
-        --accent-blue: #5FB3FF;
-        
-        /* Темные тени */
-        --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.3);
-        --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.3);
-    }
-}
+/* Убираем автоматическую темную тему для предотвращения мерцания */
+/* Теперь тема применяется только через JavaScript */
 
 /* Принудительная светлая тема - точно как в оригинале */
 [data-theme="light"] {

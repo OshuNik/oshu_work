@@ -181,4 +181,19 @@
   } else {
     initTheme();
   }
+  
+  // Дополнительная инициализация для предотвращения мерцания
+  // Применяем тему сразу при загрузке скрипта
+  initTheme();
+  
+  // Также применяем при полной загрузке страницы
+  window.addEventListener('load', () => {
+    // Убираем критический CSS после загрузки JavaScript
+    const criticalStyles = document.querySelectorAll('style');
+    criticalStyles.forEach(style => {
+      if (style.textContent.includes('!important')) {
+        style.remove();
+      }
+    });
+  });
 })();
