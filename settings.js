@@ -179,10 +179,6 @@
     const removeBtn = tag.querySelector('.keyword-tag-remove');
     removeBtn.addEventListener('click', () => {
       removeKeyword(keyword);
-      // Обновляем счетчик и предварительный просмотр после удаления
-      setTimeout(() => {
-        updateKeywordsCount();
-      }, 250); // Немного больше времени анимации удаления
     });
     
     return tag;
@@ -198,8 +194,11 @@
     
     if (currentKeywords.length === 0) {
       keywordsTagsContainer.innerHTML = '<div class="loading-indicator">-- ключевые слова не заданы --</div>';
-      // Обновляем счетчик и предварительный просмотр
-      updateKeywordsCount();
+      // Обновляем счетчик
+      const countBadge = document.getElementById('keywords-count');
+      if (countBadge) {
+        countBadge.textContent = '0';
+      }
       return;
     }
     
@@ -210,8 +209,11 @@
       }
     });
     
-    // Обновляем счетчик и предварительный просмотр
-    updateKeywordsCount();
+    // Обновляем счетчик
+    const countBadge = document.getElementById('keywords-count');
+    if (countBadge) {
+      countBadge.textContent = currentKeywords.length.toString();
+    }
   }
 
   function addKeyword(keyword) {
@@ -230,9 +232,6 @@
     debouncedSave();
     displayKeywordTags();
     
-    // Обновляем счетчик и предварительный просмотр
-    updateKeywordsCount();
-    
     return true;
   }
 
@@ -247,15 +246,11 @@
           currentKeywords.splice(index, 1);
           debouncedSave();
           displayKeywordTags();
-          // Обновляем счетчик и предварительный просмотр
-          updateKeywordsCount();
         }, 200);
       } else {
         currentKeywords.splice(index, 1);
         debouncedSave();
         displayKeywordTags();
-        // Обновляем счетчик и предварительный просмотр
-        updateKeywordsCount();
       }
     }
   }
@@ -974,15 +969,36 @@
   function initKeywordsSection() {
     const expandBtn = document.getElementById('keywords-expand-btn');
     const keywordsExpanded = document.getElementById('keywords-expanded');
-    const keywordsPreview = document.getElementById('keywords-preview');
     const addTabBtns = document.querySelectorAll('.add-tab-btn');
     const addTabContents = document.querySelectorAll('.add-tab-content');
     const suggestionTags = document.querySelectorAll('.suggestion-tag');
     const batchInput = document.getElementById('batch-keywords-input');
     const clearBatchBtn = document.getElementById('clear-batch-btn');
+    const clearAllKeywordsBtn = document.getElementById('clear-all-keywords-btn');
 
     // Загружаем ключевые слова из базы данных
     loadKeywords();
+
+    // Кнопка очистки всех ключевых слов
+    if (clearAllKeywordsBtn) {
+      clearAllKeywordsBtn.addEventListener('click', async () => {
+        if (currentKeywords.length === 0) {
+          safeAlert('Нет ключевых слов для очистки');
+          return;
+        }
+        
+        const isConfirmed = await showCustomConfirm(
+          `Очистить все ${currentKeywords.length} ключевых слов? Это действие необратимо.`
+        );
+        
+        if (isConfirmed) {
+          currentKeywords.length = 0; // Очищаем массив
+          displayKeywordTags(); // Обновляем интерфейс
+          await updateKeywordsInDatabase(); // Сохраняем в базу
+          uiToast('Все ключевые слова очищены');
+        }
+      });
+    }
 
     // Разворачивание/сворачивание секции
     if (expandBtn && keywordsExpanded) {
@@ -1039,41 +1055,10 @@
       });
     }
 
-    // Обновление счетчика ключевых слов
-    updateKeywordsCount();
+
   }
 
-  // Обновление счетчика ключевых слов
-  function updateKeywordsCount() {
-    const keywordsTags = document.querySelectorAll('#current-keywords-tags .keyword-tag');
-    const countBadge = document.getElementById('keywords-count');
-    const previewTags = document.getElementById('keywords-preview-tags');
-    
-    // Обновляем счетчик
-    if (countBadge) {
-      countBadge.textContent = keywordsTags.length;
-    }
 
-    // Обновляем предварительный просмотр
-    if (previewTags) {
-      if (keywordsTags.length === 0) {
-        previewTags.innerHTML = '<span class="no-keywords">Нет ключевых слов</span>';
-      } else {
-        // Преобразуем NodeList в массив для использования slice
-        const keywordsArray = Array.from(keywordsTags);
-        
-        // Показываем только первое ключевое слово
-        const firstKeyword = keywordsArray[0];
-        const text = firstKeyword.querySelector('.keyword-tag-text')?.textContent || '';
-        
-        if (keywordsArray.length === 1) {
-          previewTags.innerHTML = `<span class="preview-tag">${text}</span>`;
-        } else {
-          previewTags.innerHTML = `<span class="preview-tag">${text}</span><span class="preview-more">+${keywordsArray.length - 1}</span>`;
-        }
-      }
-    }
-  }
 
   // === СЕКЦИЯ КАНАЛОВ ===
   function initChannelsSection() {
@@ -1325,10 +1310,6 @@
       const keyword = newKeywordInput?.value?.trim();
       if (keyword && addKeyword(keyword)) {
         newKeywordInput.value = '';
-        // Обновляем счетчик и предварительный просмотр
-        setTimeout(() => {
-          updateKeywordsCount();
-        }, 100);
       }
     });
   }
@@ -1351,11 +1332,6 @@
           
           batchInput.value = '';
           uiToast(`Добавлено ${keywords.length} ключевых слов`);
-          
-          // Обновляем счетчик и предварительный просмотр
-          setTimeout(() => {
-            updateKeywordsCount();
-          }, 100);
         }
       }
     });
@@ -1383,9 +1359,6 @@
         const keyword = newKeywordInput.value.trim();
         if (keyword && addKeyword(keyword)) {
           newKeywordInput.value = '';
-          setTimeout(() => {
-            updateKeywordsCount();
-          }, 100);
         }
       }
     });

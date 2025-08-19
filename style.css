@@ -2410,19 +2410,7 @@ body.high-contrast[data-theme="dark"] {
   transform: rotate(180deg);
 }
 
-/* Свернутый предварительный просмотр */
-.keywords-preview {
-  padding: 16px;
-  background: var(--card-color);
-}
 
-.keywords-preview-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-height: 32px;
-  align-items: center;
-}
 
 /* Развернутый список */
 .keywords-expanded {
@@ -2431,9 +2419,9 @@ body.high-contrast[data-theme="dark"] {
   border-top: 1px solid var(--section-separator);
 }
 
-/* Компактная кнопка загрузки стандартных */
-.button-load-defaults.compact {
-  background: var(--accent-green);
+/* Кнопка очистки всех ключевых слов */
+.button-clear-all-keywords {
+  background: var(--accent-red);
   color: white;
   border: 2px solid var(--border-color);
   border-radius: 8px;
@@ -2450,13 +2438,13 @@ body.high-contrast[data-theme="dark"] {
   box-shadow: 2px 2px 0px var(--border-color);
 }
 
-.button-load-defaults.compact:hover {
-  background: var(--accent-green);
+.button-clear-all-keywords:hover {
+  background: var(--accent-red);
   transform: translateY(-1px);
   box-shadow: 3px 3px 0px var(--border-color);
 }
 
-.button-load-defaults.compact:active {
+.button-clear-all-keywords:active {
   transform: translateY(0px);
   box-shadow: 1px 1px 0px var(--border-color);
 }
@@ -3249,4 +3237,34 @@ body.high-contrast[data-theme="dark"] {
 
 [data-theme="dark"] .retro-preview-card.dark-theme {
   background: var(--background-color);
+}
+
+/* Кнопка очистки всех ключевых слов */
+.button-clear-all-keywords {
+  background: var(--accent-red);
+  color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0px var(--border-color);
+}
+
+.button-clear-all-keywords:hover {
+  background: var(--accent-red);
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px var(--border-color);
+}
+
+.button-clear-all-keywords:active {
+  transform: translateY(0px);
+  box-shadow: 1px 1px 0px var(--border-color);
 }
