@@ -10,8 +10,8 @@
     const savedReduceAnimations = localStorage.getItem('reduce-animations') === 'true';
     const savedHighContrast = localStorage.getItem('high-contrast') === 'true';
     
-    // Устанавливаем сохраненную тему
-    setTheme(savedTheme);
+    // Устанавливаем сохраненную тему без уведомления
+    setTheme(savedTheme, false);
     
     // Применяем дополнительные настройки
     if (savedReduceAnimations) {

@@ -610,8 +610,8 @@
     const savedReduceAnimations = localStorage.getItem('reduce-animations') === 'true';
     const savedHighContrast = localStorage.getItem('high-contrast') === 'true';
     
-    // Устанавливаем сохраненную тему
-    setTheme(savedTheme);
+    // Устанавливаем сохраненную тему без уведомления
+    setTheme(savedTheme, false);
     
     // Устанавливаем состояние переключателей
     const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
@@ -639,7 +639,7 @@
     }
   }
   
-  function setTheme(theme) {
+  function setTheme(theme, showNotification = true) {
     const body = document.body;
     
     // Удаляем все классы тем
@@ -658,8 +658,8 @@
     
     localStorage.setItem('app-theme', theme);
     
-    // Уведомляем о смене темы
-    if (typeof uiToast === 'function') {
+    // Уведомляем о смене темы только если это не инициализация
+    if (showNotification && typeof uiToast === 'function') {
       const themeNames = { light: 'Светлая', dark: 'Темная' };
       uiToast(`Тема изменена: ${themeNames[theme] || theme}`);
     }
