@@ -1093,25 +1093,137 @@ mark.highlight {
     will-change: transform;
 }
 
-.settings-tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-.settings-tab-button {
-    flex-grow: 1;
-    font-family: 'Roboto Mono', monospace;
-    background: var(--card-color);
-    color: var(--hint-color);
-    border: var(--border-width) solid var(--border-color);
-    padding: 10px 5px;
-    font-size: 14px;
-    font-weight: 700;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    will-change: transform, background-color; /* Оптимизация settings табов */
+/* === РЕТРО-ГЕЙМ ВКЛАДКИ НАСТРОЕК === */
+.settings-tabs { 
+  display: flex; 
+  gap: 8px; 
+  margin-bottom: 25px;
+  padding: 15px;
+  background: var(--background-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
 }
+
+.settings-tab-button {
+  flex: 1;
+  font-family: var(--font-pixel);
+  background: var(--card-color);
+  color: var(--text-color);
+  border: var(--border-width) solid var(--border-color);
+  padding: 15px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 80px;
+  justify-content: center;
+  will-change: transform, background-color;
+  
+  /* Ретро-эффект: пиксельные границы */
+  image-rendering: pixelated;
+  box-shadow: var(--box-shadow);
+}
+
+.settings-tab-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px var(--border-color);
+  background: var(--secondary-bg);
+}
+
+.settings-tab-button:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
 .settings-tab-button.active {
-    background-color: var(--accent-blue);
-    color: var(--card-color);
-    box-shadow: 2px 2px 0px var(--border-color);
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 6px 6px 0px rgba(65, 166, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Иконки вкладок */
+.tab-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 4px;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+.settings-tab-button.active .tab-icon {
+  filter: drop-shadow(2px 2px 0px rgba(255, 255, 255, 0.3));
+  transform: scale(1.1);
+}
+
+/* Лейблы вкладок */
+.tab-label {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.2;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Мигающий курсор */
+.tab-cursor {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-green);
+  animation: blink 1.5s step-end infinite;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.settings-tab-button.active .tab-cursor {
+  color: white;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Анимация появления вкладок */
+.settings-tab-button {
+  animation: tabAppear 0.4s ease-out;
+}
+
+.settings-tab-button:nth-child(1) { animation-delay: 0.1s; }
+.settings-tab-button:nth-child(2) { animation-delay: 0.2s; }
+.settings-tab-button:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes tabAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Эффект глитча при переключении */
+.settings-tab-button.switching {
+  animation: glitch 0.2s ease-in-out;
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
 }
 .settings-form { display: flex; flex-direction: column; gap: 15px; }
 .settings-form label { font-weight: 700; margin-top: 10px; }
@@ -1923,6 +2035,34 @@ body.high-contrast[data-theme="dark"] {
   background-color: var(--accent-blue);
   color: white;
   border-color: var(--accent-blue);
+  box-shadow: 6px 6px 0px rgba(65, 166, 255, 0.4);
+}
+
+/* Ретро-вкладки в темной теме */
+[data-theme="dark"] .settings-tabs {
+  background: var(--background-color);
+  border-color: var(--border-color);
+  box-shadow: var(--box-shadow);
+}
+
+[data-theme="dark"] .settings-tab-button {
+  background: var(--card-color);
+  color: var(--text-color);
+  border-color: var(--border-color);
+  box-shadow: var(--box-shadow);
+}
+
+[data-theme="dark"] .settings-tab-button:hover {
+  background: var(--secondary-bg);
+  box-shadow: 6px 6px 0px var(--border-color);
+}
+
+[data-theme="dark"] .tab-cursor {
+  color: var(--accent-green);
+}
+
+[data-theme="dark"] .settings-tab-button.active .tab-cursor {
+  color: white;
 }
 
 [data-theme="dark"] .settings-form input,

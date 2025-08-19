@@ -738,6 +738,61 @@
     });
   });
   
+  // Ретро-анимация для вкладок настроек
+  function initRetroTabs() {
+    const tabButtons = document.querySelectorAll('.settings-tab-button');
+    const tabContents = document.querySelectorAll('.settings-tab-content');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        
+        // Добавляем эффект глитча
+        this.classList.add('switching');
+        
+        // Обновляем активные состояния
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        this.classList.add('active');
+        document.getElementById(targetId).classList.add('active');
+        
+        // Убираем эффект глитча
+        setTimeout(() => {
+          this.classList.remove('switching');
+        }, 200);
+        
+        // Добавляем звуковой эффект (если доступен)
+        if (window.AudioContext || window.webkitAudioContext) {
+          playRetroSound();
+        }
+      });
+    });
+  }
+  
+  // Функция для воспроизведения ретро-звука
+  function playRetroSound() {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    } catch (e) {
+      // Игнорируем ошибки аудио
+    }
+  }
+  
   // Обработчик для уменьшения анимаций
   const reduceAnimationsCheckbox = document.getElementById('reduce-animations');
   if (reduceAnimationsCheckbox) {
@@ -788,4 +843,5 @@
   initTheme();
   loadKeywords();
   loadChannels();
+  initRetroTabs(); // Инициализируем ретро-вкладки
 })();
