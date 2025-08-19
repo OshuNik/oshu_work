@@ -189,7 +189,10 @@
   }
 
   function displayKeywordTags() {
-    if (!keywordsTagsContainer) return;
+    if (!keywordsTagsContainer) {
+      console.error('displayKeywordTags: элемент keywordsTagsContainer не найден');
+      return;
+    }
     
     keywordsTagsContainer.innerHTML = '';
     
@@ -993,6 +996,7 @@
     const countBadge = document.getElementById('keywords-count');
     const previewTags = document.getElementById('keywords-preview-tags');
     
+    // Обновляем счетчик
     if (countBadge) {
       countBadge.textContent = keywordsTags.length;
     }
@@ -1002,14 +1006,16 @@
       if (keywordsTags.length === 0) {
         previewTags.innerHTML = '<span class="no-keywords">Нет ключевых слов</span>';
       } else {
-        const previewHTML = Array.from(keywordsTags.slice(0, 3))
+        // Преобразуем NodeList в массив для использования slice
+        const keywordsArray = Array.from(keywordsTags);
+        const previewHTML = keywordsArray.slice(0, 3)
           .map(tag => {
             const text = tag.querySelector('.keyword-tag-text')?.textContent || '';
             return `<span class="preview-tag">${text}</span>`;
           })
           .join('');
         
-        const remaining = keywordsTags.length > 3 ? `+${keywordsTags.length - 3}` : '';
+        const remaining = keywordsArray.length > 3 ? `+${keywordsArray.length - 3}` : '';
         previewTags.innerHTML = previewHTML + (remaining ? `<span class="preview-more">${remaining}</span>` : '');
       }
     }
