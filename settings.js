@@ -602,7 +602,187 @@
     });
   }
 
+  // === ФУНКЦИОНАЛЬНОСТЬ ТЕМНОЙ ТЕМЫ ===
+  
+  // Инициализация темы
+  function initTheme() {
+    const savedTheme = localStorage.getItem('app-theme') || 'auto';
+    const savedReduceAnimations = localStorage.getItem('reduce-animations') === 'true';
+    const savedHighContrast = localStorage.getItem('high-contrast') === 'true';
+    
+    // Устанавливаем сохраненную тему
+    setTheme(savedTheme);
+    
+    // Устанавливаем состояние переключателей
+    const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+    if (themeRadio) themeRadio.checked = true;
+    
+    const reduceAnimationsCheckbox = document.getElementById('reduce-animations');
+    if (reduceAnimationsCheckbox) {
+      reduceAnimationsCheckbox.checked = savedReduceAnimations;
+      if (savedReduceAnimations) {
+        document.body.classList.add('reduce-animations');
+      }
+    }
+    
+    const highContrastCheckbox = document.getElementById('high-contrast');
+    if (highContrastCheckbox) {
+      highContrastCheckbox.checked = savedHighContrast;
+      if (savedHighContrast) {
+        document.body.classList.add('high-contrast');
+      }
+    }
+    
+    // Интеграция с Telegram WebApp Theme
+    if (tg && tg.themeParams) {
+      applyTelegramTheme(tg.themeParams);
+    }
+  }
+  
+  function setTheme(theme) {
+    const body = document.body;
+    
+    // Удаляем все классы тем
+    body.classList.remove('dark-theme');
+    body.removeAttribute('data-theme');
+    
+    switch (theme) {
+      case 'dark':
+        body.setAttribute('data-theme', 'dark');
+        break;
+      case 'light':
+        body.setAttribute('data-theme', 'light');
+        break;
+      case 'auto':
+      default:
+        // Авто-тема использует CSS @media (prefers-color-scheme)
+        break;
+    }
+    
+    localStorage.setItem('app-theme', theme);
+    
+    // Уведомляем о смене темы
+    if (typeof uiToast === 'function') {
+      const themeNames = { auto: 'Авто', light: 'Светлая', dark: 'Темная' };
+      uiToast(`Тема изменена: ${themeNames[theme] || theme}`);
+    }
+  }
+  
+  function applyTelegramTheme(themeParams) {
+    if (!themeParams) return;
+    
+    const root = document.documentElement;
+    
+    // Применяем цвета из Telegram
+    if (themeParams.bg_color) {
+      root.style.setProperty('--tg-theme-bg-color', themeParams.bg_color);
+      root.style.setProperty('--background-color', themeParams.bg_color);
+    }
+    
+    if (themeParams.text_color) {
+      root.style.setProperty('--tg-theme-text-color', themeParams.text_color);
+      root.style.setProperty('--text-color', themeParams.text_color);
+    }
+    
+    if (themeParams.hint_color) {
+      root.style.setProperty('--tg-theme-hint-color', themeParams.hint_color);
+      root.style.setProperty('--hint-color', themeParams.hint_color);
+    }
+    
+    if (themeParams.link_color) {
+      root.style.setProperty('--tg-theme-link-color', themeParams.link_color);
+      root.style.setProperty('--link-color', themeParams.link_color);
+    }
+    
+    if (themeParams.button_color) {
+      root.style.setProperty('--tg-theme-button-color', themeParams.button_color);
+      root.style.setProperty('--button-bg', themeParams.button_color);
+    }
+    
+    if (themeParams.button_text_color) {
+      root.style.setProperty('--tg-theme-button-text-color', themeParams.button_text_color);
+      root.style.setProperty('--button-text', themeParams.button_text_color);
+    }
+    
+    if (themeParams.secondary_bg_color) {
+      root.style.setProperty('--tg-theme-secondary-bg-color', themeParams.secondary_bg_color);
+      root.style.setProperty('--secondary-bg', themeParams.secondary_bg_color);
+    }
+    
+    if (themeParams.header_bg_color) {
+      root.style.setProperty('--tg-theme-header-bg-color', themeParams.header_bg_color);
+      root.style.setProperty('--header-bg', themeParams.header_bg_color);
+    }
+    
+    if (themeParams.destructive_text_color) {
+      root.style.setProperty('--tg-theme-destructive-text-color', themeParams.destructive_text_color);
+      root.style.setProperty('--destructive-color', themeParams.destructive_text_color);
+    }
+    
+    if (themeParams.section_separator_color) {
+      root.style.setProperty('--tg-theme-section-separator-color', themeParams.section_separator_color);
+      root.style.setProperty('--section-separator', themeParams.section_separator_color);
+    }
+  }
+  
+  // Обработчики событий для переключения темы
+  const themeRadios = document.querySelectorAll('input[name="theme"]');
+  themeRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        setTheme(e.target.value);
+      }
+    });
+  });
+  
+  // Обработчик для уменьшения анимаций
+  const reduceAnimationsCheckbox = document.getElementById('reduce-animations');
+  if (reduceAnimationsCheckbox) {
+    reduceAnimationsCheckbox.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      localStorage.setItem('reduce-animations', isChecked.toString());
+      
+      if (isChecked) {
+        document.body.classList.add('reduce-animations');
+      } else {
+        document.body.classList.remove('reduce-animations');
+      }
+      
+      uiToast(isChecked ? 'Анимации уменьшены' : 'Анимации восстановлены');
+    });
+  }
+  
+  // Обработчик для высокого контраста
+  const highContrastCheckbox = document.getElementById('high-contrast');
+  if (highContrastCheckbox) {
+    highContrastCheckbox.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      localStorage.setItem('high-contrast', isChecked.toString());
+      
+      if (isChecked) {
+        document.body.classList.add('high-contrast');
+      } else {
+        document.body.classList.remove('high-contrast');
+      }
+      
+      uiToast(isChecked ? 'Высокий контраст включен' : 'Высокий контраст выключен');
+    });
+  }
+  
+  // Слушаем изменения системной темы
+  if (window.matchMedia) {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addListener(() => {
+      const currentTheme = localStorage.getItem('app-theme');
+      if (currentTheme === 'auto') {
+        // Обновляем отображение при изменении системной темы
+        uiToast('Тема обновлена согласно системным настройкам');
+      }
+    });
+  }
+  
   // Инициализация приложения
+  initTheme();
   loadKeywords();
   loadChannels();
 })();

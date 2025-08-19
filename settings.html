@@ -44,6 +44,7 @@
   <div class="settings-tabs">
     <button class="settings-tab-button active" data-target="tab-keywords">Ключевые слова</button>
     <button class="settings-tab-button" data-target="tab-channels">Каналы</button>
+    <button class="settings-tab-button" data-target="tab-appearance">Внешний вид</button>
   </div>
 
   <main class="content">
@@ -79,6 +80,73 @@
         <button id="delete-all-btn" class="button-delete">Удалить все каналы</button>
       </div>
     </div>
+
+    <div id="tab-appearance" class="settings-tab-content">
+      <div class="settings-form">
+        <div class="appearance-section">
+          <h3 class="section-title">🎨 Тема оформления</h3>
+          <div class="theme-selector">
+            <label class="theme-option">
+              <input type="radio" name="theme" value="auto" checked>
+              <span class="theme-option-content">
+                <span class="theme-preview theme-preview-auto"></span>
+                <span class="theme-label">
+                  <strong>Авто</strong>
+                  <small>Следует системным настройкам</small>
+                </span>
+              </span>
+            </label>
+            
+            <label class="theme-option">
+              <input type="radio" name="theme" value="light">
+              <span class="theme-option-content">
+                <span class="theme-preview theme-preview-light"></span>
+                <span class="theme-label">
+                  <strong>Светлая</strong>
+                  <small>Белый фон, черный текст</small>
+                </span>
+              </span>
+            </label>
+            
+            <label class="theme-option">
+              <input type="radio" name="theme" value="dark">
+              <span class="theme-option-content">
+                <span class="theme-preview theme-preview-dark"></span>
+                <span class="theme-label">
+                  <strong>Темная</strong>
+                  <small>Темный фон, светлый текст</small>
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="appearance-section">
+          <h3 class="section-title">⚡ Дополнительные настройки</h3>
+          <div class="setting-item">
+            <label class="toggle-switch">
+              <input type="checkbox" id="reduce-animations" />
+              <span class="toggle-slider"></span>
+            </label>
+            <div class="setting-info">
+              <strong>Уменьшить анимации</strong>
+              <small>Снижает количество анимаций для экономии батареи</small>
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <label class="toggle-switch">
+              <input type="checkbox" id="high-contrast" />
+              <span class="toggle-slider"></span>
+            </label>
+            <div class="setting-info">
+              <strong>Высокий контраст</strong>
+              <small>Увеличивает контрастность для лучшей читаемости</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
   
   <div id="toast-container" class="toast-container"></div>
@@ -96,6 +164,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="config.js"></script>
   <script src="utils.min.js"></script>
+  <script src="theme-manager.js"></script>
   <script src="settings.js"></script>
 </body>
 </html>

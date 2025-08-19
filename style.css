@@ -1,15 +1,36 @@
 /* Шрифты теперь загружаются через preconnect в HTML для лучшей производительности */
 
 :root {
-    /* Основные цвета */
+    /* Светлая тема (по умолчанию) */
     --background-color: #F0F0F0;
     --card-color: #FFFFFF;
     --text-color: #000000;
     --hint-color: #666666;
+    --border-color: #000000;
+    --input-bg: #FFFFFF;
+    --input-border: #CCCCCC;
+    --secondary-bg: #E8E8E8;
+    --header-bg: #FFFFFF;
+    --button-bg: #FFFFFF;
+    --button-text: #000000;
+    --destructive-color: #FF5C5C;
+    --link-color: #41A6FF;
+    --section-separator: #E0E0E0;
+    
+    /* Telegram Web App CSS переменные (интеграция) */
+    --tg-theme-bg-color: var(--background-color);
+    --tg-theme-text-color: var(--text-color);
+    --tg-theme-hint-color: var(--hint-color);
+    --tg-theme-link-color: var(--link-color);
+    --tg-theme-button-color: var(--button-bg);
+    --tg-theme-button-text-color: var(--button-text);
+    --tg-theme-secondary-bg-color: var(--secondary-bg);
+    --tg-theme-header-bg-color: var(--header-bg);
+    --tg-theme-destructive-text-color: var(--destructive-color);
+    --tg-theme-section-separator-color: var(--section-separator);
     
     /* Границы и тени */
     --border-width: 2px;
-    --border-color: #000000;
     --shadow-offset: 4px;
     --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
     --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--border-color);
@@ -28,6 +49,67 @@
     /* Шрифты */
     --font-mono: 'Roboto Mono', 'Courier New', monospace;
     --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+}
+
+/* Темная тема */
+[data-theme="dark"], 
+.dark-theme {
+    /* Основные цвета для темной темы */
+    --background-color: #1A1A1A;
+    --card-color: #2D2D2D;
+    --text-color: #FFFFFF;
+    --hint-color: #888888;
+    --border-color: #404040;
+    --input-bg: #2D2D2D;
+    --input-border: #404040;
+    --secondary-bg: #252525;
+    --header-bg: #2D2D2D;
+    --button-bg: #3D3D3D;
+    --button-text: #FFFFFF;
+    --destructive-color: #FF6B6B;
+    --link-color: #5FB3FF;
+    --section-separator: #404040;
+    
+    /* Темные акцентные цвета (более мягкие для темной темы) */
+    --accent-red: #FF6B6B;
+    --accent-yellow: #FFE066;
+    --accent-green: #7ED87E;
+    --accent-blue: #5FB3FF;
+    
+    /* Темные тени */
+    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.3);
+    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.3);
+}
+
+/* Автоматическая темная тема (следует системным настройкам) */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        /* Основные цвета для темной темы */
+        --background-color: #1A1A1A;
+        --card-color: #2D2D2D;
+        --text-color: #FFFFFF;
+        --hint-color: #888888;
+        --border-color: #404040;
+        --input-bg: #2D2D2D;
+        --input-border: #404040;
+        --secondary-bg: #252525;
+        --header-bg: #2D2D2D;
+        --button-bg: #3D3D3D;
+        --button-text: #FFFFFF;
+        --destructive-color: #FF6B6B;
+        --link-color: #5FB3FF;
+        --section-separator: #404040;
+        
+        /* Темные акцентные цвета */
+        --accent-red: #FF6B6B;
+        --accent-yellow: #FFE066;
+        --accent-green: #7ED87E;
+        --accent-blue: #5FB3FF;
+        
+        /* Темные тени */
+        --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.3);
+        --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.3);
+    }
 }
 
 /* === УТИЛИТАРНЫЕ КЛАССЫ === */
@@ -199,6 +281,8 @@ body {
     /* Блокируем сворачивание мини-аппа */
     overscroll-behavior: contain;
     -webkit-overscroll-behavior: contain;
+    /* Плавные переходы при смене темы */
+    transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
 /* === Pull-to-Refresh (Финальный Ретро-дизайн) === */
@@ -1532,4 +1616,239 @@ details[open] .vacancy-text {
   padding: 12px;
   font-family: var(--font-mono);
   font-weight: 700;
+}
+
+/* === СТИЛИ ДЛЯ ВКЛАДКИ ВНЕШНЕГО ВИДА === */
+.appearance-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--section-separator);
+}
+
+.appearance-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  letter-spacing: 0.5px;
+}
+
+/* Селектор темы */
+.theme-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.theme-option input[type="radio"] {
+  display: none;
+}
+
+.theme-option-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  width: 100%;
+  background-color: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 12px;
+  transition: all var(--transition-normal);
+  box-shadow: 2px 2px 0px var(--border-color);
+}
+
+.theme-option:hover .theme-option-content {
+  background-color: var(--secondary-bg);
+  transform: translateY(-1px);
+}
+
+.theme-option input[type="radio"]:checked + .theme-option-content {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 4px 4px 0px rgba(65, 166, 255, 0.3);
+}
+
+.theme-preview {
+  width: 40px;
+  height: 30px;
+  border-radius: 6px;
+  border: 2px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.theme-preview-light {
+  background: linear-gradient(135deg, #F0F0F0 50%, #FFFFFF 50%);
+}
+
+.theme-preview-dark {
+  background: linear-gradient(135deg, #1A1A1A 50%, #2D2D2D 50%);
+}
+
+.theme-preview-auto {
+  background: linear-gradient(135deg, #F0F0F0 25%, #1A1A1A 25%, #1A1A1A 50%, #F0F0F0 50%, #F0F0F0 75%, #2D2D2D 75%);
+}
+
+.theme-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.theme-label strong {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.theme-label small {
+  font-size: 11px;
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
+.theme-option input[type="radio"]:checked + .theme-option-content .theme-label small {
+  opacity: 0.9;
+}
+
+/* Настройки переключателей */
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background-color: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all var(--transition-normal);
+}
+
+.setting-item:hover {
+  background-color: var(--secondary-bg);
+  transform: translateY(-1px);
+}
+
+.setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.setting-info strong {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--text-color);
+}
+
+.setting-info small {
+  font-size: 10px;
+  color: var(--hint-color);
+  line-height: 1.3;
+}
+
+/* Переключатели */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--hint-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 14px;
+  transition: all var(--transition-normal);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+  background-color: white;
+  border-color: var(--accent-green);
+}
+
+/* Специальные стили для уменьшенных анимаций */
+body.reduce-animations *,
+body.reduce-animations *:before,
+body.reduce-animations *:after {
+  animation-duration: 0.1s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0.1s !important;
+  transition-delay: 0s !important;
+}
+
+/* Высокий контраст */
+body.high-contrast {
+  --background-color: #000000;
+  --card-color: #FFFFFF;
+  --text-color: #000000;
+  --hint-color: #666666;
+  --border-color: #000000;
+  --accent-blue: #0066CC;
+  --accent-green: #008800;
+  --accent-red: #CC0000;
+  --accent-yellow: #CC8800;
+}
+
+body.high-contrast.dark-theme,
+body.high-contrast[data-theme="dark"] {
+  --background-color: #000000;
+  --card-color: #000000;
+  --text-color: #FFFFFF;
+  --hint-color: #CCCCCC;
+  --border-color: #FFFFFF;
+  --accent-blue: #66AAFF;
+  --accent-green: #66FF66;
+  --accent-red: #FF6666;
+  --accent-yellow: #FFCC66;
 }
