@@ -22,61 +22,133 @@
   <!-- Async CSS Loading for non-critical styles -->
   <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   
+  <!-- Retro Gaming Styles for Settings -->
+  <link rel="stylesheet" href="retro-settings.css">
+  
   <!-- Fonts loaded asynchronously -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <header class="header header-settings">
-    <h1>⚙︎ Настройки</h1>
-    <div class="header-actions">
-      <a href="index.html" class="header-button">← Назад</a>
-      <button id="save-button" class="header-icon-btn" aria-label="Сохранить настройки">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <title>Сохранить настройки</title>
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <path d="M17 21v-8H7v8M7 3v5h8"/>
-        </svg>
+  <header class="header header-settings retro-header">
+    <div class="retro-header-bg"></div>
+    <h1 class="retro-title">
+      <span class="retro-icon">⚙</span>
+      <span class="retro-text">НАСТРОЙКИ</span>
+      <span class="retro-blink">◆</span>
+    </h1>
+    <div class="header-actions retro-actions">
+      <a href="index.html" class="header-button retro-btn retro-btn-back">
+        <span class="btn-text">◄ НАЗАД</span>
+      </a>
+      <button id="save-button" class="header-button retro-btn retro-btn-save" aria-label="Сохранить настройки">
+        <span class="btn-text">💾 SAVE</span>
       </button>
     </div>
   </header>
 
-  <div class="settings-tabs">
-    <button class="settings-tab-button active" data-target="tab-keywords">Ключевые слова</button>
-    <button class="settings-tab-button" data-target="tab-channels">Каналы</button>
+  <div class="settings-tabs retro-tabs">
+    <button class="settings-tab-button retro-tab-btn active" data-target="tab-keywords">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-text">КЛЮЧЕВЫЕ СЛОВА</span>
+      <div class="tab-pixel-border"></div>
+    </button>
+    <button class="settings-tab-button retro-tab-btn" data-target="tab-channels">
+      <span class="tab-icon">📡</span>
+      <span class="tab-text">КАНАЛЫ</span>
+      <div class="tab-pixel-border"></div>
+    </button>
   </div>
 
-  <main class="content">
-    <div id="tab-keywords" class="settings-tab-content active">
-      <div class="current-keywords-container">
-        <p class="current-keywords-label">Текущие ключевые слова:</p>
-        <div id="current-keywords-tags" class="keywords-tags-container">
-          <div class="loading-indicator">Загрузка...</div>
+  <main class="content retro-content">
+    <div id="tab-keywords" class="settings-tab-content retro-panel active">
+      <div class="retro-panel-border">
+        <div class="retro-panel-header">
+          <span class="panel-icon">📝</span>
+          <span class="panel-title">CURRENT KEYWORDS</span>
+        </div>
+        <div class="current-keywords-container retro-keywords-display">
+          <div id="current-keywords-tags" class="keywords-tags-container retro-tags">
+            <div class="loading-indicator retro-loading">
+              <span class="loading-text">ЗАГРУЗКА</span>
+              <span class="loading-dots">...</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="add-keyword-section">
-        <label for="new-keyword-input">Добавить ключевое слово:</label>
-        <div class="add-keyword-form">
-          <input type="text" id="new-keyword-input" placeholder="например: монтаж" maxlength="30">
-          <button id="add-keyword-btn" type="button">+</button>
+      
+      <div class="retro-panel-border">
+        <div class="retro-panel-header">
+          <span class="panel-icon">➕</span>
+          <span class="panel-title">ADD KEYWORD</span>
+        </div>
+        <div class="add-keyword-section retro-input-section">
+          <div class="add-keyword-form retro-input-form">
+            <input type="text" id="new-keyword-input" class="retro-input" placeholder="например: монтаж" maxlength="30">
+            <button id="add-keyword-btn" class="retro-btn retro-btn-add" type="button">
+              <span class="btn-text">ADD</span>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="settings-form">
-        <label for="keywords-input">Или изменить весь список (через запятую):</label>
-        <textarea id="keywords-input" rows="4" placeholder="монтаж, рилс, анимация..."></textarea>
+      
+      <div class="retro-panel-border">
+        <div class="retro-panel-header">
+          <span class="panel-icon">✏️</span>
+          <span class="panel-title">EDIT ALL</span>
+        </div>
+        <div class="settings-form retro-form">
+          <textarea id="keywords-input" class="retro-textarea" rows="4" placeholder="монтаж, рилс, анимация..."></textarea>
+        </div>
       </div>
     </div>
 
-    <div id="tab-channels" class="settings-tab-content">
-      <div class="settings-form">
-        <button id="load-defaults-btn" class="button-load-defaults">Загрузить стандартные каналы</button>
-        <label for="channel-input">Добавить новый канал:</label>
-        <div class="add-channel-form">
-          <input type="text" id="channel-input" placeholder="@username или https://t.me/..." aria-label="Адрес канала для добавления">
-          <button id="add-channel-btn" aria-label="Добавить канал">+</button>
+    <div id="tab-channels" class="settings-tab-content retro-panel">
+      <div class="retro-panel-border">
+        <div class="retro-panel-header">
+          <span class="panel-icon">⬇️</span>
+          <span class="panel-title">LOAD DEFAULTS</span>
         </div>
-        <div id="channels-list" class="channels-list"></div>
-        <button id="delete-all-btn" class="button-delete">Удалить все каналы</button>
+        <div class="retro-form">
+          <button id="load-defaults-btn" class="retro-btn retro-btn-load">
+            <span class="btn-text">📥 ЗАГРУЗИТЬ СТАНДАРТНЫЕ</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="retro-panel-border">
+        <div class="retro-panel-header">
+          <span class="panel-icon">📡</span>
+          <span class="panel-title">ADD CHANNEL</span>
+        </div>
+        <div class="retro-form">
+          <div class="add-channel-form retro-input-form">
+            <input type="text" id="channel-input" class="retro-input" placeholder="@username или https://t.me/..." aria-label="Адрес канала для добавления">
+            <button id="add-channel-btn" class="retro-btn retro-btn-add" aria-label="Добавить канал">
+              <span class="btn-text">ADD</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="retro-panel-border">
+        <div class="retro-panel-header">
+          <span class="panel-icon">📜</span>
+          <span class="panel-title">CHANNELS LIST</span>
+        </div>
+        <div id="channels-list" class="channels-list retro-channels-list"></div>
+      </div>
+      
+      <div class="retro-panel-border retro-danger-panel">
+        <div class="retro-panel-header">
+          <span class="panel-icon">⚠️</span>
+          <span class="panel-title">DANGER ZONE</span>
+        </div>
+        <div class="retro-form">
+          <button id="delete-all-btn" class="retro-btn retro-btn-danger">
+            <span class="btn-text">🗑️ УДАЛИТЬ ВСЕ</span>
+          </button>
+        </div>
       </div>
     </div>
   </main>
