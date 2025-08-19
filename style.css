@@ -813,76 +813,69 @@ mark.highlight {
   }
 }
 
-/* Визуальные теги ключевых слов */
+/* Контейнер для тегов ключевых слов */
 .keywords-tags-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 12px 0;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.05);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
   min-height: 60px;
-  align-items: flex-start;
-  align-content: flex-start;
+  padding: 16px;
+  background: var(--secondary-bg);
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  margin-bottom: 16px;
 }
 
+/* Отдельный тег ключевого слова */
 .keyword-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   background: var(--accent-blue);
-  color: var(--text-color);
-  padding: 6px 10px;
-  border: 2px solid var(--text-color);
-  border-radius: 6px;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 700;
-  box-shadow: 2px 2px 0px var(--text-color);
-  transition: all 0.2s ease-out;
-  animation: tagAppear 0.3s ease-out;
-  max-width: 120px;
-  overflow: hidden;
+  font-weight: 600;
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  max-width: 200px;
+  word-break: break-word;
 }
 
 .keyword-tag:hover {
   transform: translateY(-1px);
-  box-shadow: 3px 3px 0px var(--text-color);
+  box-shadow: 3px 3px 0px var(--border-color);
 }
 
-.keyword-tag-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.keyword-tag:active {
+  transform: translateY(0px);
+  box-shadow: 1px 1px 0px var(--border-color);
 }
 
-.keyword-tag-remove {
-  background: var(--accent-red);
-  color: var(--text-color);
+/* Кнопка удаления тега */
+.keyword-tag .remove-btn {
+  background: none;
   border: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
+  color: white;
   cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-out;
+  border-radius: 50%;
+  transition: all var(--transition-normal);
   flex-shrink: 0;
 }
 
-.keyword-tag-remove:hover {
-  background: #FF3333;
+.keyword-tag .remove-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
-}
-
-.keyword-tag-remove:active {
-  transform: scale(0.9);
 }
 
 /* Форма добавления ключевого слова */
@@ -2355,28 +2348,35 @@ body.high-contrast[data-theme="dark"] {
   gap: 12px;
 }
 
+/* Счетчик ключевых слов */
 .keywords-count-badge {
-  background: var(--accent-blue);
+  background: var(--accent-color);
   color: white;
-  padding: 4px 10px;
-  border-radius: 16px;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-pixel);
-  font-size: 11px;
+  font-size: 20px;
   font-weight: 700;
-  border: 2px solid var(--border-color);
-  box-shadow: 2px 2px 0px var(--border-color);
+  border: 3px solid var(--border-color);
+  box-shadow: 4px 4px 0px var(--border-color);
+  flex-shrink: 0;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
 }
 
+/* Заголовок секции ключевых слов */
 .keywords-summary-title {
-  margin: 0;
   font-family: var(--font-pixel);
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.5px;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text-color);
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
-
-
 
 .keywords-expand-btn {
   background: var(--button-bg);
@@ -3210,18 +3210,19 @@ body.high-contrast[data-theme="dark"] {
   background: var(--accent-red);
   color: white;
   border: 2px solid var(--border-color);
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-radius: 6px;
+  padding: 8px 16px;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-normal);
   display: flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
+  margin: 0 auto;
   box-shadow: 2px 2px 0px var(--border-color);
+  max-width: 200px;
 }
 
 .button-clear-all-keywords:hover {
@@ -3237,38 +3238,8 @@ body.high-contrast[data-theme="dark"] {
 
 /* Секция очистки всех ключевых слов */
 .keywords-clear-section {
-  padding: 16px;
-  border-top: 1px solid var(--section-separator);
+  padding: 20px;
+  border-top: 2px solid var(--section-separator);
   background: var(--card-color);
   text-align: center;
-}
-
-/* Кнопка очистки всех ключевых слов */
-.button-clear-all-keywords {
-  background: var(--accent-red);
-  color: white;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 auto;
-  box-shadow: 2px 2px 0px var(--border-color);
-}
-
-.button-clear-all-keywords:hover {
-  background: var(--accent-red);
-  transform: translateY(-1px);
-  box-shadow: 3px 3px 0px var(--border-color);
-}
-
-.button-clear-all-keywords:active {
-  transform: translateY(0px);
-  box-shadow: 1px 1px 0px var(--border-color);
 }
