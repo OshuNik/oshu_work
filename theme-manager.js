@@ -72,8 +72,8 @@
       '--accent-yellow': '#FFC107',        /* Более яркий желтый для темной темы */
       '--accent-green': '#4CAF50',         /* Более яркий зеленый для темной темы */
       '--accent-blue': '#64B5F6',
-      '--box-shadow': '4px 4px 0px rgba(0, 0, 0, 0.4)',
-      '--box-shadow-pressed': '2px 2px 0px rgba(0, 0, 0, 0.4)'
+      '--box-shadow': 'none',
+      '--box-shadow-pressed': 'none'
     };
     
     Object.entries(darkColors).forEach(([property, value]) => {

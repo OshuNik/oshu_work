@@ -2005,6 +2005,111 @@ body.high-contrast[data-theme="dark"] {
   border-color: var(--border-color);
 }
 
+/* Убираем видимые переходы между блоками в темной теме */
+[data-theme="dark"] .main-wrapper {
+  background-color: var(--background-color);
+}
+
+[data-theme="dark"] .header {
+  background-color: var(--background-color);
+}
+
+[data-theme="dark"] .search-container {
+  background-color: var(--background-color);
+}
+
+[data-theme="dark"] .content {
+  background-color: var(--background-color);
+}
+
+[data-theme="dark"] .category-tabs {
+  background-color: var(--background-color);
+}
+
+/* Убираем тени у карточек в темной теме для лучшей интеграции */
+[data-theme="dark"] .vacancy-card {
+  box-shadow: none;
+  border-color: var(--border-color);
+}
+
+/* Убираем тени у кнопок в темной теме */
+[data-theme="dark"] .header-button {
+  box-shadow: none;
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .search-input {
+  box-shadow: none;
+  border-color: var(--border-color);
+}
+
+/* Убираем тени у вкладок в темной теме */
+[data-theme="dark"] .tab-button {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .tab-button.active {
+  box-shadow: none;
+}
+
+/* Убираем тени у settings элементов в темной теме */
+[data-theme="dark"] .settings-tab-button {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .settings-tab-button.active {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .theme-option-content {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .setting-item {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .button-load-defaults {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .button-delete {
+  box-shadow: none;
+}
+
+/* Убираем тени у других элементов в темной теме */
+[data-theme="dark"] .custom-confirm-box {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .toast {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .load-more-btn {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .keyword-tag {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .add-keyword-form button {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .favorites-count {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .retro-progress-bar-outline {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .ptr-bar {
+  box-shadow: none;
+}
+
 [data-theme="dark"] .tab-button.active {
   color: var(--text-color);
 }
@@ -2039,4 +2144,40 @@ body.high-contrast[data-theme="dark"] {
   color: var(--text-color);
   opacity: 1;
   font-weight: 700;
+}
+
+/* Дополнительные стили для устранения видимых переходов в темной теме */
+[data-theme="dark"] body {
+  background-color: var(--background-color);
+}
+
+[data-theme="dark"] .ptr-bar {
+  background-color: var(--background-color);
+  border-color: var(--border-color);
+}
+
+/* Убираем тени у всех элементов в темной теме для единообразия */
+[data-theme="dark"] * {
+  box-shadow: none !important;
+}
+
+/* Но оставляем тени для активных состояний вкладок */
+[data-theme="dark"] .tab-button.main.active,
+[data-theme="dark"] .tab-button.maybe.active,
+[data-theme="dark"] .tab-button.other.active {
+  box-shadow: none !important;
+}
+
+/* Убираем тени у всех кнопок и интерактивных элементов */
+[data-theme="dark"] button,
+[data-theme="dark"] .button,
+[data-theme="dark"] .btn {
+  box-shadow: none !important;
+}
+
+/* Убираем тени у всех карточек и контейнеров */
+[data-theme="dark"] .card,
+[data-theme="dark"] .container,
+[data-theme="dark"] .wrapper {
+  box-shadow: none !important;
 }
