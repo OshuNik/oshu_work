@@ -124,12 +124,16 @@
    * @returns {Promise<Object>} Созданный объект канала
    */
   async function createChannel(channelId) {
+    console.log('[DEBUG] Создание канала:', channelId);
+    
     const newChannelData = { 
       channel_id: channelId, 
       channel_title: channelId, 
       is_enabled: true 
     };
     
+    console.log('[DEBUG] Отправляемые данные:', newChannelData);
+    console.log('[DEBUG] API URL:', API_ENDPOINTS.CHANNELS);
     
     const response = await fetch(API_ENDPOINTS.CHANNELS, {
       method: 'POST',
@@ -137,18 +141,25 @@
       body: JSON.stringify(newChannelData)
     });
     
+    console.log('[DEBUG] Ответ сервера:', response.status, response.statusText);
+    
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('[DEBUG] Ошибка API:', errorText);
       throw new Error(`Ошибка API: ${response.status} ${response.statusText}. ${errorText}`);
     }
     
     const data = await response.json();
+    console.log('[DEBUG] Полученные данные:', data);
+    
     if (data && data.length > 0) {
       renderChannel(data[0]);
       channelInput.value = '';
       uiToast(MESSAGES.SUCCESS.CHANNEL_ADDED);
+      console.log('[DEBUG] Канал успешно создан:', data[0]);
       return data[0];
     } else {
+      console.error('[DEBUG] API не вернул данные о канале');
       throw new Error('API не вернул данные о добавленном канале');
     }
   }
@@ -442,22 +453,41 @@
     // Создаем обработчики как отдельные функции для возможности cleanup
     const deleteHandler = async () => {
       const dbId = channelItem.dataset.dbId;
-      if (!dbId) return;
+      console.log('[DEBUG] Удаление канала:', { dbId, channel_id: channel.channel_id });
+      
+      if (!dbId) {
+        console.error('[DEBUG] Отсутствует dbId для удаления канала:', channel.channel_id);
+        return;
+      }
+      
       const ok = await showCustomConfirm('Удалить этот канал?');
       if (!ok) return;
+      
       channelItem.style.opacity = '0.5';
       try {
-        const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+        const deleteUrl = `${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`;
+        console.log('[DEBUG] URL удаления:', deleteUrl);
+        
+        const response = await fetch(deleteUrl, {
           method: 'DELETE',
           headers: createSupabaseHeaders()
         });
-        if (!response.ok) throw new Error('Ошибка ответа сети');
+        
+        console.log('[DEBUG] Ответ удаления:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('[DEBUG] Ошибка удаления:', errorText);
+          throw new Error(`Ошибка ответа сети: ${response.status} ${errorText}`);
+        }
+        
+        console.log('[DEBUG] Канал успешно удален из БД');
         channelItem.remove();
         uiToast(MESSAGES.SUCCESS.CHANNEL_DELETED);
         // Обновляем состояние кнопки удаления выбранных
         updateDeleteSelectedButton();
       } catch (error) {
-        console.error('Ошибка удаления канала:', error);
+        console.error('[DEBUG] Ошибка удаления канала:', error);
         safeAlert(MESSAGES.ERRORS.DELETE_FAILED);
         channelItem.style.opacity = '1';
       }
@@ -466,17 +496,35 @@
     const toggleHandler = async (event) => {
       const dbId = channelItem.dataset.dbId;
       const is_enabled = event.target.checked;
-      if (!dbId) return;
+      console.log('[DEBUG] Переключение канала:', { dbId, is_enabled, channel_id: channel.channel_id });
+      
+      if (!dbId) {
+        console.error('[DEBUG] Отсутствует dbId для канала:', channel.channel_id);
+        return;
+      }
+      
       try {
-        const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+        const updateUrl = `${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`;
+        console.log('[DEBUG] URL обновления:', updateUrl);
+        
+        const response = await fetch(updateUrl, {
           method: 'PATCH',
           headers: createSupabaseHeaders(),
           body: JSON.stringify({ is_enabled: is_enabled })
         });
-        if (!response.ok) throw new Error('Ошибка ответа сети');
+        
+        console.log('[DEBUG] Ответ обновления статуса:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('[DEBUG] Ошибка обновления:', errorText);
+          throw new Error(`Ошибка ответа сети: ${response.status} ${errorText}`);
+        }
+        
+        console.log('[DEBUG] Статус канала успешно обновлен');
         uiToast(is_enabled ? MESSAGES.SUCCESS.CHANNEL_TOGGLED : MESSAGES.SUCCESS.CHANNEL_DISABLED);
       } catch (error) {
-        console.error('Ошибка обновления статуса канала:', error);
+        console.error('[DEBUG] Ошибка обновления статуса канала:', error);
         safeAlert(MESSAGES.ERRORS.UPDATE_FAILED);
         event.target.checked = !is_enabled;
       }
@@ -1100,17 +1148,40 @@
       deleteSelectedBtn.addEventListener('click', () => {
         const selectedChannels = document.querySelectorAll('.channel-item input[type="checkbox"]:checked');
         if (selectedChannels.length > 0) {
-          showConfirmDialog(
-            `Удалить ${selectedChannels.length} выбранных каналов?`,
-            () => {
-              selectedChannels.forEach(cb => {
+          showCustomConfirm(
+            `Удалить ${selectedChannels.length} выбранных каналов?`
+          ).then(confirmed => {
+            if (confirmed) {
+              selectedChannels.forEach(async cb => {
                 const channelItem = cb.closest('.channel-item');
-                channelItem.style.animation = 'fadeOut 0.3s ease-out forwards';
-                setTimeout(() => {
-                  channelItem.remove();
-                  updateDeleteSelectedButton();
-                }, 300);
+                const dbId = channelItem.dataset.dbId;
+                
+                if (dbId) {
+                  try {
+                    // Удаляем из базы данных
+                    const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+                      method: 'DELETE',
+                      headers: createSupabaseHeaders()
+                    });
+                    
+                    if (response.ok) {
+                      channelItem.style.animation = 'fadeOut 0.3s ease-out forwards';
+                      setTimeout(() => {
+                        channelItem.remove();
+                        updateDeleteSelectedButton();
+                      }, 300);
+                    } else {
+                      console.error('Ошибка удаления канала из БД:', response.statusText);
+                      safeAlert('Ошибка удаления канала из базы данных');
+                    }
+                  } catch (error) {
+                    console.error('Ошибка при удалении канала:', error);
+                    safeAlert('Ошибка при удалении канала');
+                  }
+                }
               });
+            }
+          });
             }
           );
         }
