@@ -768,6 +768,23 @@ mark.highlight {
   animation: countingComplete 0.4s ease-out;
 }
 
+/* Иконка настроек в заголовке */
+.settings-icon {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-color);
+  background: var(--accent-blue);
+  padding: 6px 12px;
+  border: 2px solid var(--text-color);
+  box-shadow: 2px 2px 0px var(--text-color);
+  min-width: 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: settingsPulse 3s infinite ease-in-out;
+}
+
 /* Анимации */
 @keyframes pixelPulse {
   0%, 100% { 
@@ -810,6 +827,17 @@ mark.highlight {
     background: var(--accent-yellow);
     transform: scale(1);
     box-shadow: 2px 2px 0px var(--text-color);
+  }
+}
+
+@keyframes settingsPulse {
+  0%, 100% { 
+    background: var(--accent-blue);
+    transform: scale(1);
+  }
+  50% { 
+    background: var(--accent-green);
+    transform: scale(1.05);
   }
 }
 
