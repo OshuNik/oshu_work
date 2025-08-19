@@ -177,7 +177,13 @@
     
     // Добавляем обработчик удаления
     const removeBtn = tag.querySelector('.keyword-tag-remove');
-    removeBtn.addEventListener('click', () => removeKeyword(keyword));
+    removeBtn.addEventListener('click', () => {
+      removeKeyword(keyword);
+      // Обновляем счетчик и предварительный просмотр после удаления
+      setTimeout(() => {
+        updateKeywordsCount();
+      }, 250); // Немного больше времени анимации удаления
+    });
     
     return tag;
   }
@@ -220,6 +226,10 @@
     currentKeywords.push(trimmed);
     debouncedSave();
     displayKeywordTags();
+    
+    // Обновляем счетчик и предварительный просмотр
+    updateKeywordsCount();
+    
     return true;
   }
 
@@ -234,11 +244,15 @@
           currentKeywords.splice(index, 1);
           debouncedSave();
           displayKeywordTags();
+          // Обновляем счетчик и предварительный просмотр
+          updateKeywordsCount();
         }, 200);
       } else {
         currentKeywords.splice(index, 1);
         debouncedSave();
         displayKeywordTags();
+        // Обновляем счетчик и предварительный просмотр
+        updateKeywordsCount();
       }
     }
   }
@@ -254,7 +268,6 @@
 
   async function updateKeywordsInDatabase() {
     const keywordsString = currentKeywords.join(', ');
-    keywordsInput.value = keywordsString;
     
     try {
       // Пробуем PATCH для обновления существующей записи
@@ -320,7 +333,8 @@
       
       // Парсим ключевые слова
       currentKeywords = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
-      keywordsInput.value = keywords;
+      
+      // Отображаем теги ключевых слов
       displayKeywordTags();
     } catch (error) {
       console.error('loadKeywords: произошла ошибка', error);
@@ -335,18 +349,21 @@
   }
 
   async function saveKeywords() {
-    if (!keywordsInput) return;
-    const kws = keywordsInput.value.trim();
+    if (!currentKeywords || currentKeywords.length === 0) {
+      safeAlert('Нет ключевых слов для сохранения');
+      return;
+    }
+    
     saveBtn.disabled = true;
     try {
-      // Обновляем текущие ключевые слова из textarea
-      currentKeywords = kws ? kws.split(',').map(k => k.trim()).filter(k => k) : [];
+      // Формируем строку ключевых слов из массива
+      const keywordsString = currentKeywords.join(', ');
       
       // Используем PATCH для обновления как в updateKeywordsInDatabase
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
         headers: createSupabaseHeaders(),
-        body: JSON.stringify({ keywords: kws })
+        body: JSON.stringify({ keywords: keywordsString })
       });
       
       if (!response.ok) {
@@ -358,7 +375,7 @@
           const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
             method: 'POST',
             headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
-            body: JSON.stringify({ update_key: 1, keywords: kws })
+            body: JSON.stringify({ update_key: 1, keywords: keywordsString })
           });
           
           if (!postResponse.ok) {
@@ -369,7 +386,6 @@
         }
       }
       
-      displayKeywordTags();
       uiToast(MESSAGES.SUCCESS.KEYWORDS_SAVED);
     } catch (error) {
       console.error('saveKeywords: произошла ошибка', error);
@@ -566,8 +582,14 @@
 
   saveBtn?.addEventListener('click', () => {
     const activeTab = document.querySelector('.settings-tab-content.active');
-    if (activeTab.id === 'tab-keywords') saveKeywords();
-    else safeAlert('Изменения в каналах сохраняются автоматически!');
+    if (activeTab.id === 'tab-keywords') {
+      // Сохраняем ключевые слова в базу данных
+      updateKeywordsInDatabase();
+    } else if (activeTab.id === 'tab-channels') {
+      safeAlert('Изменения в каналах сохраняются автоматически!');
+    } else if (activeTab.id === 'tab-appearance') {
+      safeAlert('Настройки внешнего вида сохраняются автоматически!');
+    }
   });
 
   loadDefaultsBtn?.addEventListener('click', async () => {
