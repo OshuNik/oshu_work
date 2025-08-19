@@ -655,7 +655,9 @@
 
   // Функция загрузки стандартных ключевых слов
   async function loadDefaultKeywords() {
-    loadDefaultsBtn.disabled = true;
+    const loadDefaultsBtn = document.querySelector('#load-defaults-btn');
+    if (loadDefaultsBtn) loadDefaultsBtn.disabled = true;
+    
     try {
       // Стандартные ключевые слова для фриланса
       const defaultKeywords = [
@@ -684,38 +686,83 @@
       // Сохраняем в базу данных
       await updateKeywordsInDatabase();
       
-      uiToast(`Добавлено ${newKeywords.length} стандартных ключевых слов`);
+      uiToast(`Добавлено ${newKeywords.length} новых стандартных ключевых слов`);
     } catch (error) {
       console.error('Ошибка загрузки стандартных ключевых слов:', error);
-      safeAlert('Не удалось добавить стандартные ключевые слова. Проверьте подключение к интернету.');
+      safeAlert(`Не удалось добавить стандартные ключевые слова: ${error.message}`);
     } finally {
-      loadDefaultsBtn.disabled = false;
+      if (loadDefaultsBtn) loadDefaultsBtn.disabled = false;
     }
   }
 
   // Функция загрузки стандартных каналов
   async function loadDefaultChannels() {
-    loadDefaultsBtn.disabled = true;
+    const loadDefaultsBtn = document.querySelector('#load-defaults-btn');
+    if (loadDefaultsBtn) loadDefaultsBtn.disabled = true;
+    
     try {
+      // Сначала получаем текущие каналы
+      const currentChannelsResponse = await fetch(`${API_ENDPOINTS.CHANNELS}?select=channel_id`, {
+        headers: createSupabaseHeaders()
+      });
+      
+      if (!currentChannelsResponse.ok) {
+        throw new Error('Не удалось получить текущие каналы');
+      }
+      
+      const currentChannels = await currentChannelsResponse.json();
+      const currentChannelIds = currentChannels.map(ch => ch.channel_id);
+      
+      // Получаем стандартные каналы
       const response = await fetch(`${API_ENDPOINTS.DEFAULT_CHANNELS}?select=channel_id`, {
         headers: createSupabaseHeaders()
       });
-      if (!response.ok) throw new Error('Не удалось получить стандартные каналы');
+      
+      if (!response.ok) {
+        throw new Error('Не удалось получить стандартные каналы');
+      }
+      
       const defaultChannels = await response.json();
-      if (defaultChannels.length === 0) { safeAlert('Список стандартных каналов пуст.'); return; }
-      const channelsToUpsert = defaultChannels.map(ch => ({ channel_id: ch.channel_id, is_enabled: true }));
-      await fetch(API_ENDPOINTS.CHANNELS, {
+      if (defaultChannels.length === 0) {
+        safeAlert('Список стандартных каналов пуст.');
+        return;
+      }
+      
+      // Фильтруем только те каналы, которых еще нет
+      const newChannels = defaultChannels.filter(ch => 
+        !currentChannelIds.includes(ch.channel_id)
+      );
+      
+      if (newChannels.length === 0) {
+        safeAlert('Все стандартные каналы уже добавлены!');
+        return;
+      }
+      
+      // Добавляем только новые каналы
+      const channelsToUpsert = newChannels.map(ch => ({ 
+        channel_id: ch.channel_id, 
+        is_enabled: true 
+      }));
+      
+      const addResponse = await fetch(API_ENDPOINTS.CHANNELS, {
         method: 'POST',
-        headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
+        headers: createSupabaseHeaders({ prefer: 'return=representation' }),
         body: JSON.stringify(channelsToUpsert)
       });
+      
+      if (!addResponse.ok) {
+        throw new Error(`Ошибка добавления каналов: ${addResponse.status}`);
+      }
+      
+      // Обновляем список каналов
       await loadChannels();
-      uiToast(MESSAGES.SUCCESS.DEFAULTS_LOADED);
+      uiToast(`Добавлено ${newChannels.length} новых стандартных каналов`);
+      
     } catch (error) {
       console.error('Ошибка загрузки стандартных каналов:', error);
-      safeAlert('Не удалось добавить стандартные каналы. Проверьте подключение к интернету.');
+      safeAlert(`Не удалось добавить стандартные каналы: ${error.message}`);
     } finally {
-      loadDefaultsBtn.disabled = false;
+      if (loadDefaultsBtn) loadDefaultsBtn.disabled = false;
     }
   }
 
