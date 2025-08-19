@@ -73,9 +73,9 @@
       '--destructive-color': '#FF6B6B',
       '--link-color': '#64B5F6',
       '--section-separator': '#2A2A2A',
-      '--accent-red': '#FF6B6B',
-      '--accent-yellow': '#FFD54F',
-      '--accent-green': '#81C784',
+      '--accent-red': '#F44336',           /* Более яркий красный для темной темы */
+      '--accent-yellow': '#FFC107',        /* Более яркий желтый для темной темы */
+      '--accent-green': '#4CAF50',         /* Более яркий зеленый для темной темы */
       '--accent-blue': '#64B5F6',
       '--box-shadow': '4px 4px 0px rgba(0, 0, 0, 0.4)',
       '--box-shadow-pressed': '2px 2px 0px rgba(0, 0, 0, 0.4)'
@@ -86,7 +86,7 @@
     });
   }
   
-  // Принудительное применение светлой темы
+  // Принудительное применение светлой темы - точно как в оригинале
   function applyLightTheme() {
     const root = document.documentElement;
     const lightColors = {
@@ -104,10 +104,10 @@
       '--destructive-color': '#FF5C5C',
       '--link-color': '#41A6FF',
       '--section-separator': '#E0E0E0',
-      '--accent-red': '#FF5C5C',
-      '--accent-yellow': '#FFD93D',
-      '--accent-green': '#6BCB77',
-      '--accent-blue': '#41A6FF',
+      '--accent-red': '#FF5C5C',           /* Оригинальный красный */
+      '--accent-yellow': '#FFD93D',        /* Оригинальный желтый */
+      '--accent-green': '#6BCB77',         /* Оригинальный зеленый */
+      '--accent-blue': '#41A6FF',          /* Оригинальный синий */
       '--box-shadow': '4px 4px 0px #000000',
       '--box-shadow-pressed': '2px 2px 0px #000000'
     };

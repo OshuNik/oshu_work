@@ -112,8 +112,9 @@
     }
 }
 
-/* Принудительная светлая тема */
+/* Принудительная светлая тема - точно как в оригинале */
 [data-theme="light"] {
+    /* Возвращаем оригинальные цвета без изменений */
     --background-color: #F0F0F0;
     --card-color: #FFFFFF;
     --text-color: #000000;
@@ -129,13 +130,13 @@
     --link-color: #41A6FF;
     --section-separator: #E0E0E0;
     
-    /* Светлые акцентные цвета */
+    /* Оригинальные акцентные цвета */
     --accent-red: #FF5C5C;
     --accent-yellow: #FFD93D;
     --accent-green: #6BCB77;
     --accent-blue: #41A6FF;
     
-    /* Светлые тени */
+    /* Оригинальные тени */
     --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
     --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--border-color);
 }
@@ -1292,6 +1293,20 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .vacancy-card.category-maybe .card-header h3 { background-color: var(--accent-yellow); }
 .vacancy-card.category-other .card-header h3 { background-color: var(--accent-red); }
 
+/* Улучшенные заголовки для темной темы */
+[data-theme="dark"] .vacancy-card.category-main .card-header h3 { 
+  background-color: #4CAF50;               /* Более яркий зеленый */
+  color: white;                            /* Белый текст для лучшего контраста */
+}
+[data-theme="dark"] .vacancy-card.category-maybe .card-header h3 { 
+  background-color: #FFC107;               /* Более яркий желтый */
+  color: black;                            /* Черный текст для лучшего контраста */
+}
+[data-theme="dark"] .vacancy-card.category-other .card-header h3 { 
+  background-color: #F44336;               /* Более яркий красный */
+  color: white;                            /* Белый текст для лучшего контраста */
+}
+
 /* Цветовые маркеры категорий - быстрое визуальное различение */
 .vacancy-card.category-main {
   border-left: 6px solid var(--accent-green);
@@ -1301,6 +1316,17 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 }
 .vacancy-card.category-other {
   border-left: 6px solid var(--accent-red);
+}
+
+/* Улучшенные цветовые маркеры для темной темы */
+[data-theme="dark"] .vacancy-card.category-main {
+  border-left: 6px solid #4CAF50;         /* Более яркий зеленый для темной темы */
+}
+[data-theme="dark"] .vacancy-card.category-maybe {
+  border-left: 6px solid #FFC107;         /* Более яркий желтый для темной темы */
+}
+[data-theme="dark"] .vacancy-card.category-other {
+  border-left: 6px solid #F44336;         /* Более яркий красный для темной темы */
 }
 
 /* Плашка NEW для свежих вакансий (≤ 3 часов) */
@@ -1904,8 +1930,8 @@ body.high-contrast[data-theme="dark"] {
 }
 
 [data-theme="dark"] .category-tab {
-  background-color: var(--button-bg);
-  color: var(--button-text);
+  background-color: #1E1E1E;              /* Темный фон как у карточек */
+  color: var(--text-color);
   border-color: var(--border-color);
 }
 
@@ -1995,9 +2021,9 @@ body.high-contrast[data-theme="dark"] {
 }
 
 [data-theme="light"] .category-tab {
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border-color: var(--border-color);
+  background-color: #FFFFFF;               /* Оригинальный белый фон */
+  color: #000000;                          /* Оригинальный черный текст */
+  border-color: #000000;                   /* Оригинальные черные границы */
 }
 
 [data-theme="light"] .category-tab.active {
