@@ -2376,11 +2376,7 @@ body.high-contrast[data-theme="dark"] {
   color: var(--text-color);
 }
 
-.keywords-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+
 
 .keywords-expand-btn {
   background: var(--button-bg);
@@ -2417,36 +2413,6 @@ body.high-contrast[data-theme="dark"] {
   padding: 16px;
   background: var(--secondary-bg);
   border-top: 1px solid var(--section-separator);
-}
-
-/* Кнопка очистки всех ключевых слов */
-.button-clear-all-keywords {
-  background: var(--accent-red);
-  color: white;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  box-shadow: 2px 2px 0px var(--border-color);
-}
-
-.button-clear-all-keywords:hover {
-  background: var(--accent-red);
-  transform: translateY(-1px);
-  box-shadow: 3px 3px 0px var(--border-color);
-}
-
-.button-clear-all-keywords:active {
-  transform: translateY(0px);
-  box-shadow: 1px 1px 0px var(--border-color);
 }
 
 /* === 2. СЕКЦИЯ КАНАЛОВ === */
@@ -3255,6 +3221,44 @@ body.high-contrast[data-theme="dark"] {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  box-shadow: 2px 2px 0px var(--border-color);
+}
+
+.button-clear-all-keywords:hover {
+  background: var(--accent-red);
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px var(--border-color);
+}
+
+.button-clear-all-keywords:active {
+  transform: translateY(0px);
+  box-shadow: 1px 1px 0px var(--border-color);
+}
+
+/* Секция очистки всех ключевых слов */
+.keywords-clear-section {
+  padding: 16px;
+  border-top: 1px solid var(--section-separator);
+  background: var(--card-color);
+  text-align: center;
+}
+
+/* Кнопка очистки всех ключевых слов */
+.button-clear-all-keywords {
+  background: var(--accent-red);
+  color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
   box-shadow: 2px 2px 0px var(--border-color);
 }
 
