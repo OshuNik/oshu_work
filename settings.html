@@ -128,8 +128,16 @@
             <div class="loading-indicator">Загрузка...</div>
           </div>
           
-          <!-- Кнопка очистки всех ключевых слов -->
-          <div class="keywords-clear-section">
+          <!-- Кнопки управления ключевыми словами -->
+          <div class="keywords-actions-section">
+            <button id="load-defaults-btn" class="button-secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Загрузить стандартные
+            </button>
             <button id="clear-all-keywords-btn" class="button-clear-all-keywords">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -229,9 +237,17 @@
         </div>
         <div id="channels-list" class="channels-list"></div>
         <div class="channels-actions">
+          <button id="load-defaults-btn" class="button-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Загрузить стандартные каналы
+          </button>
           <button id="delete-all-btn" class="button-delete">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a4a2 2 0 0 1 2 2v2"/>
             </svg>
             Удалить все каналы
           </button>

@@ -323,7 +323,6 @@
         console.error('loadKeywords: элемент keywordsTagsContainer не найден');
         return;
     }
-    saveBtn.disabled = true;
     keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Загрузка...</div>';
     try {
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
@@ -353,7 +352,7 @@
         keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
       }
     } finally {
-      saveBtn.disabled = false;
+      // saveBtn больше не существует - все сохраняется автоматически
     }
   }
 
@@ -363,7 +362,7 @@
       return;
     }
     
-    saveBtn.disabled = true;
+    // saveBtn больше не существует - все сохраняется автоматически
     try {
       // Формируем строку ключевых слов из массива
       const keywordsString = currentKeywords.join(', ');
@@ -404,7 +403,7 @@
         safeAlert('Не удалось сохранить настройки. Проверьте подключение к интернету.');
       }
     } finally {
-      saveBtn.disabled = false;
+      // saveBtn больше не существует - все сохраняется автоматически
     }
   }
 
@@ -639,15 +638,18 @@
   //   }
   // });
 
-  loadDefaultsBtn?.addEventListener('click', async () => {
-    const activeTab = document.querySelector('.settings-tab-content.active');
-    
-    if (activeTab.id === 'tab-keywords') {
-      // Загружаем стандартные ключевые слова
-      await loadDefaultKeywords();
-    } else if (activeTab.id === 'tab-channels') {
-      // Загружаем стандартные каналы
-      await loadDefaultChannels();
+  // Обработчик для кнопки "Загрузить стандартные" в зависимости от активной вкладки
+  document.addEventListener('click', async (e) => {
+    if (e.target.closest('#load-defaults-btn')) {
+      const activeTab = document.querySelector('.settings-tab-content.active');
+      
+      if (activeTab.id === 'tab-keywords') {
+        // Загружаем стандартные ключевые слова
+        await loadDefaultKeywords();
+      } else if (activeTab.id === 'tab-channels') {
+        // Загружаем стандартные каналы
+        await loadDefaultChannels();
+      }
     }
   });
 
