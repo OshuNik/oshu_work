@@ -638,24 +638,20 @@
   //   }
   // });
 
-  // Обработчик для кнопки "Загрузить стандартные" в зависимости от активной вкладки
+  // Обработчики для кнопок "Загрузить стандартные"
   document.addEventListener('click', async (e) => {
-    if (e.target.closest('#load-defaults-btn')) {
-      const activeTab = document.querySelector('.settings-tab-content.active');
-      
-      if (activeTab.id === 'tab-keywords') {
-        // Загружаем стандартные ключевые слова
-        await loadDefaultKeywords();
-      } else if (activeTab.id === 'tab-channels') {
-        // Загружаем стандартные каналы
-        await loadDefaultChannels();
-      }
+    if (e.target.closest('#load-defaults-keywords-btn')) {
+      // Загружаем стандартные ключевые слова
+      await loadDefaultKeywords();
+    } else if (e.target.closest('#load-defaults-channels-btn')) {
+      // Загружаем стандартные каналы
+      await loadDefaultChannels();
     }
   });
 
   // Функция загрузки стандартных ключевых слов
   async function loadDefaultKeywords() {
-    const loadDefaultsBtn = document.querySelector('#load-defaults-btn');
+    const loadDefaultsBtn = document.querySelector('#load-defaults-keywords-btn');
     if (loadDefaultsBtn) loadDefaultsBtn.disabled = true;
     
     try {
@@ -697,7 +693,7 @@
 
   // Функция загрузки стандартных каналов
   async function loadDefaultChannels() {
-    const loadDefaultsBtn = document.querySelector('#load-defaults-btn');
+    const loadDefaultsBtn = document.querySelector('#load-defaults-channels-btn');
     if (loadDefaultsBtn) loadDefaultsBtn.disabled = true;
     
     try {
