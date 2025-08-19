@@ -1152,83 +1152,84 @@
 
 
 
-  // === СЕКЦИЯ КАНАЛОВ ===
-  function initChannelsSection() {
-    const selectAllBtn = document.getElementById('channels-select-all');
-    const deselectAllBtn = document.getElementById('channels-deselect-all');
-    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-    const exampleBtns = document.querySelectorAll('.example-btn');
-    const channelInput = document.getElementById('channel-input');
+     // === СЕКЦИЯ КАНАЛОВ ===
+   function initChannelsSection() {
+     const toggleAllBtn = document.getElementById('channels-toggle-all');
+     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+     const exampleBtns = document.querySelectorAll('.example-btn');
+     const channelInput = document.getElementById('channel-input');
 
-    // Загружаем каналы из базы данных
-    loadChannels();
+     // Загружаем каналы из базы данных
+     loadChannels();
 
-    // Выбор всех каналов
-    if (selectAllBtn) {
-      selectAllBtn.addEventListener('click', () => {
-        const checkboxes = document.querySelectorAll('.channel-item input[type="checkbox"]');
-        checkboxes.forEach(cb => {
-          cb.checked = true;
-          cb.closest('.channel-item').classList.add('selected');
-        });
-        updateDeleteSelectedButton();
-      });
-    }
+     // Переключение выбора всех каналов
+     if (toggleAllBtn) {
+       toggleAllBtn.addEventListener('click', () => {
+         const checkboxes = document.querySelectorAll('.channel-select-checkbox');
+         const allSelected = checkboxes.length > 0 && 
+                           Array.from(checkboxes).every(cb => cb.checked);
+         
+         // Если все выбраны - снимаем выбор, иначе - выбираем все
+         checkboxes.forEach(cb => {
+           cb.checked = !allSelected;
+           const channelItem = cb.closest('.channel-item');
+           if (channelItem) {
+             if (!allSelected) {
+               channelItem.classList.add('selected');
+             } else {
+               channelItem.classList.remove('selected');
+             }
+           }
+         });
+         
+         updateDeleteSelectedButton();
+         updateToggleAllButton();
+       });
+     }
 
-    // Снятие выбора со всех каналов
-    if (deselectAllBtn) {
-      deselectAllBtn.addEventListener('click', () => {
-        const checkboxes = document.querySelectorAll('.channel-item input[type="checkbox"]');
-        checkboxes.forEach(cb => {
-          cb.checked = false;
-          cb.closest('.channel-item').classList.remove('selected');
-        });
-        updateDeleteSelectedButton();
-      });
-    }
-
-    // Удаление выбранных каналов
-    if (deleteSelectedBtn) {
-      deleteSelectedBtn.addEventListener('click', () => {
-        const selectedChannels = document.querySelectorAll('.channel-item input[type="checkbox"]:checked');
-        if (selectedChannels.length > 0) {
-          showCustomConfirm(
-            `Удалить ${selectedChannels.length} выбранных каналов?`
-          ).then(confirmed => {
-            if (confirmed) {
-              selectedChannels.forEach(async cb => {
-                const channelItem = cb.closest('.channel-item');
-                const dbId = channelItem.dataset.dbId;
-                
-                if (dbId) {
-                  try {
-                    // Удаляем из базы данных
-                    const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
-                      method: 'DELETE',
-                      headers: createSupabaseHeaders()
-                    });
-                    
-                    if (response.ok) {
-                      channelItem.style.animation = 'fadeOut 0.3s ease-out forwards';
-                      setTimeout(() => {
-                        channelItem.remove();
-                        updateDeleteSelectedButton();
-                      }, 300);
-                    } else {
-                      console.error('Ошибка удаления канала из БД:', response.statusText);
-                      safeAlert('Ошибка удаления канала из базы данных');
-                    }
-                  } catch (error) {
-                    console.error('Ошибка при удалении канала:', error);
-                    safeAlert('Ошибка при удалении канала');
-                  }
-                }
-              });
-            }
-          });
-        }
-      });
-    }
+         // Удаление выбранных каналов
+     if (deleteSelectedBtn) {
+       deleteSelectedBtn.addEventListener('click', () => {
+         const selectedChannels = document.querySelectorAll('.channel-select-checkbox:checked');
+         if (selectedChannels.length > 0) {
+           showCustomConfirm(
+             `Удалить ${selectedChannels.length} выбранных каналов?`
+           ).then(confirmed => {
+             if (confirmed) {
+               selectedChannels.forEach(async cb => {
+                 const channelItem = cb.closest('.channel-item');
+                 const dbId = channelItem.dataset.dbId;
+                 
+                 if (dbId) {
+                   try {
+                     // Удаляем из базы данных
+                     const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+                       method: 'DELETE',
+                       headers: createSupabaseHeaders()
+                     });
+                     
+                     if (response.ok) {
+                       channelItem.style.animation = 'fadeOut 0.3s ease-out forwards';
+                       setTimeout(() => {
+                         channelItem.remove();
+                         updateDeleteSelectedButton();
+                         updateToggleAllButton();
+                       }, 300);
+                     } else {
+                       console.error('Ошибка удаления канала из БД:', response.statusText);
+                       safeAlert('Ошибка удаления канала из базы данных');
+                     }
+                   } catch (error) {
+                     console.error('Ошибка при удалении канала:', error);
+                     safeAlert('Ошибка при удалении канала');
+                   }
+                 }
+               });
+             }
+           });
+         }
+       });
+     }
 
     // Примеры форматов каналов
     exampleBtns.forEach(btn => {
@@ -1247,33 +1248,54 @@
       });
     });
 
-    // Обработка выбора отдельных каналов
-    document.addEventListener('change', (e) => {
-      if (e.target.type === 'checkbox' && e.target.closest('.channel-item')) {
-        const channelItem = e.target.closest('.channel-item');
-        if (e.target.checked) {
-          channelItem.classList.add('selected');
-        } else {
-          channelItem.classList.remove('selected');
-        }
-        updateDeleteSelectedButton();
-      }
-    });
+         // Обработка выбора отдельных каналов
+     document.addEventListener('change', (e) => {
+       if (e.target.type === 'checkbox' && e.target.classList.contains('channel-select-checkbox')) {
+         const channelItem = e.target.closest('.channel-item');
+         if (channelItem) {
+           if (e.target.checked) {
+             channelItem.classList.add('selected');
+           } else {
+             channelItem.classList.remove('selected');
+           }
+         }
+         updateDeleteSelectedButton();
+         updateToggleAllButton();
+       }
+     });
 
-    // Инициализация состояния кнопки удаления
-    updateDeleteSelectedButton();
+     // Инициализация состояния кнопок
+     updateDeleteSelectedButton();
+     updateToggleAllButton();
   }
 
-  // Обновление состояния кнопки удаления выбранных
-  function updateDeleteSelectedButton() {
-    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-    const selectedCount = document.querySelectorAll('.channel-item input[type="checkbox"]:checked').length;
-    
-    if (deleteSelectedBtn) {
-      deleteSelectedBtn.disabled = selectedCount === 0;
-      deleteSelectedBtn.textContent = `Удалить выбранные (${selectedCount})`;
-    }
-  }
+     // Обновление состояния кнопки удаления выбранных
+   function updateDeleteSelectedButton() {
+     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+     const selectedCount = document.querySelectorAll('.channel-select-checkbox:checked').length;
+     
+     if (deleteSelectedBtn) {
+       deleteSelectedBtn.disabled = selectedCount === 0;
+       deleteSelectedBtn.textContent = `Удалить выбранные (${selectedCount})`;
+     }
+   }
+
+   // Обновление состояния кнопки переключения всех
+   function updateToggleAllButton() {
+     const toggleAllBtn = document.getElementById('channels-toggle-all');
+     const checkboxes = document.querySelectorAll('.channel-select-checkbox');
+     const selectedCount = document.querySelectorAll('.channel-select-checkbox:checked').length;
+     
+     if (toggleAllBtn && checkboxes.length > 0) {
+       if (selectedCount === 0) {
+         toggleAllBtn.textContent = 'Выбрать все';
+       } else if (selectedCount === checkboxes.length) {
+         toggleAllBtn.textContent = 'Снять выбор';
+       } else {
+         toggleAllBtn.textContent = 'Выбрать все';
+       }
+     }
+   }
 
   // === СЕКЦИЯ ВНЕШНЕГО ВИДА ===
   function initAppearanceSection() {
