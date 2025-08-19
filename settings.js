@@ -606,7 +606,7 @@
   
   // Инициализация темы
   function initTheme() {
-    const savedTheme = localStorage.getItem('app-theme') || 'auto';
+    const savedTheme = localStorage.getItem('app-theme') || 'light';
     const savedReduceAnimations = localStorage.getItem('reduce-animations') === 'true';
     const savedHighContrast = localStorage.getItem('high-contrast') === 'true';
     
@@ -651,11 +651,8 @@
         body.setAttribute('data-theme', 'dark');
         break;
       case 'light':
-        body.setAttribute('data-theme', 'light');
-        break;
-      case 'auto':
       default:
-        // Авто-тема использует CSS @media (prefers-color-scheme)
+        body.setAttribute('data-theme', 'light');
         break;
     }
     
@@ -663,7 +660,7 @@
     
     // Уведомляем о смене темы
     if (typeof uiToast === 'function') {
-      const themeNames = { auto: 'Авто', light: 'Светлая', dark: 'Темная' };
+      const themeNames = { light: 'Светлая', dark: 'Темная' };
       uiToast(`Тема изменена: ${themeNames[theme] || theme}`);
     }
   }

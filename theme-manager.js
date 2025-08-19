@@ -6,7 +6,7 @@
 
   // Инициализация темы при загрузке страницы
   function initTheme() {
-    const savedTheme = localStorage.getItem('app-theme') || 'auto';
+    const savedTheme = localStorage.getItem('app-theme') || 'light';
     const savedReduceAnimations = localStorage.getItem('reduce-animations') === 'true';
     const savedHighContrast = localStorage.getItem('high-contrast') === 'true';
     
@@ -42,15 +42,10 @@
         applyDarkTheme();
         break;
       case 'light':
+      default:
         body.setAttribute('data-theme', 'light');
         // Принудительно применяем светлую тему
         applyLightTheme();
-        break;
-      case 'auto':
-      default:
-        // Авто-тема использует CSS @media (prefers-color-scheme)
-        // Убираем принудительные стили
-        removeForcedTheme();
         break;
     }
   }
