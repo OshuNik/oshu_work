@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: raw.githubusercontent.com; connect-src 'self' *.supabase.co;">
+  <title>Настройки - oshu://work v12.3</title>
+  <!-- Preload критических ресурсов для быстрого First Paint -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
+  
+  <!-- Preload критических файлов -->
+  <link rel="preload" href="style.css" as="style">
+  <link rel="preload" href="settings.js" as="script">
+  <link rel="preload" href="utils.min.js" as="script">
+  <link rel="preload" href="config.js" as="script">
+  
+  <!-- Critical CSS для быстрого First Paint -->
+  <link rel="stylesheet" href="critical.css">
+  
+  <!-- Критический CSS для предотвращения мерцания темы -->
+  <style>
+    /* Предотвращаем мерцание темной темы при загрузке */
+    :root {
+      --background-color: #F0F0F0 !important;
+      --card-color: #FFFFFF !important;
+      --text-color: #000000 !important;
+      --hint-color: #666666 !important;
+      --border-color: #000000 !important;
+      --input-bg: #FFFFFF !important;
+      --input-border: #CCCCCC !important;
+      --secondary-bg: #E8E8E8 !important;
+      --header-bg: #FFFFFF !important;
+      --button-bg: #FFFFFF !important;
+      --button-text: #000000 !important;
+      --destructive-color: #FF5C5C !important;
+      --link-color: #41A6FF !important;
+      --section-separator: #E0E0E0 !important;
+      --accent-red: #FF5C5C !important;
+      --accent-yellow: #FFD93D !important;
+      --accent-green: #6BCB77 !important;
+      --accent-blue: #41A6FF !important;
+      --box-shadow: 4px 4px 0px #000000 !important;
+      --box-shadow-pressed: 2px 2px 0px #000000 !important;
+    }
+    
+    /* Принудительно устанавливаем светлую тему до загрузки JavaScript */
+    body {
+      background-color: #F0F0F0 !important;
+      color: #000000 !important;
+    }
+    
+    .main-wrapper {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .header {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .search-container {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .content {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .category-tabs {
+      background-color: transparent !important;
+    }
+  </style>
+  
+  <!-- Async CSS Loading for non-critical styles -->
+  <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  
+  <!-- Fonts loaded asynchronously -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="header header-centered">
+    <h1>НАСТРОЙКИ</h1>
+    <div class="header-actions">
+      <a href="index.html" class="header-button">← Назад</a>
+    </div>
+  </header>
+
+  <div class="settings-tabs">
+    <button class="settings-tab-button active" data-target="tab-keywords">
+      <span class="tab-icon">🔑</span>
+      <span class="tab-label">Ключевые слова</span>
+      <span class="tab-cursor">█</span>
+    </button>
+    <button class="settings-tab-button" data-target="tab-channels">
+      <span class="tab-icon">📡</span>
+      <span class="tab-label">Каналы</span>
+      <span class="tab-cursor">█</span>
+    </button>
+    <button class="settings-tab-button" data-target="tab-appearance">
+      <span class="tab-icon">🎨</span>
+      <span class="tab-label">Внешний вид</span>
+      <span class="tab-cursor">█</span>
+    </button>
+  </div>
+
+  <main class="content">
+    <div id="tab-keywords" class="settings-tab-content active">
+      <!-- Заголовок секции -->
+      <div class="keywords-section-header">
+        <h3 class="section-title">🔑 Ключевые слова</h3>
+        <p class="section-description">Добавляйте теги для поиска вакансий</p>
+      </div>
+
+      <!-- Секция добавления -->
+      <div class="keywords-add-section">
+        <h4 class="subsection-title">Добавить</h4>
+        <p class="input-description">Одно слово или несколько через запятую:</p>
+        
+        <div class="keyword-input-group">
+          <input type="text" id="new-keyword-input" placeholder="After Effects, Blender, Motion Design" maxlength="100">
+          <button id="add-keyword-btn" type="button" class="keyword-add-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="keywords-actions">
+          <button id="load-preset-btn" class="button-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Загрузить пресет
+          </button>
+        </div>
+      </div>
+
+      <!-- Секция активных тегов -->
+      <div class="keywords-tags-section">
+        <h4 class="subsection-title">Активные ключевые слова:</h4>
+        <div class="keywords-tags-container" id="current-keywords-tags">
+          <div class="loading-indicator">Загрузка...</div>
+        </div>
+      </div>
+
+      <!-- Действия с тегами -->
+      <div class="keywords-actions-section">
+        <button id="save-preset-btn" class="button-warning">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17,21 17,13 7,13 7,21"/>
+            <polyline points="7,3 7,8 15,8"/>
+          </svg>
+          Сохранить как пресет
+        </button>
+        <button id="clear-all-keywords-btn" class="button-clear-all-keywords">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          Удалить все
+        </button>
+      </div>
+    </div>
+
+    <div id="tab-channels" class="settings-tab-content">
+      <div class="channels-header">
+        <div class="channels-info">
+          <h3>Каналы для мониторинга</h3>
+          <p class="channels-description">Управляйте списком каналов для поиска вакансий</p>
+        </div>
+      </div>
+      
+      <!-- Улучшенная форма добавления канала -->
+      <div class="channel-add-card">
+        <div class="channel-add-header">
+          <h4>Добавить новый канал</h4>
+          <div class="channel-input-examples">
+            <span class="example-label">Примеры:</span>
+            <button class="example-btn" data-example="@username">@username</button>
+            <button class="example-btn" data-example="https://t.me/channel">t.me/channel</button>
+          </div>
+        </div>
+        <div class="channel-input-group">
+          <input type="text" id="channel-input" placeholder="Введите @username или ссылку на канал..." aria-label="Адрес канала для добавления">
+          <button id="add-channel-btn" aria-label="Добавить канал" class="channel-add-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Улучшенный список каналов -->
+      <div class="channels-list-container">
+                 <div class="channels-list-header">
+           <h4>Текущие каналы</h4>
+           <div class="channels-controls">
+             <button id="channels-toggle-all" class="control-btn secondary">Выбрать все</button>
+             <button id="delete-selected-btn" class="control-btn destructive" disabled>Удалить выбранные</button>
+           </div>
+         </div>
+        <div id="channels-list" class="channels-list"></div>
+                 <div class="channels-actions">
+           <button id="load-defaults-channels-btn" class="button-secondary">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+               <polyline points="7,10 12,15 17,10"/>
+               <line x1="12" y1="15" x2="12" y2="3"/>
+             </svg>
+             Загрузить стандартные каналы
+           </button>
+                     <button id="delete-all-btn" class="button-delete">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+             </svg>
+             Удалить все каналы
+           </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-appearance" class="settings-tab-content">
+      <div class="appearance-header">
+        <h3>🎨 Тема оформления</h3>
+        <p class="appearance-description">Выберите предпочитаемую тему интерфейса</p>
+      </div>
+      
+      <!-- Ретро переключатель темы -->
+      <div class="retro-theme-toggle">
+        <div class="theme-toggle-container">
+          <span class="theme-label-text">☀️ Светлая</span>
+          <div class="retro-toggle-switch">
+            <input type="checkbox" id="theme-toggle" />
+            <label for="theme-toggle" class="retro-toggle-slider">
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+          <span class="theme-label-text">🌙 Темная</span>
+        </div>
+        
+        <!-- Ретро предварительный просмотр темы -->
+        <div class="retro-theme-preview">
+          <div class="retro-preview-card light-theme" id="light-preview">
+            <div class="retro-preview-header">
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+            </div>
+            <div class="retro-preview-content">
+              <div class="retro-line short"></div>
+              <div class="retro-line medium"></div>
+              <div class="retro-line long"></div>
+            </div>
+          </div>
+          <div class="retro-preview-card dark-theme" id="dark-preview">
+            <div class="retro-preview-header">
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+            </div>
+            <div class="retro-preview-content">
+              <div class="retro-line short"></div>
+              <div class="retro-line medium"></div>
+              <div class="retro-line long"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Модальное окно пресетов -->
+  <div class="modal-overlay" id="presetModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Выберите пресет</h3>
+        <button class="close-btn" id="closeModal">×</button>
+      </div>
+      
+      <div class="presets-grid" id="presetsGrid">
+        <!-- Пресеты будут добавлены через JavaScript -->
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="randomPresetBtn">Случайный</button>
+        <button class="btn btn-primary" id="loadSelectedPresetBtn">Загрузить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для сохранения пресета -->
+  <div class="modal-overlay" id="savePresetModal">
+    <div class="modal save-preset-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Сохранить пресет</h3>
+        <button class="close-btn" id="closeSaveModal">×</button>
+      </div>
+      
+      <form class="save-preset-form" id="savePresetForm">
+        <div class="form-group">
+          <label class="form-label">Название пресета:</label>
+          <input type="text" class="form-input" id="presetNameInput" placeholder="Мой пресет" required>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelSaveBtn">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+
+  <div id="custom-confirm-overlay" class="custom-confirm-overlay hidden">
+    <div class="custom-confirm-box">
+      <p id="custom-confirm-text"></p>
+      <div class="custom-confirm-actions">
+        <button id="confirm-btn-cancel" class="custom-confirm-button">Отмена</button>
+        <button id="confirm-btn-ok" class="custom-confirm-button ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="config.js"></script>
+  <script src="utils.min.js"></script>
+  <script src="theme-manager.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>
