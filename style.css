@@ -1170,9 +1170,9 @@ mark.highlight {
   animation: pressGlitch 0.15s ease-out;
 }
 
-/* Анимация превращения бургера в X */
+/* Улучшенная анимация превращения бургера в X */
 .burger-menu-btn.active .burger-line:nth-child(1) {
-  transform: rotate(45deg) translateY(10px);
+  transform: rotate(45deg) translate(6px, 6px);
 }
 
 .burger-menu-btn.active .burger-line:nth-child(2) {
@@ -1181,7 +1181,7 @@ mark.highlight {
 }
 
 .burger-menu-btn.active .burger-line:nth-child(3) {
-  transform: rotate(-45deg) translateY(-10px);
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* === OVERLAY ЗАТЕМНЕНИЯ === */
@@ -1216,74 +1216,15 @@ mark.highlight {
   box-shadow: -8px 0 16px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   transform: translateX(100%);
-  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  overflow-y: auto;
   opacity: 0;
+  overflow-y: auto;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s ease;
 }
 
 .settings-sidebar.active {
   transform: translateX(0);
   opacity: 1;
-  animation: pixelSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Улучшенная пиксельная анимация выезда */
-@keyframes pixelSlideIn {
-  0% { 
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  15% { 
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  25% { 
-    transform: translateX(-8px);
-    opacity: 0.3;
-  }
-  35% { 
-    transform: translateX(4px);
-    opacity: 0.6;
-  }
-  45% { 
-    transform: translateX(-2px);
-    opacity: 0.8;
-  }
-  55% { 
-    transform: translateX(1px);
-    opacity: 0.9;
-  }
-  65% { 
-    transform: translateX(-1px);
-    opacity: 0.95;
-  }
-  75% { 
-    transform: translateX(0px);
-    opacity: 1;
-  }
-  100% { 
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Анимация глитча при открытии */
-.settings-sidebar.glitch {
-  animation: sidebarPixelGlitch 0.3s ease-out;
-}
-
-@keyframes sidebarPixelGlitch {
-  0% { transform: translateX(100%); filter: hue-rotate(0deg); }
-  10% { transform: translateX(-8px); filter: hue-rotate(90deg); }
-  20% { transform: translateX(4px); filter: hue-rotate(180deg); }
-  30% { transform: translateX(-2px); filter: hue-rotate(270deg); }
-  40% { transform: translateX(1px); filter: hue-rotate(360deg); }
-  50% { transform: translateX(-1px); filter: hue-rotate(90deg); }
-  60% { transform: translateX(0px); filter: hue-rotate(180deg); }
-  70% { transform: translateX(1px); filter: hue-rotate(270deg); }
-  80% { transform: translateX(-1px); filter: hue-rotate(360deg); }
-  90% { transform: translateX(0px); filter: hue-rotate(0deg); }
-  100% { transform: translateX(0); filter: hue-rotate(0deg); }
 }
 
 /* === ХЕДЕР САЙДБАРА === */

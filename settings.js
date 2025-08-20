@@ -964,20 +964,16 @@
       settingsSidebar.classList.add('active');
       sidebarOverlay.classList.add('active');
       
-      // Добавляем глитч эффект к сайдбару
-      settingsSidebar.classList.add('glitch');
+      // Анимация появления кнопок с задержкой
       setTimeout(() => {
-        settingsSidebar.classList.remove('glitch');
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (sidebarNav) {
+          sidebarNav.classList.add('animate');
+          setTimeout(() => {
+            sidebarNav.classList.remove('animate');
+          }, 1000);
+        }
       }, 200);
-      
-      // Анимация появления кнопок
-      const sidebarNav = document.querySelector('.sidebar-nav');
-      if (sidebarNav) {
-        sidebarNav.classList.add('animate');
-        setTimeout(() => {
-          sidebarNav.classList.remove('animate');
-        }, 1000);
-      }
       
       // Блокируем прокрутку body
       document.body.style.overflow = 'hidden';
