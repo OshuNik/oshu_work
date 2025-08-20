@@ -1212,6 +1212,29 @@ mark.highlight {
               opacity 0.4s ease;
 }
 
+/* CRT Monitor эффект при появлении сайдбара */
+.settings-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 0, 0.06) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.settings-sidebar.active::before {
+  animation: crtScanReveal 0.5s ease-out;
+}
+
 .settings-sidebar.active {
   transform: translateX(0);
   opacity: 1;
@@ -1350,21 +1373,72 @@ mark.highlight {
   transition: none;
 }
 
-/* Анимация появления кнопок */
+/* Анимация появления кнопок с scanline эффектом */
 .sidebar-nav.animate .sidebar-tab-button {
   animation: sidebarButtonPixelAppear 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   animation-fill-mode: forwards !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-nav.animate .sidebar-tab-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 0, 0.8) 50%,
+    transparent 100%
+  );
+  animation: scanlineReveal 0.4s ease-out;
+  z-index: 1;
 }
 
 .sidebar-nav.animate .sidebar-tab-button:nth-child(1) { animation-delay: 0.2s; }
 .sidebar-nav.animate .sidebar-tab-button:nth-child(2) { animation-delay: 0.35s; }
 .sidebar-nav.animate .sidebar-tab-button:nth-child(3) { animation-delay: 0.5s; }
 
+.sidebar-nav.animate .sidebar-tab-button:nth-child(1)::after { animation-delay: 0.2s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(2)::after { animation-delay: 0.35s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(3)::after { animation-delay: 0.5s; }
+
 /* После завершения анимации кнопки остаются видными */
 .sidebar-tab-button.animated {
   opacity: 1 !important;
   transform: translateX(0) !important;
   animation: none !important;
+}
+
+@keyframes crtScanReveal {
+  0% {
+    opacity: 1;
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 0% 0);
+  }
+}
+
+@keyframes scanlineReveal {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
 }
 
 @keyframes sidebarButtonPixelAppear {
