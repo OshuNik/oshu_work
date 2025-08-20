@@ -864,57 +864,7 @@ mark.highlight {
   margin-bottom: 16px;
 }
 
-/* Отдельный тег ключевого слова */
-.keyword-tag {
-  background: var(--accent-blue);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  border: 2px solid var(--border-color);
-  box-shadow: 2px 2px 0px var(--border-color);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  max-width: 200px;
-  word-break: break-word;
-}
 
-.keyword-tag:hover {
-  transform: translateY(-1px);
-  box-shadow: 3px 3px 0px var(--border-color);
-}
-
-.keyword-tag:active {
-  transform: translateY(0px);
-  box-shadow: 1px 1px 0px var(--border-color);
-}
-
-/* Кнопка удаления тега */
-.keyword-tag .remove-btn {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 0;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all var(--transition-normal);
-  flex-shrink: 0;
-}
-
-.keyword-tag .remove-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
 
 /* Форма добавления ключевого слова */
 .add-keyword-section {
@@ -2584,6 +2534,7 @@ body.high-contrast[data-theme="dark"] {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 15px;
+  margin-top: 0;
 }
 
 .keywords-count-display {
@@ -2624,6 +2575,7 @@ body.high-contrast[data-theme="dark"] {
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
+  margin-top: 0;
   box-shadow: var(--box-shadow);
   transition: all 0.2s ease;
 }
@@ -2641,6 +2593,11 @@ body.high-contrast[data-theme="dark"] {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 15px;
+  margin-top: 20px;
+}
+
+.keywords-add-card .keywords-section-subtitle {
+  margin-top: 0;
 }
 
 .keywords-section-description {
@@ -2654,6 +2611,7 @@ body.high-contrast[data-theme="dark"] {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
+  align-items: center;
 }
 
 .keywords-input-field {
@@ -2679,14 +2637,15 @@ body.high-contrast[data-theme="dark"] {
   color: white;
   border: 4px solid var(--accent-blue);
   border-radius: 8px;
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: var(--box-shadow);
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .keywords-add-button:hover {
@@ -2703,6 +2662,7 @@ body.high-contrast[data-theme="dark"] {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 15px;
 }
 
 .keywords-action-btn {
@@ -2765,18 +2725,13 @@ body.high-contrast[data-theme="dark"] {
   box-shadow: 6px 6px 0px var(--border-color);
 }
 
-.keywords-tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 15px;
-  min-height: 50px;
-}
+
 
 .keywords-preset-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 15px;
 }
 
 /* === МОДАЛЬНОЕ ОКНО С ПРЕСЕТАМИ === */
@@ -2913,20 +2868,30 @@ body.high-contrast[data-theme="dark"] {
 }
 
 /* === СТИЛИ ДЛЯ ТЕГОВ КЛЮЧЕВЫХ СЛОВ === */
+.keywords-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+  min-height: 60px;
+  align-items: flex-start;
+}
+
 .keyword-tag {
   background: var(--accent-blue);
   color: white;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border: 3px solid var(--border-color);
   border-radius: 6px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   box-shadow: 2px 2px 0px var(--border-color);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s ease;
+  margin: 4px;
 }
 
 .keyword-tag:hover {
@@ -2956,6 +2921,27 @@ body.high-contrast[data-theme="dark"] {
 
 .keyword-tag .keyword-tag-remove:hover {
   color: var(--accent-red);
+  transform: scale(1.1);
+}
+
+.keyword-tag .keyword-tag-save {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.keyword-tag .keyword-tag-save:hover {
+  color: var(--accent-green);
   transform: scale(1.1);
 }
 

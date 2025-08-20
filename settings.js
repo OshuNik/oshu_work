@@ -197,8 +197,15 @@
     tag.className = 'keyword-tag';
     tag.innerHTML = `
       <span class="keyword-tag-text">${escapeHtml(keyword)}</span>
-      <button class="keyword-tag-remove" type="button" data-keyword="${escapeHtml(keyword)}">×</button>
+      <button class="keyword-tag-save" type="button" title="Сохранить" data-keyword="${escapeHtml(keyword)}">💾</button>
+      <button class="keyword-tag-remove" type="button" title="Удалить" data-keyword="${escapeHtml(keyword)}">×</button>
     `;
+    
+    // Добавляем обработчик сохранения
+    const saveBtn = tag.querySelector('.keyword-tag-save');
+    saveBtn.addEventListener('click', () => {
+      saveKeywordToDatabase(keyword);
+    });
     
     // Добавляем обработчик удаления
     const removeBtn = tag.querySelector('.keyword-tag-remove');
@@ -1730,18 +1737,68 @@
     }
   }
 
-  // Сохранить ключевые слова (заглушка)
+  // Сохранить ключевые слова в базу данных
   function saveKeywords() {
-    console.log('Сохранение ключевых слов:', currentKeywords);
-    uiToast('Ключевые слова сохранены (заглушка)');
+    if (!currentKeywords || currentKeywords.length === 0) {
+      console.log('Нет ключевых слов для сохранения');
+      return;
+    }
+    
+    // Сохраняем в localStorage как временное решение
+    // В реальном приложении здесь будет API запрос к Supabase
+    try {
+      localStorage.setItem('oshu_keywords', JSON.stringify(currentKeywords));
+      console.log('Ключевые слова сохранены в localStorage:', currentKeywords);
+      uiToast('Ключевые слова сохранены');
+    } catch (error) {
+      console.error('Ошибка сохранения ключевых слов:', error);
+      uiToast('Ошибка сохранения ключевых слов');
+    }
   }
 
-  // Загрузить ключевые слова (заглушка)
+  // Загрузить ключевые слова из базы данных
   function loadKeywords() {
-    // В реальном приложении здесь будет загрузка из базы
-    currentKeywords = ['монтаж', 'анимация', 'дизайн'];
+    try {
+      // Загружаем из localStorage как временное решение
+      // В реальном приложении здесь будет API запрос к Supabase
+      const savedKeywords = localStorage.getItem('oshu_keywords');
+      if (savedKeywords) {
+        currentKeywords = JSON.parse(savedKeywords);
+        console.log('Ключевые слова загружены из localStorage:', currentKeywords);
+      } else {
+        // Загружаем стандартные ключевые слова
+        currentKeywords = ['монтаж', 'анимация', 'эффекты', 'цветокоррекция'];
+        console.log('Загружены стандартные ключевые слова:', currentKeywords);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки ключевых слов:', error);
+      currentKeywords = ['монтаж', 'анимация', 'эффекты', 'цветокоррекция'];
+    }
+    
     renderKeywords();
     updateKeywordsCount();
+  }
+
+  // Сохранить отдельное ключевое слово в базу данных
+  function saveKeywordToDatabase(keyword) {
+    try {
+      // В реальном приложении здесь будет API запрос к Supabase
+      // Пока сохраняем в localStorage
+      localStorage.setItem('oshu_keywords', JSON.stringify(currentKeywords));
+      console.log('Ключевое слово сохранено в базу:', keyword);
+      uiToast(`Ключевое слово "${keyword}" сохранено`);
+    } catch (error) {
+      console.error('Ошибка сохранения ключевого слова:', error);
+      uiToast('Ошибка сохранения ключевого слова');
+    }
+  }
+
+  // Закрыть модальное окно пресетов
+  function closePresetsModal() {
+    const modal = document.getElementById('presets-modal');
+    if (modal) {
+      modal.classList.remove('active');
+    }
   }
 
   // Инициализация ключевых слов
@@ -1841,6 +1898,34 @@
       }
     });
   }
+
+  // Обработчик для кнопки "Загрузить пресет"
+  const loadPresetsBtn = document.getElementById('load-presets-btn');
+  if (loadPresetsBtn) {
+    loadPresetsBtn.addEventListener('click', () => {
+      showPresetsModal();
+    });
+  }
+
+  // Обработчик для кнопки "Сохранить как пресет"
+  const saveAsPresetBtn = document.getElementById('save-as-preset-btn');
+  if (saveAsPresetBtn) {
+    saveAsPresetBtn.addEventListener('click', () => {
+      saveAsPreset();
+    });
+  }
+
+  // Обработчик для клика по пресетам в модальном окне
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.preset-option')) {
+      const presetOption = e.target.closest('.preset-option');
+      const presetType = presetOption.dataset.preset;
+      if (presetType) {
+        loadPreset(presetType);
+        closePresetsModal();
+      }
+    }
+  });
 
   // Обработчик для Enter в поле добавления канала
   if (channelInput) {
