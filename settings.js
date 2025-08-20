@@ -972,9 +972,14 @@
         const sidebarNav = document.querySelector('.sidebar-nav');
         if (sidebarNav) {
           sidebarNav.classList.add('animate');
-          setTimeout(() => {
-            sidebarNav.classList.remove('animate');
-          }, 1000);
+          
+          // Добавляем класс animated каждой кнопке после завершения её анимации
+          const buttons = sidebarNav.querySelectorAll('.sidebar-tab-button');
+          buttons.forEach((button, index) => {
+            setTimeout(() => {
+              button.classList.add('animated');
+            }, 600 + (index * 150)); // 600ms анимация + задержка для каждой кнопки
+          });
         }
       }, 200);
       
@@ -996,6 +1001,16 @@
       burgerMenuBtn.classList.remove('active');
       settingsSidebar.classList.remove('active');
       sidebarOverlay.classList.remove('active');
+      
+      // Сбрасываем состояния анимации кнопок
+      const sidebarNav = document.querySelector('.sidebar-nav');
+      if (sidebarNav) {
+        sidebarNav.classList.remove('animate');
+        const buttons = sidebarNav.querySelectorAll('.sidebar-tab-button');
+        buttons.forEach(button => {
+          button.classList.remove('animated');
+        });
+      }
       
       // Возвращаем бургер наверх
       burgerMenuBtn.style.zIndex = '1001';
