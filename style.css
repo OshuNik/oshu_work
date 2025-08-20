@@ -1337,17 +1337,17 @@ mark.highlight {
   animation: blink 0.8s step-end infinite;
 }
 
-/* Скрываем кнопки когда меню закрыто */
-.settings-sidebar:not(.active) .sidebar-tab-button {
+/* Скрываем кнопки изначально и когда меню закрыто */
+.sidebar-tab-button {
   opacity: 0;
   transform: translateX(30px);
   transition: none;
 }
 
-/* Когда меню открыто, кнопки должны быть видны */
-.settings-sidebar.active .sidebar-tab-button {
-  opacity: 1;
-  transform: translateX(0);
+.settings-sidebar:not(.active) .sidebar-tab-button {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: none;
 }
 
 /* Анимация появления кнопок - теперь более плавная и пиксельная */
