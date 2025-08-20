@@ -49,8 +49,14 @@
     }
   };
 
-  const settingsTabButtons = document.querySelectorAll('.settings-tab-button');
+  const settingsTabButtons = document.querySelectorAll('.sidebar-tab-button');
   const settingsTabContents = document.querySelectorAll('.settings-tab-content');
+  
+  // Элементы бургер меню
+  const burgerMenuBtn = document.getElementById('burger-menu-btn');
+  const settingsSidebar = document.getElementById('settings-sidebar');
+  const sidebarOverlay = document.getElementById('sidebar-overlay');
+  const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
   const keywordsInput = document.getElementById('keywords-input');
   const keywordsDisplay = document.getElementById('current-keywords-display');
   const keywordsTagsContainer = document.getElementById('current-keywords-tags');
@@ -940,21 +946,78 @@
     });
   });
   
-  // Ретро-анимация для вкладок настроек
-  function initRetroTabs() {
-    const settingsTabs = document.querySelector('.settings-tabs');
-    const tabButtons = document.querySelectorAll('.settings-tab-button');
-    const tabContents = document.querySelectorAll('.settings-tab-content');
-    
-    // Добавляем класс для анимации появления только при первой загрузке
-    if (settingsTabs) {
-      settingsTabs.classList.add('initial-load');
+  // Бургер меню и навигация
+  function initBurgerMenu() {
+    // Открытие меню
+    function openSidebar() {
+      burgerMenuBtn.classList.add('active');
+      settingsSidebar.classList.add('active');
+      sidebarOverlay.classList.add('active');
       
-      // Убираем класс после завершения анимации
+      // Добавляем глитч эффект к сайдбару
+      settingsSidebar.classList.add('glitch');
       setTimeout(() => {
-        settingsTabs.classList.remove('initial-load');
-      }, 1000);
+        settingsSidebar.classList.remove('glitch');
+      }, 200);
+      
+      // Анимация появления кнопок
+      const sidebarNav = document.querySelector('.sidebar-nav');
+      if (sidebarNav) {
+        sidebarNav.classList.add('animate');
+        setTimeout(() => {
+          sidebarNav.classList.remove('animate');
+        }, 1000);
+      }
+      
+      // Блокируем прокрутку body
+      document.body.style.overflow = 'hidden';
+      
+      // Тактильная обратная связь
+      if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
+        tg.HapticFeedback.impactOccurred('medium');
+      }
     }
+    
+    // Закрытие меню
+    function closeSidebar() {
+      burgerMenuBtn.classList.remove('active');
+      settingsSidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+      
+      // Разблокируем прокрутку body
+      document.body.style.overflow = '';
+      
+      // Тактильная обратная связь
+      if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+    }
+    
+    // Обработчики событий
+    if (burgerMenuBtn) {
+      burgerMenuBtn.addEventListener('click', openSidebar);
+    }
+    
+    if (sidebarCloseBtn) {
+      sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Закрытие по Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && settingsSidebar.classList.contains('active')) {
+        closeSidebar();
+      }
+    });
+  }
+
+  // Навигация по вкладкам в сайдбаре
+  function initSidebarTabs() {
+    const tabButtons = document.querySelectorAll('.sidebar-tab-button');
+    const tabContents = document.querySelectorAll('.settings-tab-content');
     
     tabButtons.forEach(button => {
       button.addEventListener('click', function() {
@@ -968,16 +1031,24 @@
         tabContents.forEach(content => content.classList.remove('active'));
         
         this.classList.add('active');
-        document.getElementById(targetId).classList.add('active');
+        const targetContent = document.getElementById(targetId);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
         
-        // Убираем эффект глитча
+        // Закрываем сайдбар после выбора вкладки
         setTimeout(() => {
+          burgerMenuBtn.classList.remove('active');
+          settingsSidebar.classList.remove('active');
+          sidebarOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+          
           this.classList.remove('switching');
-        }, 150);
+        }, 300);
         
-        // Добавляем звуковой эффект (если доступен)
-        if (window.AudioContext || window.webkitAudioContext) {
-          playRetroSound();
+        // Тактильная обратная связь
+        if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
+          tg.HapticFeedback.impactOccurred('light');
         }
       });
     });
@@ -1395,7 +1466,8 @@
   // Инициализация при загрузке страницы
   document.addEventListener('DOMContentLoaded', function() {
     initTheme();
-    initRetroTabs();
+    initBurgerMenu();
+    initSidebarTabs();
     initEnhancedSettings();
     
     // Добавляем CSS анимации

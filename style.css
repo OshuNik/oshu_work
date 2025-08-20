@@ -1124,102 +1124,344 @@ mark.highlight {
     will-change: transform;
 }
 
-/* === РЕТРО-ГЕЙМ ВКЛАДКИ НАСТРОЕК === */
-.settings-tabs { 
-  display: flex; 
-  gap: 8px; 
-  margin-bottom: 25px;
-  padding: 15px;
-  background: var(--background-color);
-  border: var(--border-width) solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: var(--box-shadow);
-}
-
-.settings-tab-button {
-  flex: 1;
-  font-family: var(--font-pixel);
-  background: var(--card-color);
-  color: var(--text-color);
-  border: var(--border-width) solid var(--border-color);
-  padding: 15px 10px;
-  font-size: 12px;
-  font-weight: 400;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
+/* === КОМПАКТНЫЙ ХЕДЕР === */
+.header-compact {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  min-height: 80px;
-  justify-content: center;
-  will-change: transform, background-color, box-shadow;
-  
-  /* Ретро-эффект: пиксельные границы */
-  image-rendering: pixelated;
-  box-shadow: var(--box-shadow);
+  padding: 15px 20px;
+  background: var(--header-bg);
+  border-bottom: 4px solid var(--border-color);
+  position: relative;
+  z-index: 100;
 }
 
-.settings-tab-button:hover {
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-left h1 {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  margin: 0;
+  color: var(--text-color);
+  text-shadow: 2px 2px 0px var(--border-color);
+}
+
+.back-btn {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 3px solid var(--border-color);
+  padding: 8px 12px;
+  text-decoration: none;
+  box-shadow: var(--box-shadow);
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
   transform: translateY(-1px);
   box-shadow: 5px 5px 0px var(--border-color);
-  background: var(--secondary-bg);
 }
 
-.settings-tab-button:active {
+.back-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
+/* === БУРГЕР МЕНЮ === */
+.burger-menu-btn {
+  background: var(--button-bg);
+  border: 3px solid var(--border-color);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--box-shadow);
+  position: relative;
+  z-index: 1001;
+}
+
+.burger-line {
+  width: 24px;
+  height: 4px;
+  background: var(--text-color);
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.burger-menu-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 0px var(--border-color);
+}
+
+.burger-menu-btn:active {
   transform: translateY(1px);
   box-shadow: var(--box-shadow-pressed);
   animation: pressGlitch 0.15s ease-out;
 }
 
-.settings-tab-button.active {
+/* Анимация превращения бургера в X */
+.burger-menu-btn.active .burger-line:nth-child(1) {
+  transform: rotate(45deg) translateY(10px);
+}
+
+.burger-menu-btn.active .burger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.burger-menu-btn.active .burger-line:nth-child(3) {
+  transform: rotate(-45deg) translateY(-10px);
+}
+
+/* === OVERLAY ЗАТЕМНЕНИЯ === */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* === БОКОВАЯ ПАНЕЛЬ === */
+.settings-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--card-color);
+  border-left: 4px solid var(--border-color);
+  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.68, 0, 0.265, 1);
+  overflow-y: auto;
+}
+
+.settings-sidebar.active {
+  transform: translateX(0);
+}
+
+/* Анимация глитча при открытии */
+.settings-sidebar.glitch {
+  animation: sidebarGlitch 0.2s ease-out;
+}
+
+@keyframes sidebarGlitch {
+  0% { transform: translateX(100%); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+/* === ХЕДЕР САЙДБАРА === */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 4px solid var(--border-color);
+  background: var(--secondary-bg);
+}
+
+.sidebar-header h2 {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  margin: 0;
+  color: var(--text-color);
+  text-shadow: 1px 1px 0px var(--border-color);
+}
+
+.sidebar-close-btn {
+  background: var(--destructive-color);
+  border: 3px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--box-shadow);
+}
+
+.close-x {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  color: white;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-close-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px var(--border-color);
+}
+
+.sidebar-close-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
+/* === НАВИГАЦИЯ САЙДБАРА === */
+.sidebar-nav {
+  padding: 20px;
+}
+
+.sidebar-tab-button {
+  width: 100%;
+  font-family: var(--font-pixel);
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 3px solid var(--border-color);
+  padding: 15px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+  box-shadow: var(--box-shadow);
+  position: relative;
+}
+
+.sidebar-tab-icon {
+  font-size: 20px;
+  filter: drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.3));
+}
+
+.sidebar-tab-label {
+  flex: 1;
+  font-size: 11px;
+}
+
+.sidebar-tab-cursor {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--accent-green);
+  opacity: 0.7;
+}
+
+.sidebar-tab-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 0px var(--border-color);
+  background: var(--secondary-bg);
+}
+
+.sidebar-tab-button:active {
+  transform: translateY(1px);
+  box-shadow: var(--box-shadow-pressed);
+  animation: pressGlitch 0.15s ease-out;
+}
+
+.sidebar-tab-button.active {
   background: var(--accent-blue);
   color: white;
   border-color: var(--accent-blue);
-  box-shadow: 5px 5px 0px rgba(65, 166, 255, 0.4);
-  transform: translateY(-1px);
+  box-shadow: 6px 6px 0px var(--border-color);
 }
 
-/* Иконки вкладок */
-.tab-icon {
-  font-size: 24px;
-  display: block;
-  margin-bottom: 4px;
-  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
-  transition: all 0.3s ease;
-}
-
-.settings-tab-button.active .tab-icon {
+.sidebar-tab-button.active .sidebar-tab-icon {
   filter: drop-shadow(2px 2px 0px rgba(255, 255, 255, 0.3));
   transform: scale(1.1);
 }
 
-/* Лейблы вкладок */
-.tab-label {
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  text-align: center;
-  line-height: 1.2;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-/* Мигающий курсор */
-.tab-cursor {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--accent-green);
-  animation: blink 1.5s step-end infinite;
-  opacity: 0.7;
-  margin-top: 2px;
-}
-
-.settings-tab-button.active .tab-cursor {
+.sidebar-tab-button.active .sidebar-tab-cursor {
   color: white;
   animation: blink 0.8s step-end infinite;
+}
+
+/* Анимация появления кнопок */
+.sidebar-nav.animate .sidebar-tab-button {
+  animation: sidebarButtonAppear 0.4s ease-out;
+}
+
+.sidebar-nav.animate .sidebar-tab-button:nth-child(1) { animation-delay: 0.1s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(2) { animation-delay: 0.2s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes sidebarButtonAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(30px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* === ФУТЕР САЙДБАРА === */
+.sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 15px 20px;
+  border-top: 4px solid var(--border-color);
+  background: var(--secondary-bg);
+  text-align: center;
+}
+
+.pixel-decoration {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--hint-color);
+  opacity: 0.5;
+  animation: blink 2s step-end infinite;
+}
+
+/* === АДАПТИВНОСТЬ === */
+@media (max-width: 480px) {
+  .settings-sidebar {
+    width: 260px;
+  }
+  
+  .header-left h1 {
+    font-size: 14px;
+  }
+  
+  .sidebar-tab-label {
+    font-size: 10px;
+  }
+}
+
+/* === ЭФФЕКТЫ И АНИМАЦИИ === */
+@keyframes pressGlitch {
+  0%, 100% { transform: translateY(1px); }
+  25% { transform: translateY(1px) translateX(1px); }
+  50% { transform: translateY(1px) translateX(-1px); }
+  75% { transform: translateY(1px) translateX(1px); }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 @keyframes blink {

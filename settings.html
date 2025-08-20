@@ -80,29 +80,49 @@
 </head>
 <body>
 
-  <header class="header header-centered">
-    <h1>НАСТРОЙКИ</h1>
-    <div class="header-actions">
-      <a href="index.html" class="header-button">← Назад</a>
+  <header class="header header-compact">
+    <div class="header-left">
+      <a href="index.html" class="header-button back-btn">← Назад</a>
+      <h1>НАСТРОЙКИ</h1>
     </div>
+    <button class="burger-menu-btn" id="burger-menu-btn" aria-label="Открыть меню">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
   </header>
 
-  <div class="settings-tabs">
-    <button class="settings-tab-button active" data-target="tab-keywords">
-      <span class="tab-icon">🔑</span>
-      <span class="tab-label">Ключевые слова</span>
-      <span class="tab-cursor">█</span>
-    </button>
-    <button class="settings-tab-button" data-target="tab-channels">
-      <span class="tab-icon">📡</span>
-      <span class="tab-label">Каналы</span>
-      <span class="tab-cursor">█</span>
-    </button>
-    <button class="settings-tab-button" data-target="tab-appearance">
-      <span class="tab-icon">🎨</span>
-      <span class="tab-label">Внешний вид</span>
-      <span class="tab-cursor">█</span>
-    </button>
+  <!-- Overlay для затемнения фона -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Боковая панель с навигацией -->
+  <div class="settings-sidebar" id="settings-sidebar">
+    <div class="sidebar-header">
+      <h2>МЕНЮ</h2>
+      <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Закрыть меню">
+        <span class="close-x">✕</span>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-tab-button active" data-target="tab-keywords">
+        <span class="sidebar-tab-icon">🔑</span>
+        <span class="sidebar-tab-label">Ключевые слова</span>
+        <span class="sidebar-tab-cursor">█</span>
+      </button>
+      <button class="sidebar-tab-button" data-target="tab-channels">
+        <span class="sidebar-tab-icon">📡</span>
+        <span class="sidebar-tab-label">Каналы</span>
+        <span class="sidebar-tab-cursor">█</span>
+      </button>
+      <button class="sidebar-tab-button" data-target="tab-appearance">
+        <span class="sidebar-tab-icon">🎨</span>
+        <span class="sidebar-tab-label">Внешний вид</span>
+        <span class="sidebar-tab-cursor">█</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="pixel-decoration">▓▓▓</div>
+    </div>
   </div>
 
   <main class="content">
