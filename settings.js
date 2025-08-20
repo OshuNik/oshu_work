@@ -639,19 +639,6 @@
 
   addChannelBtn?.addEventListener('click', addChannel);
 
-  // Убираем кнопку "Сохранить" - все сохраняется автоматически
-  // saveBtn?.addEventListener('click', () => {
-  //   const activeTab = document.querySelector('.settings-tab-content.active');
-  //   if (activeTab.id === 'tab-keywords') {
-  //     // Сохраняем ключевые слова в базу данных
-  //     updateKeywordsInDatabase();
-  //   } else if (activeTab.id === 'tab-channels') {
-  //     safeAlert('Изменения в каналах сохраняются автоматически!');
-  //   } else if (activeTab.id === 'tab-appearance') {
-  //     safeAlert('Настройки внешнего вида сохраняются автоматически!');
-  //   }
-  // });
-
   // Обработчики для кнопок "Загрузить стандартные"
   document.addEventListener('click', async (e) => {
     if (e.target.closest('#load-defaults-keywords-btn')) {
@@ -813,6 +800,8 @@
         const keyword = newKeywordInput.value.trim();
         if (keyword && addKeyword(keyword)) {
           newKeywordInput.value = '';
+          // Обновляем состояние крестика
+          updateKeywordsInputState();
         }
       }
     });
@@ -1186,6 +1175,11 @@
 
     // Загружаем ключевые слова из базы данных
     loadKeywords();
+    
+    // Обновляем состояние крестика после загрузки
+    setTimeout(() => {
+      updateKeywordsInputState();
+    }, 100);
 
     // Кнопка очистки всех ключевых слов
     if (clearAllKeywordsBtn) {
@@ -1246,6 +1240,9 @@
         const input = document.getElementById('new-keyword-input');
         input.value = keyword;
         input.focus();
+        
+        // Обновляем состояние крестика
+        updateKeywordsInputState();
         
         // Анимация нажатия
         tag.style.transform = 'scale(0.95)';
@@ -1797,6 +1794,11 @@
     await loadKeywords();
   }, 100);
 
+  // Обновляем состояние крестика после загрузки
+  setTimeout(() => {
+    updateKeywordsInputState();
+  }, 100);
+
   // Обработчик для кнопки "Удалить все"
   const clearAllKeywordsBtn = document.getElementById('clear-all-keywords-btn');
   if (clearAllKeywordsBtn) {
@@ -1877,6 +1879,8 @@
         const keyword = newKeywordInput.value.trim();
         if (keyword && addKeyword(keyword)) {
           newKeywordInput.value = '';
+          // Обновляем состояние крестика
+          updateKeywordsInputState();
         }
       }
     });
@@ -1891,6 +1895,8 @@
         const keyword = newKeywordInputField.value.trim();
         if (keyword && addKeyword(keyword)) {
           newKeywordInputField.value = '';
+          // Обновляем состояние крестика
+          updateKeywordsInputState();
         }
       }
     });
@@ -1903,6 +1909,8 @@
       const keyword = newKeywordInputField?.value?.trim();
       if (keyword && addKeyword(keyword)) {
         newKeywordInputField.value = '';
+        // Обновляем состояние крестика
+        updateKeywordsInputState();
       }
     });
   }
@@ -1914,8 +1922,32 @@
       if (newKeywordInputField) {
         newKeywordInputField.value = '';
         newKeywordInputField.focus();
+        // Обновляем состояние крестика
+        updateKeywordsInputState();
       }
     });
+  }
+
+  // Обработчики для обновления состояния крестика
+  if (newKeywordInputField) {
+    // При вводе текста
+    newKeywordInputField.addEventListener('input', () => {
+      updateKeywordsInputState();
+    });
+    
+    // При фокусе
+    newKeywordInputField.addEventListener('focus', () => {
+      updateKeywordsInputState();
+    });
+  }
+
+  // Функция обновления состояния крестика
+  function updateKeywordsInputState() {
+    const keywordsInputContainer = document.querySelector('.keywords-input-container');
+    if (keywordsInputContainer && newKeywordInputField) {
+      const hasText = newKeywordInputField.value.length > 0;
+      keywordsInputContainer.classList.toggle('has-text', hasText);
+    }
   }
 
 
