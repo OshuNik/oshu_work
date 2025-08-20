@@ -2523,30 +2523,34 @@ body.high-contrast[data-theme="dark"] {
 .keywords-window-header {
   background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
   color: white;
-  padding: 12px 20px;
+  padding: 18px 24px;
   margin: -20px -20px 20px -20px;
   border-radius: 8px 8px 0 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .keywords-window-title {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-family: var(--font-pixel);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
 }
 
 .keywords-window-counter {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-weight: 600;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* 2. Секция добавления */
@@ -2590,9 +2594,10 @@ body.high-contrast[data-theme="dark"] {
 
 .keywords-input-container {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 15px;
   align-items: center;
+  position: relative;
 }
 
 .keywords-input-field {
@@ -2611,6 +2616,34 @@ body.high-contrast[data-theme="dark"] {
   outline: none;
   border-color: var(--accent-blue);
   box-shadow: 4px 4px 0px var(--accent-blue);
+}
+
+.keywords-clear-button {
+  background: var(--accent-red);
+  color: white;
+  border: 3px solid var(--accent-red);
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: var(--box-shadow);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.keywords-clear-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px var(--border-color);
+}
+
+.keywords-clear-button:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
 }
 
 .keywords-add-button {

@@ -1603,7 +1603,7 @@
       });
       
       // Обновляем интерфейс
-      renderKeywords();
+      displayKeywordTags();
       updateKeywordsCount();
       
       // Закрываем модальное окно
@@ -1665,22 +1665,7 @@
     }
   }
 
-  // Отрисовать ключевые слова
-  function renderKeywords() {
-    const container = document.getElementById('current-keywords-tags');
-    if (!container) return;
 
-    if (currentKeywords.length === 0) {
-      container.innerHTML = '<div class="loading-indicator">Нет активных ключевых слов</div>';
-      return;
-    }
-
-    container.innerHTML = '';
-    currentKeywords.forEach(keyword => {
-      const tag = createKeywordTag(keyword);
-      container.appendChild(tag);
-    });
-  }
 
   // Добавить ключевое слово
   function addKeyword(keyword) {
@@ -1693,13 +1678,13 @@
     }
 
     currentKeywords.push(trimmedKeyword);
-    renderKeywords();
+    displayKeywordTags();
     updateKeywordsCount();
     
     // Автосохранение через 1 секунду
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
-      saveKeywords();
+      saveKeywordToDatabase();
     }, 1000);
 
     return true;
@@ -1709,71 +1694,100 @@
   function removeKeyword(keyword) {
     const index = currentKeywords.indexOf(keyword);
     if (index > -1) {
-      currentKeywords.splice(index, 1);
-      renderKeywords();
-      updateKeywordsCount();
+          currentKeywords.splice(index, 1);
+    displayKeywordTags();
+    updateKeywordsCount();
       
       // Автосохранение
       if (saveTimeout) clearTimeout(saveTimeout);
       saveTimeout = setTimeout(() => {
-        saveKeywords();
+        saveKeywordToDatabase();
       }, 1000);
     }
   }
 
-  // Сохранить ключевые слова в базу данных
-  function saveKeywords() {
-    if (!currentKeywords || currentKeywords.length === 0) {
-      console.log('Нет ключевых слов для сохранения');
+
+
+  // Загрузить ключевые слова из базы данных
+  async function loadKeywords() {
+    if (!keywordsTagsContainer) {
+      console.error('loadKeywords: элемент keywordsTagsContainer не найден');
       return;
     }
     
-    // Сохраняем в localStorage как временное решение
-    // В реальном приложении здесь будет API запрос к Supabase
+    keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Загрузка...</div>';
+    
     try {
-      localStorage.setItem('oshu_keywords', JSON.stringify(currentKeywords));
-      console.log('Ключевые слова сохранены в localStorage:', currentKeywords);
-      uiToast('Ключевые слова сохранены');
+      const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
+        headers: createSupabaseHeaders()
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      const keywords = data.length > 0 ? data[0].keywords : '';
+      
+      // Парсим ключевые слова
+      currentKeywords = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
+      
+      // Отображаем теги ключевых слов
+      displayKeywordTags();
+    } catch (error) {
+      console.error('loadKeywords: произошла ошибка', error);
+      if (error.message.includes('авторизации')) {
+        keywordsTagsContainer.innerHTML = `<div class="loading-indicator error-indicator">${error.message}</div>`;
+      } else {
+        keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
+      }
+    }
+  }
+
+  // Сохранить ключевые слова в базу данных
+  async function saveKeywordToDatabase(keyword = null) {
+    try {
+      const keywordsString = currentKeywords.join(', ');
+      
+      const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
+        method: 'PATCH',
+        headers: createSupabaseHeaders(),
+        body: JSON.stringify({ keywords: keywordsString })
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ.');
+        }
+        if (response.status === 404) {
+          // Если записи нет, создаем новую
+          const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
+            method: 'POST',
+            headers: createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }),
+            body: JSON.stringify({ update_key: 1, keywords: keywordsString })
+          });
+          
+          if (!postResponse.ok) {
+            throw new Error(`POST failed: HTTP ${postResponse.status}`);
+          }
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+      
+      if (keyword) {
+        console.log('Ключевое слово сохранено в базу:', keyword);
+        uiToast(`Ключевое слово "${keyword}" сохранено`);
+      } else {
+        console.log('Все ключевые слова сохранены в базу');
+        uiToast('Ключевые слова сохранены');
+      }
     } catch (error) {
       console.error('Ошибка сохранения ключевых слов:', error);
       uiToast('Ошибка сохранения ключевых слов');
-    }
-  }
-
-  // Загрузить ключевые слова из базы данных
-  function loadKeywords() {
-    try {
-      // Загружаем из localStorage как временное решение
-      // В реальном приложении здесь будет API запрос к Supabase
-      const savedKeywords = localStorage.getItem('oshu_keywords');
-      if (savedKeywords) {
-        currentKeywords = JSON.parse(savedKeywords);
-        console.log('Ключевые слова загружены из localStorage:', currentKeywords);
-      } else {
-        // Загружаем стандартные ключевые слова
-        currentKeywords = ['монтаж', 'анимация', 'эффекты', 'цветокоррекция'];
-        console.log('Загружены стандартные ключевые слова:', currentKeywords);
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки ключевых слов:', error);
-      currentKeywords = ['монтаж', 'анимация', 'эффекты', 'цветокоррекция'];
-    }
-    
-    renderKeywords();
-    updateKeywordsCount();
-  }
-
-  // Сохранить отдельное ключевое слово в базу данных
-  function saveKeywordToDatabase(keyword) {
-    try {
-      // В реальном приложении здесь будет API запрос к Supabase
-      // Пока сохраняем в localStorage
-      localStorage.setItem('oshu_keywords', JSON.stringify(currentKeywords));
-      console.log('Ключевое слово сохранено в базу:', keyword);
-      uiToast(`Ключевое слово "${keyword}" сохранено`);
-    } catch (error) {
-      console.error('Ошибка сохранения ключевого слова:', error);
-      uiToast('Ошибка сохранения ключевого слова');
     }
   }
 
@@ -1786,14 +1800,14 @@
   }
 
   // Инициализация ключевых слов
-  setTimeout(() => {
-    loadKeywords();
+  setTimeout(async () => {
+    await loadKeywords();
   }, 100);
 
   // Обработчик для кнопки "Удалить все"
   const clearAllKeywordsBtn = document.getElementById('clear-all-keywords-btn');
   if (clearAllKeywordsBtn) {
-    clearAllKeywordsBtn.addEventListener('click', () => {
+    clearAllKeywordsBtn.addEventListener('click', async () => {
       if (currentKeywords.length === 0) {
         uiToast('Нет ключевых слов для удаления');
         return;
@@ -1801,9 +1815,26 @@
       
       if (confirm(`Удалить все ${currentKeywords.length} ключевых слов?`)) {
         currentKeywords = [];
-        renderKeywords();
+        displayKeywordTags();
         updateKeywordsCount();
-        uiToast('Все ключевые слова удалены');
+        
+        // Сохраняем пустой список в базу
+        try {
+          const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
+            method: 'PATCH',
+            headers: createSupabaseHeaders(),
+            body: JSON.stringify({ keywords: '' })
+          });
+          
+          if (!response.ok && response.status !== 404) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          uiToast('Все ключевые слова удалены');
+        } catch (error) {
+          console.error('Ошибка сохранения пустого списка:', error);
+          uiToast('Ошибка сохранения изменений');
+        }
       }
     });
   }
@@ -1879,6 +1910,17 @@
       const keyword = newKeywordInputField?.value?.trim();
       if (keyword && addKeyword(keyword)) {
         newKeywordInputField.value = '';
+      }
+    });
+  }
+
+  // Обработчик для кнопки очистки поля ввода
+  const keywordsClearBtn = document.getElementById('keywords-clear-button');
+  if (keywordsClearBtn) {
+    keywordsClearBtn.addEventListener('click', () => {
+      if (newKeywordInputField) {
+        newKeywordInputField.value = '';
+        newKeywordInputField.focus();
       }
     });
   }
