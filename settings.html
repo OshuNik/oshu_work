@@ -129,91 +129,53 @@
 
   <main class="content">
     <div id="tab-keywords" class="settings-tab-content active">
-      <!-- Компактный блок с текущими ключевыми словами -->
-      <div class="keywords-summary-card">
-        <div class="keywords-summary-header">
-          <div class="keywords-summary-info">
-            <span class="keywords-count-badge" id="keywords-count">0</span>
-            <h3 class="keywords-summary-title">Ключевые слова</h3>
-          </div>
-          <button class="keywords-expand-btn" id="keywords-expand-btn" aria-label="Развернуть ключевые слова">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 9l6 6 6-6"/>
+      <!-- 1. КЛЮЧЕВЫЕ СЛОВА -->
+      <div class="keywords-header-card">
+        <h2 class="keywords-section-title">🔑 КЛЮЧЕВЫЕ СЛОВА</h2>
+        <div class="keywords-count-display">
+          <span class="keywords-count-badge" id="keywords-count">0</span>
+          <span class="keywords-count-text">слов активно</span>
+        </div>
+      </div>
+
+      <!-- 2. ДОБАВИТЬ -->
+      <div class="keywords-add-card">
+        <h3 class="keywords-section-subtitle">➕ ДОБАВИТЬ</h3>
+        
+        <!-- 3. Одно слово или несколько через запятую: -->
+        <p class="keywords-section-description">Одно слово или несколько через запятую:</p>
+        
+        <!-- 4. Окно ввода -->
+        <div class="keywords-input-container">
+          <input type="text" class="keywords-input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
+          <button id="add-keyword-btn" class="keywords-add-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
             </svg>
           </button>
         </div>
         
-        <!-- Развернутый список для редактирования -->
-        <div class="keywords-expanded" id="keywords-expanded" style="display: none;">
-          <div class="keywords-tags-container" id="current-keywords-tags">
-            <div class="loading-indicator">Загрузка...</div>
-          </div>
-          
-                     <!-- Кнопки управления ключевыми словами -->
-           <div class="keywords-actions-section">
-             <button id="load-defaults-keywords-btn" class="button-secondary">
-               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                 <polyline points="7,10 12,15 17,10"/>
-                 <line x1="12" y1="15" x2="12" y2="3"/>
-               </svg>
-               Загрузить стандартные
-             </button>
-            <button id="clear-all-keywords-btn" class="button-clear-all-keywords">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              </svg>
-              Очистить все ключевые слова
-            </button>
-          </div>
-          
-          <!-- Улучшенная форма добавления -->
-          <div class="keywords-add-section">
-            <div class="keywords-add-header">
-              <h4>Добавить ключевые слова</h4>
-              <div class="keywords-add-tabs">
-                <button class="add-tab-btn active" data-tab="single">По одному</button>
-                <button class="add-tab-btn" data-tab="batch">Пачкой</button>
-              </div>
-            </div>
-            
-            <!-- Форма добавления по одному -->
-            <div class="add-tab-content active" id="add-single">
-              <div class="keyword-input-group">
-                <input type="text" id="new-keyword-input" placeholder="Введите ключевое слово..." maxlength="30">
-                <button id="add-keyword-btn" type="button" class="keyword-add-btn">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
-                  </svg>
-                </button>
-              </div>
-              <div class="keyword-suggestions" id="keyword-suggestions">
-                <span class="suggestion-label">Популярные:</span>
-                <div class="suggestion-tags">
-                  <button class="suggestion-tag" data-keyword="монтаж">монтаж</button>
-                  <button class="suggestion-tag" data-keyword="анимация">анимация</button>
-                  <button class="suggestion-tag" data-keyword="дизайн">дизайн</button>
-                  <button class="suggestion-tag" data-keyword="разработка">разработка</button>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Форма добавления пачкой -->
-            <div class="add-tab-content" id="add-batch">
-              <div class="batch-input-group">
-                <textarea id="batch-keywords-input" rows="3" placeholder="Введите ключевые слова через запятую, пробел или с новой строки..."></textarea>
-                <div class="batch-controls">
-                  <button id="add-batch-btn" type="button" class="batch-add-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M12 5v14M5 12h14"/>
-                    </svg>
-                    Добавить все
-                  </button>
-                  <button id="clear-batch-btn" type="button" class="batch-clear-btn">Очистить</button>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- 5. Кнопки действий -->
+        <div class="keywords-actions">
+          <button id="add-keyword-action-btn" class="keywords-action-btn keywords-action-primary">Добавить</button>
+          <button id="clear-input-btn" class="keywords-action-btn keywords-action-danger">Удалить</button>
+          <button id="load-presets-btn" class="keywords-action-btn keywords-action-success">Загрузить пресет</button>
+        </div>
+      </div>
+
+      <!-- 5. АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА: -->
+      <div class="keywords-active-card">
+        <h3 class="keywords-section-subtitle">⭐ АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА:</h3>
+        
+        <!-- 6. Ключевые слова -->
+        <div class="keywords-tags-container" id="current-keywords-tags">
+          <div class="loading-indicator">Загрузка...</div>
+        </div>
+        
+        <!-- Действия с пресетами -->
+        <div class="keywords-preset-actions">
+          <button id="save-as-preset-btn" class="keywords-action-btn keywords-action-success">Сохранить как пресет</button>
+          <button id="clear-all-keywords-btn" class="keywords-action-btn keywords-action-danger">Удалить все</button>
         </div>
       </div>
     </div>
@@ -327,6 +289,44 @@
   
   <div id="toast-container" class="toast-container"></div>
 
+  <!-- Модальное окно с пресетами -->
+  <div class="presets-modal-overlay" id="presets-modal">
+    <div class="presets-modal">
+      <h3 class="presets-modal-title">Выберите пресет</h3>
+      <div class="presets-options">
+        <div class="preset-option" data-preset="video">
+          <span class="preset-icon">🎬</span>
+          <div class="preset-content">
+            <div class="preset-name">Видеомонтаж</div>
+            <div class="preset-keywords">монтаж, анимация, эффекты, цветокоррекция</div>
+          </div>
+        </div>
+        <div class="preset-option" data-preset="design">
+          <span class="preset-icon">🎨</span>
+          <div class="preset-content">
+            <div class="preset-name">Дизайн</div>
+            <div class="preset-keywords">дизайн, иллюстрация, типографика, брендинг</div>
+          </div>
+        </div>
+        <div class="preset-option" data-preset="development">
+          <span class="preset-icon">💻</span>
+          <div class="preset-content">
+            <div class="preset-name">Разработка</div>
+            <div class="preset-keywords">программирование, веб, мобильные, API</div>
+          </div>
+        </div>
+        <div class="preset-option" data-preset="marketing">
+          <span class="preset-icon">📢</span>
+          <div class="preset-content">
+            <div class="preset-name">Маркетинг</div>
+            <div class="preset-keywords">реклама, SMM, контент, аналитика</div>
+          </div>
+        </div>
+      </div>
+      <button class="presets-modal-close" onclick="closePresetsModal()">Закрыть</button>
+    </div>
+  </div>
+
   <div id="custom-confirm-overlay" class="custom-confirm-overlay hidden">
     <div class="custom-confirm-box">
       <p id="custom-confirm-text"></p>
@@ -342,5 +342,15 @@
   <script src="utils.min.js"></script>
   <script src="theme-manager.js"></script>
   <script src="settings.js"></script>
+  
+  <script>
+    // Глобальные функции для HTML
+    function closePresetsModal() {
+      const modal = document.getElementById('presets-modal');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    }
+  </script>
 </body>
 </html>

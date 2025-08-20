@@ -184,6 +184,14 @@
   let currentKeywords = [];
   let saveTimeout = null;
 
+  // Пресеты ключевых слов
+  const KEYWORD_PRESETS = {
+    video: ['монтаж', 'анимация', 'эффекты', 'цветокоррекция', 'видео'],
+    design: ['дизайн', 'иллюстрация', 'типографика', 'брендинг', 'UI/UX'],
+    development: ['программирование', 'веб', 'мобильные', 'API', 'база данных'],
+    marketing: ['реклама', 'SMM', 'контент', 'аналитика', 'SEO']
+  };
+
   function createKeywordTag(keyword) {
     const tag = document.createElement('div');
     tag.className = 'keyword-tag';
@@ -1503,7 +1511,6 @@
     initTheme();
     initBurgerMenu();
     initSidebarTabs();
-    initEnhancedSettings();
     
     // Добавляем CSS анимации
     const style = document.createElement('style');
@@ -1556,6 +1563,210 @@
     });
   }
 
+  // === ФУНКЦИИ ДЛЯ РАБОТЫ С ПРЕСЕТАМИ ===
+
+  // Показать модальное окно с пресетами
+  function showPresetsModal() {
+    const modal = document.getElementById('presets-modal');
+    if (modal) {
+      modal.classList.add('active');
+    }
+  }
+
+  // Закрыть модальное окно с пресетами
+  function closePresetsModal() {
+    const modal = document.getElementById('presets-modal');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  }
+
+  // Загрузить пресет
+  function loadPreset(presetType) {
+    const preset = KEYWORD_PRESETS[presetType];
+    if (preset) {
+      // Очищаем текущие ключевые слова
+      currentKeywords = [];
+      
+      // Добавляем слова из пресета
+      preset.forEach(keyword => {
+        if (!currentKeywords.includes(keyword)) {
+          currentKeywords.push(keyword);
+        }
+      });
+      
+      // Обновляем интерфейс
+      renderKeywords();
+      updateKeywordsCount();
+      
+      // Закрываем модальное окно
+      closePresetsModal();
+      
+      // Показываем уведомление
+      uiToast(`Загружен пресет: ${presetType}`);
+    }
+  }
+
+  // Сохранить как пресет (заглушка)
+  function saveAsPreset() {
+    if (currentKeywords.length === 0) {
+      uiToast('Нет ключевых слов для сохранения');
+      return;
+    }
+    
+    // Заглушка - в реальном приложении здесь будет сохранение в базу
+    const presetName = prompt('Введите название пресета:', 'Мой пресет');
+    if (presetName) {
+      uiToast(`Пресет "${presetName}" сохранен! (заглушка)`);
+      console.log('Сохранение пресета:', { name: presetName, keywords: currentKeywords });
+    }
+  }
+
+  // Обработчики для новых кнопок
+  const loadPresetsBtn = document.getElementById('load-presets-btn');
+  const saveAsPresetBtn = document.getElementById('save-as-preset-btn');
+  const clearInputBtn = document.getElementById('clear-input-btn');
+  const addKeywordActionBtn = document.getElementById('add-keyword-action-btn');
+
+  if (loadPresetsBtn) {
+    loadPresetsBtn.addEventListener('click', showPresetsModal);
+  }
+
+  if (saveAsPresetBtn) {
+    saveAsPresetBtn.addEventListener('click', saveAsPreset);
+  }
+
+  if (clearInputBtn) {
+    clearInputBtn.addEventListener('click', () => {
+      const input = document.getElementById('new-keyword-input');
+      if (input) input.value = '';
+    });
+  }
+
+  if (addKeywordActionBtn) {
+    addKeywordActionBtn.addEventListener('click', () => {
+      const input = document.getElementById('new-keyword-input');
+      const keyword = input?.value?.trim();
+      if (keyword && addKeyword(keyword)) {
+        input.value = '';
+      }
+    });
+  }
+
+  // Обработчики для пресетов в модальном окне
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.preset-option')) {
+      const presetOption = e.target.closest('.preset-option');
+      const presetType = presetOption.dataset.preset;
+      if (presetType) {
+        loadPreset(presetType);
+      }
+    }
+  });
+
+  // === ФУНКЦИИ ДЛЯ РЕНДЕРИНГА ===
+
+  // Обновить счетчик ключевых слов
+  function updateKeywordsCount() {
+    const countElement = document.getElementById('keywords-count');
+    if (countElement) {
+      countElement.textContent = currentKeywords.length;
+    }
+  }
+
+  // Отрисовать ключевые слова
+  function renderKeywords() {
+    const container = document.getElementById('current-keywords-tags');
+    if (!container) return;
+
+    if (currentKeywords.length === 0) {
+      container.innerHTML = '<div class="loading-indicator">Нет активных ключевых слов</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    currentKeywords.forEach(keyword => {
+      const tag = createKeywordTag(keyword);
+      container.appendChild(tag);
+    });
+  }
+
+  // Добавить ключевое слово
+  function addKeyword(keyword) {
+    if (!keyword || keyword.trim() === '') return false;
+    
+    const trimmedKeyword = keyword.trim();
+    if (currentKeywords.includes(trimmedKeyword)) {
+      uiToast('Такое ключевое слово уже существует');
+      return false;
+    }
+
+    currentKeywords.push(trimmedKeyword);
+    renderKeywords();
+    updateKeywordsCount();
+    
+    // Автосохранение через 1 секунду
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveKeywords();
+    }, 1000);
+
+    return true;
+  }
+
+  // Удалить ключевое слово
+  function removeKeyword(keyword) {
+    const index = currentKeywords.indexOf(keyword);
+    if (index > -1) {
+      currentKeywords.splice(index, 1);
+      renderKeywords();
+      updateKeywordsCount();
+      
+      // Автосохранение
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        saveKeywords();
+      }, 1000);
+    }
+  }
+
+  // Сохранить ключевые слова (заглушка)
+  function saveKeywords() {
+    console.log('Сохранение ключевых слов:', currentKeywords);
+    uiToast('Ключевые слова сохранены (заглушка)');
+  }
+
+  // Загрузить ключевые слова (заглушка)
+  function loadKeywords() {
+    // В реальном приложении здесь будет загрузка из базы
+    currentKeywords = ['монтаж', 'анимация', 'дизайн'];
+    renderKeywords();
+    updateKeywordsCount();
+  }
+
+  // Инициализация ключевых слов
+  setTimeout(() => {
+    loadKeywords();
+  }, 100);
+
+  // Обработчик для кнопки "Удалить все"
+  const clearAllKeywordsBtn = document.getElementById('clear-all-keywords-btn');
+  if (clearAllKeywordsBtn) {
+    clearAllKeywordsBtn.addEventListener('click', () => {
+      if (currentKeywords.length === 0) {
+        uiToast('Нет ключевых слов для удаления');
+        return;
+      }
+      
+      if (confirm(`Удалить все ${currentKeywords.length} ключевых слов?`)) {
+        currentKeywords = [];
+        renderKeywords();
+        updateKeywordsCount();
+        uiToast('Все ключевые слова удалены');
+      }
+    });
+  }
+
   // Обработчик для добавления ключевых слов пачкой
   const addBatchBtn = document.getElementById('add-batch-btn');
   if (addBatchBtn) {
@@ -1602,6 +1813,31 @@
         if (keyword && addKeyword(keyword)) {
           newKeywordInput.value = '';
         }
+      }
+    });
+  }
+
+  // Обработчик для Enter в новом поле ввода
+  const newKeywordInputField = document.getElementById('new-keyword-input');
+  if (newKeywordInputField) {
+    newKeywordInputField.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const keyword = newKeywordInputField.value.trim();
+        if (keyword && addKeyword(keyword)) {
+          newKeywordInputField.value = '';
+        }
+      }
+    });
+  }
+
+  // Обработчик для кнопки "+" рядом с полем ввода
+  const addKeywordBtnField = document.getElementById('add-keyword-btn');
+  if (addKeywordBtnField) {
+    addKeywordBtnField.addEventListener('click', () => {
+      const keyword = newKeywordInputField?.value?.trim();
+      if (keyword && addKeyword(keyword)) {
+        newKeywordInputField.value = '';
       }
     });
   }
