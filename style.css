@@ -721,8 +721,8 @@ mark.highlight {
   letter-spacing: 1.5px;
 }
 
-/* Пиксельный счетчик */
-.pixel-counter {
+/* Полностью отдельные стили для Keywords tab */
+.keywords-pixel-counter {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -731,15 +731,15 @@ mark.highlight {
   font-weight: 700;
 }
 
-.keywords-header-card .pixel-counter .pixel-bar {
+.keywords-pixel-counter .keywords-pixel-bar {
   color: #FFD93D; /* Желтый цвет для контраста с синим */
   font-size: 18px;
   letter-spacing: 2px;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
-  animation: pixelPulse 3s infinite ease-in-out;
+  animation: keywordsPixelPulse 3s infinite ease-in-out;
 }
 
-.keywords-header-card .pixel-counter .favorites-count {
+.keywords-pixel-counter .keywords-count {
   background: #FF6B6B; /* Красный цвет для контраста с синим */
   color: white;
   padding: 6px 12px;
@@ -751,14 +751,33 @@ mark.highlight {
   box-shadow: 4px 4px 0px #000;
 }
 
-.favorites-count {
+/* Пиксельный счетчик для избранного */
+.pixel-counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-family: var(--font-pixel);
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 700;
+}
+
+/* Стили для избранного */
+.pixel-counter .pixel-bar {
   color: var(--text-color);
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+  animation: pixelPulse 3s infinite ease-in-out;
+}
+
+.pixel-counter .favorites-count {
   background: var(--accent-yellow);
+  color: var(--text-color);
   padding: 6px 12px;
   border: 2px solid var(--text-color);
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 400;
   box-shadow: 2px 2px 0px var(--text-color);
   min-width: 40px;
   text-align: center;
@@ -766,15 +785,16 @@ mark.highlight {
   overflow: hidden;
 }
 
-.favorites-count.updating {
+/* Анимации для счетчика избранного */
+.pixel-counter .favorites-count.updating {
   animation: retroFlash 0.4s ease-out;
 }
 
-.favorites-count.counting-up {
+.pixel-counter .favorites-count.counting-up {
   animation: countingUp 0.8s ease-in-out;
 }
 
-.favorites-count.counting-complete {
+.pixel-counter .favorites-count.counting-complete {
   animation: countingComplete 0.4s ease-out;
 }
 
@@ -806,6 +826,17 @@ mark.highlight {
 }
 
 /* Анимации */
+@keyframes keywordsPixelPulse {
+  0%, 100% { 
+    color: #FFD93D;
+    transform: scale(1);
+  }
+  50% { 
+    color: #FF6B6B;
+    transform: scale(1.1);
+  }
+}
+
 @keyframes pixelPulse {
   0%, 100% { 
     color: var(--accent-green);
