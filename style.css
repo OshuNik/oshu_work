@@ -1208,7 +1208,8 @@ mark.highlight {
   transform: translateX(100%);
   opacity: 0;
   overflow-y: auto;
-  /* Убираем transition - будет только анимация */
+  /* ПРИНУДИТЕЛЬНО блокируем любые transitions */
+  transition: none !important;
 }
 
 /* Матричное появление сайдбара */
