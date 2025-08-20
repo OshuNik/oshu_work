@@ -731,7 +731,7 @@ mark.highlight {
   font-weight: 700;
 }
 
-.pixel-counter .pixel-bar {
+.keywords-header-card .pixel-counter .pixel-bar {
   color: #FFD93D; /* Желтый цвет для контраста с синим */
   font-size: 18px;
   letter-spacing: 2px;
@@ -739,7 +739,7 @@ mark.highlight {
   animation: pixelPulse 3s infinite ease-in-out;
 }
 
-.pixel-counter .favorites-count {
+.keywords-header-card .pixel-counter .favorites-count {
   background: #FF6B6B; /* Красный цвет для контраста с синим */
   color: white;
   padding: 6px 12px;
@@ -2917,8 +2917,8 @@ body.high-contrast[data-theme="dark"] {
 }
 
 .keyword-tag {
-  background: var(--accent-blue);
-  color: white;
+  background: var(--accent-yellow);
+  color: var(--text-color);
   padding: 8px 12px;
   border: 3px solid var(--border-color);
   border-radius: 6px;
