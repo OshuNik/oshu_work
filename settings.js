@@ -960,12 +960,12 @@
 
     // Открытие меню
     function openSidebar() {
+      // Бургер сразу уходит за меню
+      burgerMenuBtn.style.zIndex = '999';
+      
       burgerMenuBtn.classList.add('active');
       settingsSidebar.classList.add('active');
       sidebarOverlay.classList.add('active');
-      
-      // Бургер уходит за меню
-      burgerMenuBtn.style.zIndex = '999';
       
       // Анимация появления кнопок с задержкой
       setTimeout(() => {
