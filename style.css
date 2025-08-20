@@ -1212,11 +1212,46 @@ mark.highlight {
               opacity 0.4s ease;
 }
 
-/* Пиксельное скольжение для сайдбара */
+/* Матричное появление для сайдбара */
+.settings-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--card-color);
+  border-left: 4px solid var(--border-color);
+  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transform: translateX(100%);
+  opacity: 0;
+  overflow-y: auto;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s ease;
+}
+
+.settings-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%);
+  background-size: 2px 8px;
+  opacity: 0;
+  z-index: -1;
+}
+
 .settings-sidebar.active {
   transform: translateX(0);
   opacity: 1;
-  animation: pixelSlideIn 0.4s steps(8, end);
+  animation: matrixReveal 0.6s ease-out;
+}
+
+.settings-sidebar.active::before {
+  animation: matrixRain 0.8s steps(20, end);
 }
 
 
@@ -1353,9 +1388,10 @@ mark.highlight {
   transition: none;
 }
 
-/* Анимация появления кнопок с пиксельным телепортом */
+/* Анимация появления кнопок с пиксельным телепортом + глитч */
 .sidebar-nav.animate .sidebar-tab-button {
-  animation: pixelTeleport 0.7s steps(10, end) forwards;
+  animation: pixelTeleport 0.7s steps(10, end) forwards, 
+             buttonGlitch 0.2s ease-in-out;
   animation-fill-mode: forwards !important;
   position: relative;
   overflow: hidden;
@@ -1379,9 +1415,15 @@ mark.highlight {
   pointer-events: none;
 }
 
-.sidebar-nav.animate .sidebar-tab-button:nth-child(1) { animation-delay: 0.2s; }
-.sidebar-nav.animate .sidebar-tab-button:nth-child(2) { animation-delay: 0.35s; }
-.sidebar-nav.animate .sidebar-tab-button:nth-child(3) { animation-delay: 0.5s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(1) { 
+  animation-delay: 0.2s, 0.9s; 
+}
+.sidebar-nav.animate .sidebar-tab-button:nth-child(2) { 
+  animation-delay: 0.35s, 1.05s; 
+}
+.sidebar-nav.animate .sidebar-tab-button:nth-child(3) { 
+  animation-delay: 0.5s, 1.2s; 
+}
 
 .sidebar-nav.animate .sidebar-tab-button:nth-child(1)::before { animation-delay: 0.2s; }
 .sidebar-nav.animate .sidebar-tab-button:nth-child(2)::before { animation-delay: 0.35s; }
@@ -1394,42 +1436,85 @@ mark.highlight {
   animation: none !important;
 }
 
-@keyframes pixelSlideIn {
+@keyframes matrixReveal {
   0% {
     transform: translateX(100%);
     opacity: 0;
-  }
-  12.5% {
-    transform: translateX(87.5%);
-    opacity: 0.2;
+    filter: blur(4px);
   }
   25% {
     transform: translateX(75%);
-    opacity: 0.4;
-  }
-  37.5% {
-    transform: translateX(62.5%);
-    opacity: 0.6;
+    opacity: 0.3;
+    filter: blur(3px);
   }
   50% {
     transform: translateX(50%);
-    opacity: 0.7;
-  }
-  62.5% {
-    transform: translateX(37.5%);
-    opacity: 0.8;
+    opacity: 0.6;
+    filter: blur(2px);
   }
   75% {
     transform: translateX(25%);
-    opacity: 0.9;
-  }
-  87.5% {
-    transform: translateX(12.5%);
-    opacity: 0.95;
+    opacity: 0.8;
+    filter: blur(1px);
   }
   100% {
     transform: translateX(0);
     opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes matrixRain {
+  0% {
+    opacity: 0;
+    background-position-y: -100%;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.6;
+    background-position-y: 0;
+  }
+  90% {
+    opacity: 0.3;
+    background-position-y: 100%;
+  }
+  100% {
+    opacity: 0;
+    background-position-y: 200%;
+  }
+}
+
+@keyframes buttonGlitch {
+  0%, 100% {
+    transform: translateX(0);
+    filter: hue-rotate(0deg);
+  }
+  10% {
+    transform: translateX(-2px);
+    filter: hue-rotate(90deg);
+    text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+  }
+  20% {
+    transform: translateX(2px);
+    filter: hue-rotate(180deg);
+    text-shadow: -1px 0 #ff0000, 1px 0 #00ffff;
+  }
+  30% {
+    transform: translateX(-1px);
+    filter: hue-rotate(270deg);
+    text-shadow: 1px 0 #ff0000, -1px 0 #00ffff;
+  }
+  40% {
+    transform: translateX(1px);
+    filter: hue-rotate(360deg);
+    text-shadow: 0px 0 #ff0000, 0px 0 #00ffff;
+  }
+  50% {
+    transform: translateX(0);
+    filter: hue-rotate(45deg);
+    text-shadow: 3px 0 #ff0000, -3px 0 #00ffff;
   }
 }
 
