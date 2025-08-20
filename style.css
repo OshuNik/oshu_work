@@ -1208,50 +1208,27 @@ mark.highlight {
   transform: translateX(100%);
   opacity: 0;
   overflow-y: auto;
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              opacity 0.4s ease;
+  /* Убираем transition - будет только анимация */
 }
 
-/* Матричное появление для сайдбара */
-.settings-sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 280px;
-  height: 100%;
-  background: var(--card-color);
-  border-left: 4px solid var(--border-color);
-  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  transform: translateX(100%);
-  opacity: 0;
-  overflow-y: auto;
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              opacity 0.4s ease;
-}
-
-.settings-sidebar::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.05) 25%, rgba(0, 255, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.05) 75%, rgba(0, 255, 0, 0.05) 76%, transparent 77%);
-  background-size: 2px 8px;
-  opacity: 0;
-  z-index: -1;
-}
-
+/* ЗАМЕТНЫЙ эффект для сайдбара */
 .settings-sidebar.active {
-  transform: translateX(0);
-  opacity: 1;
-  animation: matrixReveal 0.6s ease-out;
+  animation: extremeSlideIn 0.5s steps(6, end) forwards;
 }
 
 .settings-sidebar.active::before {
-  animation: matrixRain 0.8s steps(20, end);
+  content: '█ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #00ff00;
+  font-family: monospace;
+  font-size: 20px;
+  text-shadow: 0 0 10px #00ff00;
+  animation: matrixText 0.5s ease-out;
+  z-index: 100;
+  pointer-events: none;
 }
 
 
@@ -1436,53 +1413,59 @@ mark.highlight {
   animation: none !important;
 }
 
-@keyframes matrixReveal {
+@keyframes extremeSlideIn {
   0% {
-    transform: translateX(100%);
+    transform: translateX(100%) scale(0.5) rotate(10deg);
     opacity: 0;
-    filter: blur(4px);
+    filter: hue-rotate(0deg) brightness(0.5);
   }
-  25% {
-    transform: translateX(75%);
+  16% {
+    transform: translateX(80%) scale(0.7) rotate(5deg);
     opacity: 0.3;
-    filter: blur(3px);
+    filter: hue-rotate(60deg) brightness(0.7);
+  }
+  33% {
+    transform: translateX(60%) scale(0.9) rotate(-5deg);
+    opacity: 0.5;
+    filter: hue-rotate(120deg) brightness(0.9);
   }
   50% {
-    transform: translateX(50%);
-    opacity: 0.6;
-    filter: blur(2px);
+    transform: translateX(40%) scale(1.1) rotate(2deg);
+    opacity: 0.7;
+    filter: hue-rotate(180deg) brightness(1.2);
   }
-  75% {
-    transform: translateX(25%);
+  66% {
+    transform: translateX(20%) scale(0.95) rotate(-2deg);
     opacity: 0.8;
-    filter: blur(1px);
+    filter: hue-rotate(240deg) brightness(1.1);
+  }
+  83% {
+    transform: translateX(5%) scale(1.05) rotate(1deg);
+    opacity: 0.9;
+    filter: hue-rotate(300deg) brightness(1.0);
   }
   100% {
-    transform: translateX(0);
+    transform: translateX(0) scale(1) rotate(0deg);
     opacity: 1;
-    filter: blur(0px);
+    filter: hue-rotate(360deg) brightness(1);
   }
 }
 
-@keyframes matrixRain {
+@keyframes matrixText {
   0% {
     opacity: 0;
-    background-position-y: -100%;
-  }
-  10% {
-    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.1);
+    filter: blur(10px);
   }
   50% {
-    opacity: 0.6;
-    background-position-y: 0;
-  }
-  90% {
-    opacity: 0.3;
-    background-position-y: 100%;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+    filter: blur(0px);
   }
   100% {
     opacity: 0;
-    background-position-y: 200%;
+    transform: translate(-50%, -50%) scale(0.1);
+    filter: blur(5px);
   }
 }
 
