@@ -964,6 +964,9 @@
       settingsSidebar.classList.add('active');
       sidebarOverlay.classList.add('active');
       
+      // Бургер уходит за меню
+      burgerMenuBtn.style.zIndex = '999';
+      
       // Анимация появления кнопок с задержкой
       setTimeout(() => {
         const sidebarNav = document.querySelector('.sidebar-nav');
@@ -993,6 +996,9 @@
       burgerMenuBtn.classList.remove('active');
       settingsSidebar.classList.remove('active');
       sidebarOverlay.classList.remove('active');
+      
+      // Возвращаем бургер наверх
+      burgerMenuBtn.style.zIndex = '1001';
       
       // Разблокируем прокрутку body
       document.body.style.overflow = '';

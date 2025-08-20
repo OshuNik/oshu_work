@@ -1151,6 +1151,7 @@ mark.highlight {
   z-index: 1001;
 }
 
+
 .burger-line {
   width: 24px;
   height: 4px;
@@ -1288,8 +1289,6 @@ mark.highlight {
   font-size: 10px;
   box-shadow: var(--box-shadow);
   position: relative;
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .sidebar-tab-icon {
@@ -1338,7 +1337,12 @@ mark.highlight {
   animation: blink 0.8s step-end infinite;
 }
 
-/* Скрываем кнопки когда меню закрыто */
+/* Скрываем кнопки когда меню закрыто И изначально */
+.sidebar-tab-button {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
 .settings-sidebar:not(.active) .sidebar-tab-button {
   opacity: 0;
   transform: translateX(30px);
