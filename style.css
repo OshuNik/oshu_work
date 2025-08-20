@@ -1358,8 +1358,8 @@ mark.highlight {
   font-size: 10px;
   box-shadow: var(--box-shadow);
   position: relative;
-  opacity: 0;
-  transform: translateX(30px);
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .sidebar-tab-icon {
@@ -1406,6 +1406,13 @@ mark.highlight {
 .sidebar-tab-button.active .sidebar-tab-cursor {
   color: white;
   animation: blink 0.8s step-end infinite;
+}
+
+/* Скрываем кнопки когда меню закрыто */
+.settings-sidebar:not(.active) .sidebar-tab-button {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: none;
 }
 
 /* Анимация появления кнопок - теперь более плавная и пиксельная */
