@@ -1170,19 +1170,8 @@ mark.highlight {
   animation: pressGlitch 0.15s ease-out;
 }
 
-/* Улучшенная анимация превращения бургера в X */
-.burger-menu-btn.active .burger-line:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
-}
-
-.burger-menu-btn.active .burger-line:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-.burger-menu-btn.active .burger-line:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
-}
+/* Бургер остается бургером - не превращается в крестик */
+/* Красная кнопка в сайдбаре выполняет функцию закрытия */
 
 /* === OVERLAY ЗАТЕМНЕНИЯ === */
 .sidebar-overlay {
