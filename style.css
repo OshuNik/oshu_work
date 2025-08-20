@@ -736,6 +736,7 @@ mark.highlight {
   font-size: 18px;
   letter-spacing: 2px;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+  animation: pixelPulse 3s infinite ease-in-out;
 }
 
 .pixel-counter .favorites-count {
@@ -2597,11 +2598,15 @@ body.high-contrast[data-theme="dark"] {
   gap: 8px;
   margin-bottom: 15px;
   align-items: center;
+}
+
+.keywords-input-wrapper {
+  flex: 1;
   position: relative;
 }
 
 .keywords-input-field {
-  flex: 1;
+  width: 100%;
   padding: 15px;
   border: 4px solid var(--border-color);
   border-radius: 8px;
@@ -2610,6 +2615,7 @@ body.high-contrast[data-theme="dark"] {
   background: var(--card-color);
   box-shadow: var(--box-shadow);
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .keywords-input-field:focus {
@@ -2619,39 +2625,50 @@ body.high-contrast[data-theme="dark"] {
 }
 
 .keywords-clear-button {
-  background: var(--accent-red);
-  color: white;
-  border: 3px solid var(--accent-red);
-  border-radius: 6px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  box-shadow: var(--box-shadow);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  padding: 0;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s, visibility 0.2s;
+  z-index: 10;
 }
 
-.keywords-input-container.has-text .keywords-clear-button {
+.keywords-clear-button::before,
+.keywords-clear-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: var(--border-width);
+  background-color: var(--hint-color);
+  border-radius: 2px;
+}
+
+.keywords-clear-button::before { transform: translate(-50%, -50%) rotate(45deg); }
+.keywords-clear-button::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.keywords-input-wrapper.has-text .keywords-clear-button {
   opacity: 1;
   visibility: visible;
 }
 
-.keywords-clear-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 6px 6px 0px var(--border-color);
+.keywords-clear-button:hover::before,
+.keywords-clear-button:hover::after {
+  background-color: var(--text-color);
 }
 
-.keywords-clear-button:active {
-  transform: translateY(0px);
-  box-shadow: var(--box-shadow-pressed);
+.keywords-clear-button:active::before,
+.keywords-clear-button:active::after {
+  background-color: var(--accent-red);
 }
 
 .keywords-add-button {

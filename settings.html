@@ -148,8 +148,10 @@
         
         <!-- 4. Окно ввода -->
         <div class="keywords-input-container">
-          <input type="text" class="keywords-input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
-          <button id="keywords-clear-button" class="keywords-clear-button" title="Очистить">×</button>
+          <div class="keywords-input-wrapper">
+            <input type="text" class="keywords-input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
+            <button id="keywords-clear-button" class="keywords-clear-button" aria-label="Очистить"></button>
+          </div>
           <button id="add-keyword-btn" class="keywords-add-button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>

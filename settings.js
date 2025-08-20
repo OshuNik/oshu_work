@@ -1943,10 +1943,10 @@
 
   // Функция обновления состояния крестика
   function updateKeywordsInputState() {
-    const keywordsInputContainer = document.querySelector('.keywords-input-container');
-    if (keywordsInputContainer && newKeywordInputField) {
+    const keywordsInputWrapper = document.querySelector('.keywords-input-wrapper');
+    if (keywordsInputWrapper && newKeywordInputField) {
       const hasText = newKeywordInputField.value.length > 0;
-      keywordsInputContainer.classList.toggle('has-text', hasText);
+      keywordsInputWrapper.classList.toggle('has-text', hasText);
     }
   }
 
