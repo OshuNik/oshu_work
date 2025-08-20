@@ -183,58 +183,75 @@
     </div>
 
     <div id="tab-channels" class="settings-tab-content">
-      <div class="channels-header">
-        <div class="channels-info">
-          <h3>Каналы для мониторинга</h3>
-          <p class="channels-description">Управляйте списком каналов для поиска вакансий</p>
+      <!-- 1. ЗАГОЛОВОК ОКНА -->
+      <div class="channels-window-header">
+        <span class="channels-window-title">КАННАЛЫ</span>
+        <div class="channels-pixel-counter">
+          <span class="channels-pixel-bar">■■■</span>
+          <span id="channels-count" class="channels-count">0</span>
+          <span class="channels-pixel-bar">■■■</span>
         </div>
       </div>
-      
-      <!-- Улучшенная форма добавления канала -->
-      <div class="channel-add-card">
-        <div class="channel-add-header">
-          <h4>Добавить новый канал</h4>
-          <div class="channel-input-examples">
-            <span class="example-label">Примеры:</span>
-            <button class="example-btn" data-example="@username">@username</button>
-            <button class="example-btn" data-example="https://t.me/channel">t.me/channel</button>
+
+      <!-- 2. ДОБАВИТЬ -->
+      <div class="channels-add-card">
+        <h3 class="channels-section-subtitle">ДОБАВИТЬ</h3>
+        
+        <!-- 3. Название канала: -->
+        <p class="channels-section-description">Название канала:</p>
+        
+        <!-- 4. Окно ввода -->
+        <div class="channels-input-container">
+          <div class="channels-input-wrapper">
+            <input type="text" class="channels-input-field" placeholder="Введите название канала..." id="new-channel-input">
+            <button id="channels-clear-button" class="channels-clear-button" aria-label="Очистить"></button>
           </div>
-        </div>
-        <div class="channel-input-group">
-          <input type="text" id="channel-input" placeholder="Введите @username или ссылку на канал..." aria-label="Адрес канала для добавления">
-          <button id="add-channel-btn" aria-label="Добавить канал" class="channel-add-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button id="add-channel-btn" class="channels-add-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </button>
         </div>
+
+        <!-- URL канала -->
+        <p class="channels-section-description">Ссылка на канал:</p>
+        <div class="channels-input-container">
+          <div class="channels-input-wrapper channels-url-wrapper">
+            <input type="text" class="channels-input-field" placeholder="https://t.me/channel или @username" id="new-channel-url">
+            <button id="channels-url-clear-button" class="channels-clear-button" aria-label="Очистить"></button>
+          </div>
+        </div>
+
+        <!-- Тип канала -->
+        <p class="channels-section-description">Тип:</p>
+        <div class="channels-type-selector">
+          <select id="channel-type-select" class="channels-type-select">
+            <option value="telegram">Telegram канал</option>
+            <option value="group">Telegram группа</option>
+            <option value="discord">Discord сервер</option>
+            <option value="other">Другое</option>
+          </select>
+        </div>
+        
+        <!-- 5. Кнопки действий -->
+        <div class="channels-actions">
+          <button id="load-presets-channels-btn" class="channels-action-btn channels-action-success">Загрузить пресет</button>
+        </div>
       </div>
-      
-      <!-- Улучшенный список каналов -->
-      <div class="channels-list-container">
-                 <div class="channels-list-header">
-           <h4>Текущие каналы</h4>
-           <div class="channels-controls">
-             <button id="channels-toggle-all" class="control-btn secondary">Выбрать все</button>
-             <button id="delete-selected-btn" class="control-btn destructive" disabled>Удалить выбранные</button>
-           </div>
-         </div>
-        <div id="channels-list" class="channels-list"></div>
-                 <div class="channels-actions">
-           <button id="load-defaults-channels-btn" class="button-secondary">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-               <polyline points="7,10 12,15 17,10"/>
-               <line x1="12" y1="15" x2="12" y2="3"/>
-             </svg>
-             Загрузить стандартные каналы
-           </button>
-                     <button id="delete-all-btn" class="button-delete">
-             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-             </svg>
-             Удалить все каналы
-           </button>
+
+      <!-- 5. АКТИВНЫЕ КАНАЛЫ: -->
+      <div class="channels-active-card">
+        <h3 class="channels-section-subtitle">АКТИВНЫЕ КАНАЛЫ:</h3>
+        
+        <!-- 6. Каналы -->
+        <div class="channels-tags-container" id="current-channels-tags">
+          <div class="loading-indicator">Загрузка...</div>
+        </div>
+        
+        <!-- Действия с пресетами -->
+        <div class="channels-preset-actions">
+          <button id="save-as-preset-channels-btn" class="channels-action-btn channels-action-success">Сохранить как пресет</button>
+          <button id="clear-all-channels-btn" class="channels-action-btn channels-action-danger">Удалить все</button>
         </div>
       </div>
     </div>

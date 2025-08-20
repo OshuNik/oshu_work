@@ -3904,3 +3904,351 @@ body.high-contrast[data-theme="dark"] {
   background: var(--card-color);
   text-align: center;
 }
+
+/* ===== СТИЛИ ДЛЯ ВКЛАДКИ КАНАЛЫ ===== */
+
+/* Заголовок окна каналов */
+.channels-window-header {
+  background: var(--accent-yellow);
+  border: 3px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.channels-window-title {
+  font-family: var(--font-pixel);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+}
+
+/* Счетчик каналов */
+.channels-pixel-counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.channels-pixel-counter .channels-pixel-bar {
+  color: #FF6B6B; /* Красный цвет для контраста с желтым */
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+  animation: channelsPixelPulse 3s infinite ease-in-out;
+}
+
+.channels-pixel-counter .channels-count {
+  background: #FF6B6B; /* Красный цвет для контраста с желтым */
+  color: white;
+  padding: 6px 12px;
+  border: 3px solid #000;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 4px 4px 0px #000;
+}
+
+/* Карточка добавления канала */
+.channels-add-card {
+  background: var(--accent-yellow);
+  border: 3px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--box-shadow);
+}
+
+.channels-section-subtitle {
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 12px 0;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+}
+
+.channels-section-description {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-color);
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+/* Контейнер ввода канала */
+.channels-input-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.channels-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.channels-input-field {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  box-shadow: var(--box-shadow);
+  transition: all var(--transition-normal);
+}
+
+.channels-input-field:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(65, 166, 255, 0.2);
+}
+
+/* Кнопка очистки для каналов */
+.channels-clear-button {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 10;
+}
+
+/* Специальные стили для второго поля ввода (URL) */
+.channels-url-wrapper .channels-clear-button {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.channels-url-wrapper.has-text .channels-clear-button {
+  opacity: 1;
+  visibility: visible;
+}
+
+.channels-clear-button::before,
+.channels-clear-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: var(--border-width);
+  background-color: var(--hint-color);
+  border-radius: 2px;
+}
+
+.channels-clear-button::before { transform: translate(-50%, -50%) rotate(45deg); }
+.channels-clear-button::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.channels-input-wrapper.has-text .channels-clear-button {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Кнопка добавления канала */
+.channels-add-button {
+  background: var(--accent-green);
+  color: white;
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--box-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+}
+
+.channels-add-button:hover {
+  background: var(--accent-green);
+  transform: translateY(-2px);
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.channels-add-button:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
+/* Селектор типа канала */
+.channels-type-selector {
+  margin-bottom: 16px;
+}
+
+.channels-type-select {
+  width: 100%;
+  padding: 12px;
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  box-shadow: var(--box-shadow);
+  cursor: pointer;
+}
+
+.channels-type-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(65, 166, 255, 0.2);
+}
+
+/* Действия с каналами */
+.channels-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.channels-action-btn {
+  padding: 10px 16px;
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--box-shadow);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.channels-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.channels-action-btn:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
+.channels-action-success {
+  background: var(--accent-green);
+  color: white;
+}
+
+.channels-action-danger {
+  background: var(--accent-red);
+  color: white;
+}
+
+/* Карточка активных каналов */
+.channels-active-card {
+  background: var(--accent-yellow);
+  border: 3px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--box-shadow);
+}
+
+/* Контейнер тегов каналов */
+.channels-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+  min-height: 40px;
+}
+
+.channel-tag {
+  background: var(--accent-red); /* Красный фон для контраста с желтым */
+  color: white;
+  padding: 8px 12px;
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 2px 2px 0px var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  margin: 6px;
+}
+
+.channel-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px var(--border-color);
+}
+
+.channel-tag .channel-type-icon {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.channel-tag .remove-channel {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.channel-tag .remove-channel:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Действия с пресетами каналов */
+.channels-preset-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Анимация для счетчика каналов */
+@keyframes channelsPixelPulse {
+  0%, 100% { 
+    color: #FF6B6B;
+    transform: scale(1);
+  }
+  50% { 
+    color: #FFD93D;
+    transform: scale(1.1);
+  }
+}
