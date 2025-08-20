@@ -1,13 +1,14 @@
 /* ====================================
-   🎮 РЕТРО-ИГРОВЫЕ СТИЛИ ДЛЯ НАСТРОЕК
+   🎮 УЛУЧШЕННЫЕ СТИЛИ ДЛЯ НАСТРОЕК
    ================================== */
 
-/* === RETRO HEADER === */
+/* === ENHANCED HEADER === */
 .retro-header {
   position: relative;
-  background: linear-gradient(45deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  border: 4px solid #00ffff;
-  border-image: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00) 1;
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -19,23 +20,21 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
-  animation: retro-bg-pulse 3s ease-in-out infinite alternate;
+    radial-gradient(circle at 20% 80%, rgba(65, 166, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(107, 203, 119, 0.1) 0%, transparent 50%);
+  animation: gentle-bg-pulse 4s ease-in-out infinite alternate;
 }
 
-@keyframes retro-bg-pulse {
-  0% { opacity: 0.3; }
-  100% { opacity: 0.6; }
+@keyframes gentle-bg-pulse {
+  0% { opacity: 0.5; }
+  100% { opacity: 0.8; }
 }
 
 .retro-title {
   font-family: var(--font-pixel);
   font-size: 24px;
-  color: #00ffff;
-  text-shadow: 
-    2px 2px 0px #ff00ff,
-    4px 4px 8px rgba(0, 255, 255, 0.3);
+  color: var(--text-color);
+  text-shadow: 2px 2px 0px var(--accent-blue);
   margin: 15px 0;
   display: flex;
   align-items: center;
@@ -47,14 +46,12 @@
 
 .retro-icon {
   font-size: 28px;
-  animation: retro-spin 4s linear infinite;
+  color: var(--accent-blue);
+  animation: gentle-spin 8s linear infinite;
 }
 
-@keyframes retro-spin {
+@keyframes gentle-spin {
   0% { transform: rotate(0deg); }
-  25% { transform: rotate(90deg); }
-  50% { transform: rotate(180deg); }
-  75% { transform: rotate(270deg); }
   100% { transform: rotate(360deg); }
 }
 
@@ -64,34 +61,31 @@
 }
 
 .retro-blink {
-  color: #ffff00;
-  animation: retro-blink 1.5s infinite;
+  color: var(--accent-yellow);
+  animation: gentle-blink 2s infinite;
 }
 
-@keyframes retro-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+@keyframes gentle-blink {
+  0%, 70% { opacity: 1; }
+  71%, 100% { opacity: 0.3; }
 }
 
-/* === RETRO BUTTONS === */
+/* === ENHANCED BUTTONS === */
 .retro-btn {
-  font-family: var(--font-pixel) !important;
+  font-family: var(--font-mono) !important;
   font-size: 12px !important;
+  font-weight: 700;
   text-transform: uppercase;
-  background: linear-gradient(145deg, #4a4a4a 0%, #2a2a2a 100%);
-  border: 3px solid #666;
-  border-image: 
-    linear-gradient(45deg, #888, #333, #888) 1;
-  color: #00ff00;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  color: var(--text-color);
   padding: 12px 16px !important;
+  border-radius: 8px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.2s ease;
-  box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all var(--transition-fast);
+  box-shadow: var(--box-shadow);
 }
 
 .retro-btn::before {
@@ -110,75 +104,74 @@
 }
 
 .retro-btn:hover {
-  background: linear-gradient(145deg, #5a5a5a 0%, #3a3a3a 100%);
-  border-color: #00ffff;
-  color: #00ffff;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 
-    0 6px 12px rgba(0, 255, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    calc(var(--shadow-offset) + 1px) calc(var(--shadow-offset) + 1px) 0px var(--border-color);
 }
 
 .retro-btn:active {
-  transform: translateY(1px);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translate(calc(var(--shadow-offset)/2), calc(var(--shadow-offset)/2));
+  box-shadow: var(--box-shadow-pressed);
 }
 
 .retro-btn-back {
-  background: linear-gradient(145deg, #4a4a2a 0%, #2a2a1a 100%);
-  border-color: #ffff00;
-  color: #ffff00;
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
 }
 
 .retro-btn-save {
-  background: linear-gradient(145deg, #2a4a2a 0%, #1a2a1a 100%);
-  border-color: #00ff00;
-  color: #00ff00;
+  border-color: var(--accent-green);
+  color: var(--accent-green);
 }
 
 .retro-btn-add {
-  background: linear-gradient(145deg, #2a2a4a 0%, #1a1a2a 100%);
-  border-color: #00ffff;
-  color: #00ffff;
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
 }
 
 .retro-btn-load {
-  background: linear-gradient(145deg, #4a2a4a 0%, #2a1a2a 100%);
-  border-color: #ff00ff;
-  color: #ff00ff;
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
 }
 
 .retro-btn-danger {
-  background: linear-gradient(145deg, #4a2a2a 0%, #2a1a1a 100%);
-  border-color: #ff0000;
-  color: #ff0000;
-  animation: retro-danger-pulse 2s infinite;
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  animation: danger-pulse 3s infinite;
 }
 
-@keyframes retro-danger-pulse {
-  0%, 100% { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); }
-  50% { box-shadow: 0 4px 8px rgba(255, 0, 0, 0.5); }
+@keyframes danger-pulse {
+  0%, 100% { 
+    box-shadow: var(--box-shadow);
+    border-color: var(--accent-red);
+  }
+  50% { 
+    box-shadow: 
+      var(--shadow-offset) var(--shadow-offset) 0px var(--accent-red),
+      0 0 8px rgba(255, 92, 92, 0.5);
+    border-color: var(--accent-red);
+  }
 }
 
-/* === RETRO TABS === */
+/* === ENHANCED TABS === */
 .retro-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 25px;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--background-color);
   padding: 8px;
-  border: 2px solid #333;
-  border-radius: 8px;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
 }
 
 .retro-tab-btn {
-  font-family: var(--font-pixel) !important;
+  font-family: var(--font-mono) !important;
   font-size: 11px !important;
-  background: linear-gradient(145deg, #333 0%, #1a1a1a 100%);
-  border: 2px solid #555;
-  color: #888;
+  font-weight: 700;
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  color: var(--hint-color);
   padding: 15px 20px !important;
   cursor: pointer;
   position: relative;
@@ -189,14 +182,18 @@
   gap: 5px;
   transition: all 0.3s ease;
   overflow: hidden;
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
 }
 
 .retro-tab-btn.active {
-  background: linear-gradient(145deg, #4a4a2a 0%, #2a2a1a 100%);
-  border-color: #ffff00;
-  color: #ffff00;
-  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
-  transform: translateY(-3px);
+  background: var(--accent-blue);
+  border-color: var(--border-color);
+  color: var(--card-color);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 
+    calc(var(--shadow-offset) + 1px) calc(var(--shadow-offset) + 1px) 0px var(--border-color);
 }
 
 .tab-icon {
@@ -220,28 +217,21 @@
 }
 
 .retro-tab-btn.active .tab-pixel-border {
-  background: 
-    repeating-linear-gradient(
-      90deg,
-      #ffff00 0px,
-      #ffff00 4px,
-      transparent 4px,
-      transparent 8px
-    );
-  animation: retro-pixel-scroll 1s linear infinite;
+  background: var(--accent-yellow);
+  animation: gentle-glow 2s ease-in-out infinite alternate;
 }
 
-@keyframes retro-pixel-scroll {
-  0% { background-position-x: 0px; }
-  100% { background-position-x: 8px; }
+@keyframes gentle-glow {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
-/* === RETRO PANELS === */
+/* === ENHANCED PANELS === */
 .retro-panel {
-  background: 
-    linear-gradient(145deg, rgba(26, 26, 46, 0.95) 0%, rgba(15, 52, 96, 0.95) 100%);
-  border: 3px solid;
-  border-image: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff) 1;
+  background: var(--background-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
   margin-bottom: 20px;
   padding: 0;
   position: relative;
@@ -249,9 +239,11 @@
 }
 
 .retro-panel-border {
-  border: 2px solid #333;
+  border: var(--border-width) solid var(--border-color);
   margin: 15px;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--card-color);
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
   position: relative;
   overflow: hidden;
 }
@@ -267,16 +259,16 @@
     repeating-linear-gradient(
       45deg,
       transparent,
-      transparent 10px,
-      rgba(0, 255, 255, 0.05) 10px,
-      rgba(0, 255, 255, 0.05) 20px
+      transparent 20px,
+      rgba(65, 166, 255, 0.03) 20px,
+      rgba(65, 166, 255, 0.03) 40px
     );
   pointer-events: none;
 }
 
 .retro-danger-panel .retro-panel-border {
-  border-color: #ff0000;
-  background: rgba(50, 0, 0, 0.4);
+  border-color: var(--accent-red);
+  background: var(--card-color);
 }
 
 .retro-danger-panel .retro-panel-border::before {
@@ -291,23 +283,25 @@
 }
 
 .retro-panel-header {
-  background: linear-gradient(90deg, #1a1a2e, #16213e);
-  border-bottom: 2px solid #00ffff;
+  background: var(--accent-blue);
+  border-bottom: var(--border-width) solid var(--border-color);
   padding: 10px 15px;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-pixel);
+  font-family: var(--font-mono);
   font-size: 12px;
-  color: #00ffff;
+  font-weight: 700;
+  color: var(--card-color);
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  border-radius: 6px 6px 0 0;
 }
 
 .panel-icon {
   font-size: 14px;
-  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .panel-title {
@@ -315,34 +309,31 @@
   text-align: center;
 }
 
-/* === RETRO INPUTS === */
+/* === ENHANCED INPUTS === */
 .retro-input, .retro-textarea {
   font-family: var(--font-mono) !important;
   font-size: 14px;
-  background: rgba(0, 0, 0, 0.7);
-  border: 2px solid #333;
-  color: #00ff00;
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  color: var(--text-color);
   padding: 12px !important;
   width: 100% !important;
   box-sizing: border-box;
+  border-radius: 8px;
   transition: all 0.3s ease;
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+  box-shadow: var(--box-shadow);
 }
 
 .retro-input:focus, .retro-textarea:focus {
   outline: none;
-  border-color: #00ffff;
-  background: rgba(0, 20, 20, 0.8);
+  border-color: var(--accent-blue);
   box-shadow: 
-    0 0 10px rgba(0, 255, 255, 0.3),
-    inset 0 0 10px rgba(0, 255, 255, 0.1);
-  color: #00ffff;
-  text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    var(--shadow-offset) var(--shadow-offset) 0px var(--accent-blue),
+    0 0 8px rgba(65, 166, 255, 0.3);
 }
 
 .retro-input::placeholder, .retro-textarea::placeholder {
-  color: #666;
-  text-shadow: none;
+  color: var(--hint-color);
 }
 
 /* === RETRO FORMS === */
@@ -376,11 +367,11 @@
 }
 
 .keyword-tag {
-  background: linear-gradient(145deg, #2a2a4a 0%, #1a1a2a 100%);
-  border: 2px solid #00ffff;
-  color: #00ffff;
+  background: var(--accent-blue);
+  border: var(--border-width) solid var(--border-color);
+  color: var(--card-color);
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: bold;
@@ -388,9 +379,10 @@
   align-items: center;
   gap: 8px;
   position: relative;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
-  animation: retro-tag-appear 0.3s ease;
+  box-shadow: var(--box-shadow);
+  animation: tag-appear 0.3s ease;
 }
 
 @keyframes retro-tag-appear {

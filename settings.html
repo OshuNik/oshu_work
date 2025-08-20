@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: raw.githubusercontent.com; connect-src 'self' *.supabase.co;">
-  <title>Настройки</title>
+  <title>Настройки - oshu://work v12.3</title>
   <!-- Preload критических ресурсов для быстрого First Paint -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,135 +19,285 @@
   <!-- Critical CSS для быстрого First Paint -->
   <link rel="stylesheet" href="critical.css">
   
+  <!-- Критический CSS для предотвращения мерцания темы -->
+  <style>
+    /* Предотвращаем мерцание темной темы при загрузке */
+    :root {
+      --background-color: #F0F0F0 !important;
+      --card-color: #FFFFFF !important;
+      --text-color: #000000 !important;
+      --hint-color: #666666 !important;
+      --border-color: #000000 !important;
+      --input-bg: #FFFFFF !important;
+      --input-border: #CCCCCC !important;
+      --secondary-bg: #E8E8E8 !important;
+      --header-bg: #FFFFFF !important;
+      --button-bg: #FFFFFF !important;
+      --button-text: #000000 !important;
+      --destructive-color: #FF5C5C !important;
+      --link-color: #41A6FF !important;
+      --section-separator: #E0E0E0 !important;
+      --accent-red: #FF5C5C !important;
+      --accent-yellow: #FFD93D !important;
+      --accent-green: #6BCB77 !important;
+      --accent-blue: #41A6FF !important;
+      --box-shadow: 4px 4px 0px #000000 !important;
+      --box-shadow-pressed: 2px 2px 0px #000000 !important;
+    }
+    
+    /* Принудительно устанавливаем светлую тему до загрузки JavaScript */
+    body {
+      background-color: #F0F0F0 !important;
+      color: #000000 !important;
+    }
+    
+    .main-wrapper {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .header {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .search-container {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .content {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .category-tabs {
+      background-color: transparent !important;
+    }
+  </style>
+  
   <!-- Async CSS Loading for non-critical styles -->
   <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  
-  <!-- Retro Gaming Styles for Settings -->
-  <link rel="stylesheet" href="retro-settings.css">
   
   <!-- Fonts loaded asynchronously -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <header class="header header-settings retro-header">
-    <div class="retro-header-bg"></div>
-    <h1 class="retro-title">
-      <span class="retro-icon">⚙</span>
-      <span class="retro-text">НАСТРОЙКИ</span>
-      <span class="retro-blink">◆</span>
-    </h1>
-    <div class="header-actions retro-actions">
-      <a href="index.html" class="header-button retro-btn retro-btn-back">
-        <span class="btn-text">◄ НАЗАД</span>
-      </a>
-      <button id="save-button" class="header-button retro-btn retro-btn-save" aria-label="Сохранить настройки">
-        <span class="btn-text">💾 SAVE</span>
-      </button>
+  <header class="header header-centered">
+    <h1>НАСТРОЙКИ</h1>
+    <div class="header-actions">
+      <a href="index.html" class="header-button">← Назад</a>
     </div>
   </header>
 
-  <div class="settings-tabs retro-tabs">
-    <button class="settings-tab-button retro-tab-btn active" data-target="tab-keywords">
-      <span class="tab-icon">🔍</span>
-      <span class="tab-text">КЛЮЧЕВЫЕ СЛОВА</span>
-      <div class="tab-pixel-border"></div>
+  <div class="settings-tabs">
+    <button class="settings-tab-button active" data-target="tab-keywords">
+      <span class="tab-icon">🔑</span>
+      <span class="tab-label">Ключевые слова</span>
+      <span class="tab-cursor">█</span>
     </button>
-    <button class="settings-tab-button retro-tab-btn" data-target="tab-channels">
+    <button class="settings-tab-button" data-target="tab-channels">
       <span class="tab-icon">📡</span>
-      <span class="tab-text">КАНАЛЫ</span>
-      <div class="tab-pixel-border"></div>
+      <span class="tab-label">Каналы</span>
+      <span class="tab-cursor">█</span>
+    </button>
+    <button class="settings-tab-button" data-target="tab-appearance">
+      <span class="tab-icon">🎨</span>
+      <span class="tab-label">Внешний вид</span>
+      <span class="tab-cursor">█</span>
     </button>
   </div>
 
-  <main class="content retro-content">
-    <div id="tab-keywords" class="settings-tab-content retro-panel active">
-      <div class="retro-panel-border">
-        <div class="retro-panel-header">
-          <span class="panel-icon">📝</span>
-          <span class="panel-title">CURRENT KEYWORDS</span>
+  <main class="content">
+    <div id="tab-keywords" class="settings-tab-content active">
+      <!-- Компактный блок с текущими ключевыми словами -->
+      <div class="keywords-summary-card">
+        <div class="keywords-summary-header">
+          <div class="keywords-summary-info">
+            <span class="keywords-count-badge" id="keywords-count">0</span>
+            <h3 class="keywords-summary-title">Ключевые слова</h3>
+          </div>
+          <button class="keywords-expand-btn" id="keywords-expand-btn" aria-label="Развернуть ключевые слова">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
         </div>
-        <div class="current-keywords-container retro-keywords-display">
-          <div id="current-keywords-tags" class="keywords-tags-container retro-tags">
-            <div class="loading-indicator retro-loading">
-              <span class="loading-text">ЗАГРУЗКА</span>
-              <span class="loading-dots">...</span>
+        
+        <!-- Развернутый список для редактирования -->
+        <div class="keywords-expanded" id="keywords-expanded" style="display: none;">
+          <div class="keywords-tags-container" id="current-keywords-tags">
+            <div class="loading-indicator">Загрузка...</div>
+          </div>
+          
+                     <!-- Кнопки управления ключевыми словами -->
+           <div class="keywords-actions-section">
+             <button id="load-defaults-keywords-btn" class="button-secondary">
+               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                 <polyline points="7,10 12,15 17,10"/>
+                 <line x1="12" y1="15" x2="12" y2="3"/>
+               </svg>
+               Загрузить стандартные
+             </button>
+            <button id="clear-all-keywords-btn" class="button-clear-all-keywords">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Очистить все ключевые слова
+            </button>
+          </div>
+          
+          <!-- Улучшенная форма добавления -->
+          <div class="keywords-add-section">
+            <div class="keywords-add-header">
+              <h4>Добавить ключевые слова</h4>
+              <div class="keywords-add-tabs">
+                <button class="add-tab-btn active" data-tab="single">По одному</button>
+                <button class="add-tab-btn" data-tab="batch">Пачкой</button>
+              </div>
+            </div>
+            
+            <!-- Форма добавления по одному -->
+            <div class="add-tab-content active" id="add-single">
+              <div class="keyword-input-group">
+                <input type="text" id="new-keyword-input" placeholder="Введите ключевое слово..." maxlength="30">
+                <button id="add-keyword-btn" type="button" class="keyword-add-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="keyword-suggestions" id="keyword-suggestions">
+                <span class="suggestion-label">Популярные:</span>
+                <div class="suggestion-tags">
+                  <button class="suggestion-tag" data-keyword="монтаж">монтаж</button>
+                  <button class="suggestion-tag" data-keyword="анимация">анимация</button>
+                  <button class="suggestion-tag" data-keyword="дизайн">дизайн</button>
+                  <button class="suggestion-tag" data-keyword="разработка">разработка</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Форма добавления пачкой -->
+            <div class="add-tab-content" id="add-batch">
+              <div class="batch-input-group">
+                <textarea id="batch-keywords-input" rows="3" placeholder="Введите ключевые слова через запятую, пробел или с новой строки..."></textarea>
+                <div class="batch-controls">
+                  <button id="add-batch-btn" type="button" class="batch-add-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Добавить все
+                  </button>
+                  <button id="clear-batch-btn" type="button" class="batch-clear-btn">Очистить</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="retro-panel-border">
-        <div class="retro-panel-header">
-          <span class="panel-icon">➕</span>
-          <span class="panel-title">ADD KEYWORD</span>
-        </div>
-        <div class="add-keyword-section retro-input-section">
-          <div class="add-keyword-form retro-input-form">
-            <input type="text" id="new-keyword-input" class="retro-input" placeholder="например: монтаж" maxlength="30">
-            <button id="add-keyword-btn" class="retro-btn retro-btn-add" type="button">
-              <span class="btn-text">ADD</span>
-            </button>
-          </div>
+    </div>
+
+    <div id="tab-channels" class="settings-tab-content">
+      <div class="channels-header">
+        <div class="channels-info">
+          <h3>Каналы для мониторинга</h3>
+          <p class="channels-description">Управляйте списком каналов для поиска вакансий</p>
         </div>
       </div>
       
-      <div class="retro-panel-border">
-        <div class="retro-panel-header">
-          <span class="panel-icon">✏️</span>
-          <span class="panel-title">EDIT ALL</span>
+      <!-- Улучшенная форма добавления канала -->
+      <div class="channel-add-card">
+        <div class="channel-add-header">
+          <h4>Добавить новый канал</h4>
+          <div class="channel-input-examples">
+            <span class="example-label">Примеры:</span>
+            <button class="example-btn" data-example="@username">@username</button>
+            <button class="example-btn" data-example="https://t.me/channel">t.me/channel</button>
+          </div>
         </div>
-        <div class="settings-form retro-form">
-          <textarea id="keywords-input" class="retro-textarea" rows="4" placeholder="монтаж, рилс, анимация..."></textarea>
+        <div class="channel-input-group">
+          <input type="text" id="channel-input" placeholder="Введите @username или ссылку на канал..." aria-label="Адрес канала для добавления">
+          <button id="add-channel-btn" aria-label="Добавить канал" class="channel-add-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Улучшенный список каналов -->
+      <div class="channels-list-container">
+                 <div class="channels-list-header">
+           <h4>Текущие каналы</h4>
+           <div class="channels-controls">
+             <button id="channels-toggle-all" class="control-btn secondary">Выбрать все</button>
+             <button id="delete-selected-btn" class="control-btn destructive" disabled>Удалить выбранные</button>
+           </div>
+         </div>
+        <div id="channels-list" class="channels-list"></div>
+                 <div class="channels-actions">
+           <button id="load-defaults-channels-btn" class="button-secondary">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+               <polyline points="7,10 12,15 17,10"/>
+               <line x1="12" y1="15" x2="12" y2="3"/>
+             </svg>
+             Загрузить стандартные каналы
+           </button>
+                     <button id="delete-all-btn" class="button-delete">
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+             </svg>
+             Удалить все каналы
+           </button>
         </div>
       </div>
     </div>
 
-    <div id="tab-channels" class="settings-tab-content retro-panel">
-      <div class="retro-panel-border">
-        <div class="retro-panel-header">
-          <span class="panel-icon">⬇️</span>
-          <span class="panel-title">LOAD DEFAULTS</span>
-        </div>
-        <div class="retro-form">
-          <button id="load-defaults-btn" class="retro-btn retro-btn-load">
-            <span class="btn-text">📥 ЗАГРУЗИТЬ СТАНДАРТНЫЕ</span>
-          </button>
-        </div>
+    <div id="tab-appearance" class="settings-tab-content">
+      <div class="appearance-header">
+        <h3>🎨 Тема оформления</h3>
+        <p class="appearance-description">Выберите предпочитаемую тему интерфейса</p>
       </div>
       
-      <div class="retro-panel-border">
-        <div class="retro-panel-header">
-          <span class="panel-icon">📡</span>
-          <span class="panel-title">ADD CHANNEL</span>
-        </div>
-        <div class="retro-form">
-          <div class="add-channel-form retro-input-form">
-            <input type="text" id="channel-input" class="retro-input" placeholder="@username или https://t.me/..." aria-label="Адрес канала для добавления">
-            <button id="add-channel-btn" class="retro-btn retro-btn-add" aria-label="Добавить канал">
-              <span class="btn-text">ADD</span>
-            </button>
+      <!-- Ретро переключатель темы -->
+      <div class="retro-theme-toggle">
+        <div class="theme-toggle-container">
+          <span class="theme-label-text">☀️ Светлая</span>
+          <div class="retro-toggle-switch">
+            <input type="checkbox" id="theme-toggle" />
+            <label for="theme-toggle" class="retro-toggle-slider">
+              <span class="toggle-thumb"></span>
+            </label>
           </div>
+          <span class="theme-label-text">🌙 Темная</span>
         </div>
-      </div>
-      
-      <div class="retro-panel-border">
-        <div class="retro-panel-header">
-          <span class="panel-icon">📜</span>
-          <span class="panel-title">CHANNELS LIST</span>
-        </div>
-        <div id="channels-list" class="channels-list retro-channels-list"></div>
-      </div>
-      
-      <div class="retro-panel-border retro-danger-panel">
-        <div class="retro-panel-header">
-          <span class="panel-icon">⚠️</span>
-          <span class="panel-title">DANGER ZONE</span>
-        </div>
-        <div class="retro-form">
-          <button id="delete-all-btn" class="retro-btn retro-btn-danger">
-            <span class="btn-text">🗑️ УДАЛИТЬ ВСЕ</span>
-          </button>
+        
+        <!-- Ретро предварительный просмотр темы -->
+        <div class="retro-theme-preview">
+          <div class="retro-preview-card light-theme" id="light-preview">
+            <div class="retro-preview-header">
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+            </div>
+            <div class="retro-preview-content">
+              <div class="retro-line short"></div>
+              <div class="retro-line medium"></div>
+              <div class="retro-line long"></div>
+            </div>
+          </div>
+          <div class="retro-preview-card dark-theme" id="dark-preview">
+            <div class="retro-preview-header">
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+              <div class="retro-dot"></div>
+            </div>
+            <div class="retro-preview-content">
+              <div class="retro-line short"></div>
+              <div class="retro-line medium"></div>
+              <div class="retro-line long"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -168,6 +318,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="config.js"></script>
   <script src="utils.min.js"></script>
+  <script src="theme-manager.js"></script>
   <script src="settings.js"></script>
 </body>
 </html>

@@ -25,6 +25,59 @@
   <!-- Critical CSS для быстрого First Paint -->
   <link rel="stylesheet" href="critical.css">
   
+  <!-- Критический CSS для предотвращения мерцания темы -->
+  <style>
+    /* Предотвращаем мерцание темной темы при загрузке */
+    :root {
+      --background-color: #F0F0F0 !important;
+      --card-color: #FFFFFF !important;
+      --text-color: #000000 !important;
+      --hint-color: #666666 !important;
+      --border-color: #000000 !important;
+      --input-bg: #FFFFFF !important;
+      --input-border: #CCCCCC !important;
+      --secondary-bg: #E8E8E8 !important;
+      --header-bg: #FFFFFF !important;
+      --button-bg: #FFFFFF !important;
+      --button-text: #000000 !important;
+      --destructive-color: #FF5C5C !important;
+      --link-color: #41A6FF !important;
+      --section-separator: #E0E0E0 !important;
+      --accent-red: #FF5C5C !important;
+      --accent-yellow: #FFD93D !important;
+      --accent-green: #6BCB77 !important;
+      --accent-blue: #41A6FF !important;
+      --box-shadow: 4px 4px 0px #000000 !important;
+      --box-shadow-pressed: 2px 2px 0px #000000 !important;
+    }
+    
+    /* Принудительно устанавливаем светлую тему до загрузки JavaScript */
+    body {
+      background-color: #F0F0F0 !important;
+      color: #000000 !important;
+    }
+    
+    .main-wrapper {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .header {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .search-container {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .content {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .category-tabs {
+      background-color: transparent !important;
+    }
+  </style>
+  
   <!-- Async CSS Loading for non-critical styles -->
   <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   
@@ -38,7 +91,7 @@
   
   <div id="main-header">
     <header class="header">
-      <h1>oshu://work <small>v12.2</small></h1>
+      <h1>oshu://work <small>v12.3</small></h1>
       <div id="header-actions" class="header-actions">
         <a href="favorites.html" class="header-button">★ Избранное</a>
         <a href="settings.html" class="header-button">⚙︎ Настройки</a>
@@ -134,6 +187,7 @@
 <script src="config.js"></script>
 <script src="constants.js"></script>
 <script src="utils.min.js"></script>
+<script src="theme-manager.js"></script>
 <script src="state-manager.js"></script>
 <script src="api-service.js"></script>
 <script src="dom-manager.js"></script>

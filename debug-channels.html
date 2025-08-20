@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диагностика каналов</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        button { margin: 5px; padding: 8px 16px; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+        #log { height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Диагностика каналов</h1>
+    
+    <div class="test-section">
+        <h3>1. Проверка конфигурации</h3>
+        <button onclick="testConfig()">Проверить CONFIG</button>
+        <div id="config-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Тест подключения к Supabase</h3>
+        <button onclick="testSupabaseConnection()">Тест подключения</button>
+        <div id="connection-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Загрузка каналов</h3>
+        <button onclick="testLoadChannels()">Загрузить каналы</button>
+        <div id="load-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Добавление канала</h3>
+        <input type="text" id="test-channel-input" placeholder="Введите ID канала" value="test_channel">
+        <button onclick="testAddChannel()">Добавить канал</button>
+        <div id="add-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Обновление канала</h3>
+        <input type="text" id="update-channel-id" placeholder="ID канала для обновления">
+        <button onclick="testUpdateChannel()">Переключить статус</button>
+        <div id="update-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>6. Удаление канала</h3>
+        <input type="text" id="delete-channel-id" placeholder="ID канала для удаления">
+        <button onclick="testDeleteChannel()">Удалить канал</button>
+        <div id="delete-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📋 Лог операций</h3>
+        <button onclick="clearLog()">Очистить лог</button>
+        <div id="log"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="utils.min.js"></script>
+    <script>
+        const { createSupabaseHeaders } = window.utils;
+        const CFG = window.APP_CONFIG;
+        
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#0f0';
+            logEl.innerHTML += `<div style="color: ${color}">[${time}] ${message}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        function showResult(elementId, message, isError = false) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `result ${isError ? 'error' : 'success'}`;
+        }
+
+        function testConfig() {
+            log('Проверка конфигурации...');
+            
+            if (!CFG) {
+                showResult('config-result', 'Ошибка: CFG не найден', true);
+                log('CFG не найден', 'error');
+                return;
+            }
+
+            const requiredFields = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
+            const missing = requiredFields.filter(field => !CFG[field]);
+            
+            if (missing.length > 0) {
+                const msg = `Отсутствуют поля: ${missing.join(', ')}`;
+                showResult('config-result', msg, true);
+                log(msg, 'error');
+                return;
+            }
+
+            showResult('config-result', 'Конфигурация в порядке');
+            log('Конфигурация проверена успешно', 'success');
+            log(`SUPABASE_URL: ${CFG.SUPABASE_URL}`);
+            log(`SUPABASE_ANON_KEY: ${CFG.SUPABASE_ANON_KEY.substring(0, 20)}...`);
+        }
+
+        async function testSupabaseConnection() {
+            log('Тестирование подключения к Supabase...');
+            
+            try {
+                const url = `${CFG.SUPABASE_URL}/rest/v1/`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: createSupabaseHeaders()
+                });
+
+                log(`Ответ сервера: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    showResult('connection-result', 'Подключение успешно');
+                    log('Подключение к Supabase работает', 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult('connection-result', `Ошибка: ${response.status} - ${errorText}`, true);
+                    log(`Ошибка подключения: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult('connection-result', `Ошибка сети: ${error.message}`, true);
+                log(`Ошибка сети: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLoadChannels() {
+            log('Загрузка каналов из базы данных...');
+            
+            try {
+                const url = `${CFG.SUPABASE_URL}/rest/v1/channels?select=*`;
+                const response = await fetch(url, {
+                    headers: createSupabaseHeaders()
+                });
+
+                log(`Ответ загрузки: ${response.status} ${response.statusText}`);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    showResult('load-result', `Ошибка загрузки: ${response.status} - ${errorText}`, true);
+                    log(`Ошибка загрузки: ${errorText}`, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+                const count = data ? data.length : 0;
+                showResult('load-result', `Загружено каналов: ${count}`);
+                log(`Загружено каналов: ${count}`, 'success');
+                
+                if (data && data.length > 0) {
+                    log('Первые 3 канала:');
+                    data.slice(0, 3).forEach((channel, index) => {
+                        log(`  ${index + 1}. ID: ${channel.id}, Channel: ${channel.channel_id}, Enabled: ${channel.is_enabled}`);
+                    });
+                }
+            } catch (error) {
+                showResult('load-result', `Ошибка: ${error.message}`, true);
+                log(`Ошибка загрузки каналов: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAddChannel() {
+            const channelId = document.getElementById('test-channel-input').value.trim();
+            if (!channelId) {
+                showResult('add-result', 'Введите ID канала', true);
+                return;
+            }
+
+            log(`Добавление канала: ${channelId}`);
+
+            try {
+                // Сначала проверим, существует ли канал
+                const checkUrl = `${CFG.SUPABASE_URL}/rest/v1/channels?channel_id=eq.${channelId}`;
+                const checkResponse = await fetch(checkUrl, {
+                    headers: createSupabaseHeaders()
+                });
+
+                if (checkResponse.ok) {
+                    const existing = await checkResponse.json();
+                    if (existing && existing.length > 0) {
+                        showResult('add-result', 'Канал уже существует', true);
+                        log(`Канал ${channelId} уже существует`, 'error');
+                        return;
+                    }
+                }
+
+                // Добавляем новый канал
+                const addUrl = `${CFG.SUPABASE_URL}/rest/v1/channels`;
+                const newChannelData = {
+                    channel_id: channelId,
+                    channel_title: channelId,
+                    is_enabled: true
+                };
+
+                log(`Отправка данных: ${JSON.stringify(newChannelData)}`);
+
+                const addResponse = await fetch(addUrl, {
+                    method: 'POST',
+                    headers: createSupabaseHeaders({ prefer: 'return=representation' }),
+                    body: JSON.stringify(newChannelData)
+                });
+
+                log(`Ответ добавления: ${addResponse.status} ${addResponse.statusText}`);
+
+                if (!addResponse.ok) {
+                    const errorText = await addResponse.text();
+                    showResult('add-result', `Ошибка добавления: ${addResponse.status} - ${errorText}`, true);
+                    log(`Ошибка добавления: ${errorText}`, 'error');
+                    return;
+                }
+
+                const result = await addResponse.json();
+                showResult('add-result', `Канал добавлен успешно! ID: ${result[0]?.id}`);
+                log(`Канал добавлен успешно: ${JSON.stringify(result[0])}`, 'success');
+
+            } catch (error) {
+                showResult('add-result', `Ошибка: ${error.message}`, true);
+                log(`Ошибка добавления канала: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateChannel() {
+            const channelId = document.getElementById('update-channel-id').value.trim();
+            if (!channelId) {
+                showResult('update-result', 'Введите ID канала', true);
+                return;
+            }
+
+            log(`Обновление канала: ${channelId}`);
+
+            try {
+                // Сначала найдем канал
+                const findUrl = `${CFG.SUPABASE_URL}/rest/v1/channels?channel_id=eq.${channelId}`;
+                const findResponse = await fetch(findUrl, {
+                    headers: createSupabaseHeaders()
+                });
+
+                if (!findResponse.ok) {
+                    showResult('update-result', 'Ошибка поиска канала', true);
+                    return;
+                }
+
+                const channels = await findResponse.json();
+                if (!channels || channels.length === 0) {
+                    showResult('update-result', 'Канал не найден', true);
+                    log(`Канал ${channelId} не найден`, 'error');
+                    return;
+                }
+
+                const channel = channels[0];
+                const newStatus = !channel.is_enabled;
+
+                // Обновляем статус
+                const updateUrl = `${CFG.SUPABASE_URL}/rest/v1/channels?id=eq.${channel.id}`;
+                const updateResponse = await fetch(updateUrl, {
+                    method: 'PATCH',
+                    headers: createSupabaseHeaders(),
+                    body: JSON.stringify({ is_enabled: newStatus })
+                });
+
+                log(`Ответ обновления: ${updateResponse.status} ${updateResponse.statusText}`);
+
+                if (!updateResponse.ok) {
+                    const errorText = await updateResponse.text();
+                    showResult('update-result', `Ошибка обновления: ${errorText}`, true);
+                    log(`Ошибка обновления: ${errorText}`, 'error');
+                    return;
+                }
+
+                showResult('update-result', `Статус изменен на: ${newStatus ? 'включен' : 'выключен'}`);
+                log(`Статус канала ${channelId} изменен на: ${newStatus}`, 'success');
+
+            } catch (error) {
+                showResult('update-result', `Ошибка: ${error.message}`, true);
+                log(`Ошибка обновления канала: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeleteChannel() {
+            const channelId = document.getElementById('delete-channel-id').value.trim();
+            if (!channelId) {
+                showResult('delete-result', 'Введите ID канала', true);
+                return;
+            }
+
+            log(`Удаление канала: ${channelId}`);
+
+            try {
+                // Сначала найдем канал
+                const findUrl = `${CFG.SUPABASE_URL}/rest/v1/channels?channel_id=eq.${channelId}`;
+                const findResponse = await fetch(findUrl, {
+                    headers: createSupabaseHeaders()
+                });
+
+                if (!findResponse.ok) {
+                    showResult('delete-result', 'Ошибка поиска канала', true);
+                    return;
+                }
+
+                const channels = await findResponse.json();
+                if (!channels || channels.length === 0) {
+                    showResult('delete-result', 'Канал не найден', true);
+                    log(`Канал ${channelId} не найден`, 'error');
+                    return;
+                }
+
+                const channel = channels[0];
+
+                // Удаляем канал
+                const deleteUrl = `${CFG.SUPABASE_URL}/rest/v1/channels?id=eq.${channel.id}`;
+                const deleteResponse = await fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: createSupabaseHeaders()
+                });
+
+                log(`Ответ удаления: ${deleteResponse.status} ${deleteResponse.statusText}`);
+
+                if (!deleteResponse.ok) {
+                    const errorText = await deleteResponse.text();
+                    showResult('delete-result', `Ошибка удаления: ${errorText}`, true);
+                    log(`Ошибка удаления: ${errorText}`, 'error');
+                    return;
+                }
+
+                showResult('delete-result', `Канал удален успешно`);
+                log(`Канал ${channelId} удален успешно`, 'success');
+
+            } catch (error) {
+                showResult('delete-result', `Ошибка: ${error.message}`, true);
+                log(`Ошибка удаления канала: ${error.message}`, 'error');
+            }
+        }
+
+        // Автоматически проверяем конфигурацию при загрузке
+        window.addEventListener('load', () => {
+            log('Страница диагностики загружена');
+            testConfig();
+        });
+    </script>
+</body>
+</html>
