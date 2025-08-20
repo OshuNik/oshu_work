@@ -948,6 +948,16 @@
   
   // Бургер меню и навигация
   function initBurgerMenu() {
+    // Проверяем наличие всех элементов
+    if (!burgerMenuBtn || !settingsSidebar || !sidebarOverlay) {
+      console.log('Burger menu elements not found:', {
+        burgerMenuBtn: !!burgerMenuBtn,
+        settingsSidebar: !!settingsSidebar,
+        sidebarOverlay: !!sidebarOverlay
+      });
+      return;
+    }
+
     // Открытие меню
     function openSidebar() {
       burgerMenuBtn.classList.add('active');
@@ -972,9 +982,13 @@
       // Блокируем прокрутку body
       document.body.style.overflow = 'hidden';
       
-      // Тактильная обратная связь
-      if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
-        tg.HapticFeedback.impactOccurred('medium');
+      // Тактильная обратная связь (только для поддерживаемых версий)
+      if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred && tg.version >= 6.1) {
+        try {
+          tg.HapticFeedback.impactOccurred('medium');
+        } catch (e) {
+          console.log('HapticFeedback not supported:', e);
+        }
       }
     }
     
@@ -987,24 +1001,24 @@
       // Разблокируем прокрутку body
       document.body.style.overflow = '';
       
-      // Тактильная обратная связь
-      if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
-        tg.HapticFeedback.impactOccurred('light');
+      // Тактильная обратная связь (только для поддерживаемых версий)
+      if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred && tg.version >= 6.1) {
+        try {
+          tg.HapticFeedback.impactOccurred('light');
+        } catch (e) {
+          console.log('HapticFeedback not supported:', e);
+        }
       }
     }
     
     // Обработчики событий
-    if (burgerMenuBtn) {
-      burgerMenuBtn.addEventListener('click', openSidebar);
-    }
+    burgerMenuBtn.addEventListener('click', openSidebar);
     
     if (sidebarCloseBtn) {
       sidebarCloseBtn.addEventListener('click', closeSidebar);
     }
     
-    if (sidebarOverlay) {
-      sidebarOverlay.addEventListener('click', closeSidebar);
-    }
+    sidebarOverlay.addEventListener('click', closeSidebar);
     
     // Закрытие по Escape
     document.addEventListener('keydown', function(e) {
@@ -1046,9 +1060,13 @@
           this.classList.remove('switching');
         }, 300);
         
-        // Тактильная обратная связь
-        if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred) {
-          tg.HapticFeedback.impactOccurred('light');
+        // Тактильная обратная связь (только для поддерживаемых версий)
+        if (tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred && tg.version >= 6.1) {
+          try {
+            tg.HapticFeedback.impactOccurred('light');
+          } catch (e) {
+            console.log('HapticFeedback not supported:', e);
+          }
         }
       });
     });
