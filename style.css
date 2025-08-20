@@ -1145,7 +1145,9 @@ mark.highlight {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--box-shadow);
-  position: relative;
+  position: absolute;
+  top: 15px;
+  right: 20px;
   z-index: 1001;
 }
 
