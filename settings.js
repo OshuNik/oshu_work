@@ -62,6 +62,9 @@
   const newKeywordInput = document.getElementById('new-keyword-input');
   const addKeywordBtn = document.getElementById('add-keyword-btn');
   
+  // Keywords buttons
+  const loadDefaultsKeywordsBtn = document.getElementById('load-defaults-keywords-btn');
+  
   // Channels elements
   const newChannelInput = document.getElementById('new-channel-input');
   const newChannelUrl = document.getElementById('new-channel-url');
@@ -69,6 +72,13 @@
   const addChannelBtn = document.getElementById('add-channel-btn');
   const channelsTagsContainer = document.getElementById('current-channels-tags');
   const channelsCount = document.getElementById('channels-count');
+  
+  // Channels buttons
+  const deleteAllBtn = document.getElementById('delete-all-btn');
+  const loadDefaultsChannelsBtn = document.getElementById('load-defaults-channels-btn');
+  
+  // Legacy channels elements (для совместимости)
+  const channelsListContainer = document.getElementById('channels-list');
 
   /**
    * Валидирует и форматирует ID канала
@@ -653,8 +663,7 @@
 
   // Функция загрузки стандартных ключевых слов
   async function loadDefaultKeywords() {
-    const loadDefaultsBtn = document.querySelector('#load-defaults-keywords-btn');
-    if (loadDefaultsBtn) loadDefaultsBtn.disabled = true;
+    if (loadDefaultsKeywordsBtn) loadDefaultsKeywordsBtn.disabled = true;
     
     try {
       // Стандартные ключевые слова для фриланса
@@ -689,14 +698,13 @@
       console.error('Ошибка загрузки стандартных ключевых слов:', error);
       safeAlert(`Не удалось добавить стандартные ключевые слова: ${error.message}`);
     } finally {
-      if (loadDefaultsBtn) loadDefaultsBtn.disabled = false;
+      if (loadDefaultsKeywordsBtn) loadDefaultsKeywordsBtn.disabled = false;
     }
   }
 
   // Функция загрузки стандартных каналов
   async function loadDefaultChannels() {
-    const loadDefaultsBtn = document.querySelector('#load-defaults-channels-btn');
-    if (loadDefaultsBtn) loadDefaultsBtn.disabled = true;
+    if (loadDefaultsChannelsBtn) loadDefaultsChannelsBtn.disabled = true;
     
     try {
       // Сначала получаем текущие каналы
