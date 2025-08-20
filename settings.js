@@ -197,15 +197,8 @@
     tag.className = 'keyword-tag';
     tag.innerHTML = `
       <span class="keyword-tag-text">${escapeHtml(keyword)}</span>
-      <button class="keyword-tag-save" type="button" title="Сохранить" data-keyword="${escapeHtml(keyword)}">💾</button>
-      <button class="keyword-tag-remove" type="button" title="Удалить" data-keyword="${escapeHtml(keyword)}">×</button>
+      <button class="keyword-tag-remove" type="button" title="Удалить" data-keyword="${escapeHtml(keyword)}"></button>
     `;
-    
-    // Добавляем обработчик сохранения
-    const saveBtn = tag.querySelector('.keyword-tag-save');
-    saveBtn.addEventListener('click', () => {
-      saveKeywordToDatabase(keyword);
-    });
     
     // Добавляем обработчик удаления
     const removeBtn = tag.querySelector('.keyword-tag-remove');
