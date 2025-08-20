@@ -1124,52 +1124,11 @@ mark.highlight {
     will-change: transform;
 }
 
-/* === КОМПАКТНЫЙ ХЕДЕР === */
-.header-compact {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: var(--header-bg);
-  border-bottom: 4px solid var(--border-color);
-  position: relative;
-  z-index: 100;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.header-left h1 {
-  font-family: var(--font-pixel);
+/* === СТИЛИ ДЛЯ БУРГЕРА В ХЕДЕРЕ === */
+.settings-icon {
   font-size: 16px;
-  margin: 0;
-  color: var(--text-color);
-  text-shadow: 2px 2px 0px var(--border-color);
-}
-
-.back-btn {
-  font-family: var(--font-pixel);
-  font-size: 12px;
-  background: var(--button-bg);
-  color: var(--button-text);
-  border: 3px solid var(--border-color);
-  padding: 8px 12px;
-  text-decoration: none;
-  box-shadow: var(--box-shadow);
-  transition: all 0.2s ease;
-}
-
-.back-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 5px 5px 0px var(--border-color);
-}
-
-.back-btn:active {
-  transform: translateY(1px);
-  box-shadow: var(--box-shadow-pressed);
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+  animation: blink 2s step-end infinite;
 }
 
 /* === БУРГЕР МЕНЮ === */
@@ -1255,25 +1214,74 @@ mark.highlight {
   box-shadow: -8px 0 16px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.68, 0, 0.265, 1);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   overflow-y: auto;
+  opacity: 0;
 }
 
 .settings-sidebar.active {
   transform: translateX(0);
+  opacity: 1;
+  animation: pixelSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Улучшенная пиксельная анимация выезда */
+@keyframes pixelSlideIn {
+  0% { 
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  15% { 
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  25% { 
+    transform: translateX(-8px);
+    opacity: 0.3;
+  }
+  35% { 
+    transform: translateX(4px);
+    opacity: 0.6;
+  }
+  45% { 
+    transform: translateX(-2px);
+    opacity: 0.8;
+  }
+  55% { 
+    transform: translateX(1px);
+    opacity: 0.9;
+  }
+  65% { 
+    transform: translateX(-1px);
+    opacity: 0.95;
+  }
+  75% { 
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Анимация глитча при открытии */
 .settings-sidebar.glitch {
-  animation: sidebarGlitch 0.2s ease-out;
+  animation: sidebarPixelGlitch 0.3s ease-out;
 }
 
-@keyframes sidebarGlitch {
-  0% { transform: translateX(100%); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(3px); }
-  75% { transform: translateX(-1px); }
-  100% { transform: translateX(0); }
+@keyframes sidebarPixelGlitch {
+  0% { transform: translateX(100%); filter: hue-rotate(0deg); }
+  10% { transform: translateX(-8px); filter: hue-rotate(90deg); }
+  20% { transform: translateX(4px); filter: hue-rotate(180deg); }
+  30% { transform: translateX(-2px); filter: hue-rotate(270deg); }
+  40% { transform: translateX(1px); filter: hue-rotate(360deg); }
+  50% { transform: translateX(-1px); filter: hue-rotate(90deg); }
+  60% { transform: translateX(0px); filter: hue-rotate(180deg); }
+  70% { transform: translateX(1px); filter: hue-rotate(270deg); }
+  80% { transform: translateX(-1px); filter: hue-rotate(360deg); }
+  90% { transform: translateX(0px); filter: hue-rotate(0deg); }
+  100% { transform: translateX(0); filter: hue-rotate(0deg); }
 }
 
 /* === ХЕДЕР САЙДБАРА === */
@@ -1348,6 +1356,8 @@ mark.highlight {
   font-size: 10px;
   box-shadow: var(--box-shadow);
   position: relative;
+  opacity: 0;
+  transform: translateX(30px);
 }
 
 .sidebar-tab-icon {
@@ -1396,19 +1406,31 @@ mark.highlight {
   animation: blink 0.8s step-end infinite;
 }
 
-/* Анимация появления кнопок */
+/* Анимация появления кнопок - теперь более плавная и пиксельная */
 .sidebar-nav.animate .sidebar-tab-button {
-  animation: sidebarButtonAppear 0.4s ease-out;
+  animation: sidebarButtonPixelAppear 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-.sidebar-nav.animate .sidebar-tab-button:nth-child(1) { animation-delay: 0.1s; }
-.sidebar-nav.animate .sidebar-tab-button:nth-child(2) { animation-delay: 0.2s; }
-.sidebar-nav.animate .sidebar-tab-button:nth-child(3) { animation-delay: 0.3s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(1) { animation-delay: 0.2s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(2) { animation-delay: 0.35s; }
+.sidebar-nav.animate .sidebar-tab-button:nth-child(3) { animation-delay: 0.5s; }
 
-@keyframes sidebarButtonAppear {
+@keyframes sidebarButtonPixelAppear {
   0% {
     opacity: 0;
     transform: translateX(30px) scale(0.8);
+  }
+  25% {
+    opacity: 0.3;
+    transform: translateX(-3px) scale(0.9);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(2px) scale(1.05);
+  }
+  75% {
+    opacity: 0.9;
+    transform: translateX(-1px) scale(0.98);
   }
   100% {
     opacity: 1;
