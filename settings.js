@@ -1632,8 +1632,7 @@
   // Обработчики для новых кнопок
   const loadPresetsBtn = document.getElementById('load-presets-btn');
   const saveAsPresetBtn = document.getElementById('save-as-preset-btn');
-  const clearInputBtn = document.getElementById('clear-input-btn');
-  const addKeywordActionBtn = document.getElementById('add-keyword-action-btn');
+
 
   if (loadPresetsBtn) {
     loadPresetsBtn.addEventListener('click', showPresetsModal);
@@ -1643,22 +1642,7 @@
     saveAsPresetBtn.addEventListener('click', saveAsPreset);
   }
 
-  if (clearInputBtn) {
-    clearInputBtn.addEventListener('click', () => {
-      const input = document.getElementById('new-keyword-input');
-      if (input) input.value = '';
-    });
-  }
 
-  if (addKeywordActionBtn) {
-    addKeywordActionBtn.addEventListener('click', () => {
-      const input = document.getElementById('new-keyword-input');
-      const keyword = input?.value?.trim();
-      if (keyword && addKeyword(keyword)) {
-        input.value = '';
-      }
-    });
-  }
 
   // Обработчики для пресетов в модальном окне
   document.addEventListener('click', (e) => {
@@ -1899,33 +1883,9 @@
     });
   }
 
-  // Обработчик для кнопки "Загрузить пресет"
-  const loadPresetsBtn = document.getElementById('load-presets-btn');
-  if (loadPresetsBtn) {
-    loadPresetsBtn.addEventListener('click', () => {
-      showPresetsModal();
-    });
-  }
 
-  // Обработчик для кнопки "Сохранить как пресет"
-  const saveAsPresetBtn = document.getElementById('save-as-preset-btn');
-  if (saveAsPresetBtn) {
-    saveAsPresetBtn.addEventListener('click', () => {
-      saveAsPreset();
-    });
-  }
 
-  // Обработчик для клика по пресетам в модальном окне
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('.preset-option')) {
-      const presetOption = e.target.closest('.preset-option');
-      const presetType = presetOption.dataset.preset;
-      if (presetType) {
-        loadPreset(presetType);
-        closePresetsModal();
-      }
-    }
-  });
+
 
   // Обработчик для Enter в поле добавления канала
   if (channelInput) {
