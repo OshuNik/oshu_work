@@ -25,8 +25,9 @@ class TemplateLoader {
       const fallbackPaths = [
         templatePath,
         templatePath.replace('./', ''),  // без ./
-        `../${templatePath}`,             // родительская папка
-        `../../${templatePath}`,          // два уровня вверх (для favorites.html)
+        `../${templatePath.replace('./', '')}`,             // родительская папка
+        `../../${templatePath.replace('./', '')}`,          // два уровня вверх (для favorites.html)
+        `src/html/${templatePath.replace('./', '')}`,       // папка src/html от корня
         `/${templatePath.replace('./', '')}` // от корня
       ];
       
@@ -84,7 +85,7 @@ class TemplateLoader {
    * @returns {Promise<boolean>}
    */
   static async loadVacancyCardTemplate() {
-    return await this.loadTemplate('./vacancy-card-template.html', 'body');
+    return await this.loadTemplate('vacancy-card-template.html', 'body');
   }
 
   /**
