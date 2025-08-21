@@ -256,82 +256,77 @@
       <!-- 1. ЗАГОЛОВОК ОКНА -->
       <div class="appearance-window-header">
         <span class="appearance-window-title">ВНЕШНИЙ ВИД</span>
-        <div class="appearance-pixel-counter">
-          <span class="appearance-pixel-bar">■■■</span>
-          <span id="appearance-count" class="appearance-count">🎨</span>
-          <span class="appearance-pixel-bar">■■■</span>
-        </div>
       </div>
 
-      <!-- 2. НАСТРОЙКИ -->
-      <div class="appearance-add-card">
-        <h3 class="appearance-section-subtitle">НАСТРОЙКИ</h3>
-        
-        <!-- 3. Описание -->
+      <!-- 2. НАСТРОЙКИ ТЕМЫ -->
+      <div class="appearance-theme-card">
+        <h3 class="appearance-section-subtitle">НАСТРОЙКИ ТЕМЫ</h3>
         <p class="appearance-section-description">Выберите предпочитаемую цветовую схему интерфейса:</p>
         
-        <!-- 4. Переключатель темы -->
-        <div class="appearance-theme-container">
-          <div class="theme-toggle-group">
-            <span class="theme-label-text">☀️ Светлая</span>
-            <div class="retro-toggle-switch">
-              <input type="checkbox" id="theme-toggle" />
-              <label for="theme-toggle" class="retro-toggle-slider">
-                <span class="toggle-thumb"></span>
-              </label>
+        <!-- Переключатель темы -->
+        <div class="theme-toggle-container">
+          <span class="theme-label">☀️ Светлая</span>
+          <div class="retro-toggle-switch">
+            <input type="checkbox" id="theme-toggle" />
+            <label for="theme-toggle" class="retro-toggle-slider">
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+          <span class="theme-label">🌙 Темная</span>
+        </div>
+      </div>
+
+      <!-- 3. ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР -->
+      <div class="appearance-preview-card">
+        <h3 class="appearance-section-subtitle">ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР</h3>
+        <p class="appearance-section-description">Посмотрите, как будет выглядеть выбранная тема:</p>
+        
+        <div class="theme-preview-container">
+          <div class="theme-preview-item light-theme">
+            <div class="preview-header">
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
             </div>
-            <span class="theme-label-text">🌙 Темная</span>
+            <div class="preview-content">
+              <div class="preview-line short"></div>
+              <div class="preview-line medium"></div>
+              <div class="preview-line long"></div>
+            </div>
+            <div class="preview-label">Светлая тема</div>
           </div>
           
-          <!-- Предварительный просмотр тем -->
-          <div class="theme-preview-container">
-            <div class="retro-preview-card light-theme" id="light-preview">
-              <div class="retro-preview-header">
-                <div class="retro-dot"></div>
-                <div class="retro-dot"></div>
-                <div class="retro-dot"></div>
-              </div>
-              <div class="retro-preview-content">
-                <div class="retro-line short"></div>
-                <div class="retro-line medium"></div>
-                <div class="retro-line long"></div>
-              </div>
-              <div class="preview-label">Светлая</div>
+          <div class="theme-preview-item dark-theme">
+            <div class="preview-header">
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
             </div>
-            
-            <div class="retro-preview-card dark-theme" id="dark-preview">
-              <div class="retro-preview-header">
-                <div class="retro-dot"></div>
-                <div class="retro-dot"></div>
-                <div class="retro-dot"></div>
-              </div>
-              <div class="retro-preview-content">
-                <div class="retro-line short"></div>
-                <div class="retro-line medium"></div>
-                <div class="retro-line long"></div>
-              </div>
-              <div class="preview-label">Темная</div>
+            <div class="preview-content">
+              <div class="preview-line short"></div>
+              <div class="preview-line medium"></div>
+              <div class="preview-line long"></div>
             </div>
+            <div class="preview-label">Темная тема</div>
           </div>
         </div>
       </div>
 
-      <!-- 5. ИНФОРМАЦИЯ -->
-      <div class="appearance-active-card">
-        <h3 class="appearance-section-subtitle">ИНФОРМАЦИЯ:</h3>
+      <!-- 4. ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ -->
+      <div class="appearance-options-card">
+        <h3 class="appearance-section-subtitle">ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ</h3>
+        <p class="appearance-section-description">Настройте дополнительные параметры интерфейса:</p>
         
-        <!-- 6. Информационная карточка -->
-        <div class="theme-info-section">
-          <div class="info-card">
-            <h5>ℹ️ О применении тем</h5>
-            <p>Выбранная тема применяется ко всему интерфейсу приложения и сохраняется между сеансами.</p>
-          </div>
-          
-          <!-- Дополнительная информация -->
-          <div class="appearance-preset-actions">
-            <button class="appearance-action-btn appearance-action-success">📱 Применить тему</button>
-            <button class="appearance-action-btn appearance-action-info">📊 Статистика использования</button>
-          </div>
+        <div class="appearance-options">
+          <button class="appearance-action-btn appearance-action-success">
+            📱 Применить тему
+          </button>
+          <button class="appearance-action-btn appearance-action-info">
+            📊 Статистика использования
+          </button>
+          <button class="appearance-action-btn appearance-action-warning">
+            🔄 Сбросить настройки
+          </button>
         </div>
       </div>
     </div>

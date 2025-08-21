@@ -17,6 +17,22 @@
     --link-color: #41A6FF;
     --section-separator: #E0E0E0;
     
+    /* Градиенты заголовков для унификации дизайна */
+    --header-gradient-keywords: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    --header-gradient-channels: linear-gradient(135deg, #6BCB77 0%, #4CAF50 100%);
+    --header-gradient-appearance: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+    
+    /* Унифицированные размеры для карточек */
+    --card-padding: 20px;
+    --card-margin: 20px;
+    --card-border: 4px;
+    --card-radius: 8px;
+    
+    /* Унифицированная типографика */
+    --subtitle-size: 14px;
+    --description-size: 14px;
+    --button-padding: 12px 20px;
+    
     /* Telegram Web App CSS переменные (интеграция) */
     --tg-theme-bg-color: var(--background-color);
     --tg-theme-text-color: var(--text-color);
@@ -1000,7 +1016,17 @@ mark.highlight {
   width: 100%;
 }
 
-.vacancy-list, .settings-tab-content { display: none; }
+.vacancy-list, .settings-tab-content { 
+  display: none; 
+  background: white;
+  border-left: none;
+  border-right: none;
+  border-bottom: 2px solid #000;
+  border-top: none;
+  border-radius: 0px 0px 8px 8px;
+  padding: 0px;
+  box-shadow: var(--box-shadow);
+}
 .vacancy-list.active, .settings-tab-content.active {
     display: block !important;
 }
@@ -1008,11 +1034,19 @@ mark.highlight {
 /* Стиль окна для вкладки ключевых слов */
 #tab-keywords.settings-tab-content {
   background: var(--card-color);
-  border: 4px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
+  border-left: none;
+  border-right: none;
+  border-bottom: 2px solid #000;
+  border-top: none;
+  border-radius: 0px 0px 8px 8px;
+  padding: 0px;
   box-shadow: var(--box-shadow);
   margin-bottom: 20px;
+}
+
+/* Padding для контента внутри вкладок (но не для заголовков) */
+.settings-tab-content > *:not(.keywords-window-header):not(.channels-window-header):not(.appearance-window-header) {
+  padding: 20px;
 }
 .empty-list { 
     text-align: center; 
@@ -2567,13 +2601,16 @@ body.high-contrast[data-theme="dark"] {
   background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
   color: white;
   padding: 18px 24px;
-  margin: -20px -20px 20px -20px;
-  border-radius: 8px 8px 0 0;
+  margin: 0px;
+  border-radius: 8px 8px 0px 0px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+  border: none;
+  margin-bottom: 0px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .keywords-window-title {
@@ -3907,43 +3944,38 @@ body.high-contrast[data-theme="dark"] {
 
 /* ===== СТИЛИ ДЛЯ ВКЛАДКИ КАНАЛЫ ===== */
 
-/* Заголовок окна каналов */
+/* Заголовок окна каналов - унифицированный */
 .channels-window-header {
-  background: var(--accent-yellow);
-  border: 3px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: var(--box-shadow);
+  background: var(--header-gradient-channels);
+  color: white;
+  padding: 18px 24px;
+  margin: 0px;
+  border-radius: 8px 8px 0px 0px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  position: relative;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border: none;
+  margin-bottom: 0px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Убираем цветную полоску для унификации */
 .channels-window-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent-red), var(--accent-blue), var(--accent-green));
-  border-radius: 8px 8px 0 0;
+  display: none;
 }
 
 .channels-window-title {
   font-family: var(--font-pixel);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
-  color: var(--text-color);
+  color: white;
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
-/* Счетчик каналов */
+/* Счетчик каналов - унифицированный */
 .channels-pixel-counter {
   display: flex;
   align-items: center;
@@ -3954,15 +3986,15 @@ body.high-contrast[data-theme="dark"] {
 }
 
 .channels-pixel-counter .channels-pixel-bar {
-  color: #FF6B6B; /* Красный цвет для контраста с желтым */
+  color: #FFD93D; /* Желтый цвет для контраста с зеленым */
   font-size: 18px;
   letter-spacing: 2px;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
-  animation: channelsPixelPulse 3s infinite ease-in-out;
+  animation: keywordsPixelPulse 3s infinite ease-in-out;
 }
 
 .channels-pixel-counter .channels-count {
-  background: #FF6B6B; /* Красный цвет для контраста с желтым */
+  background: #FFD93D; /* Желтый цвет для контраста с зеленым */
   color: white;
   padding: 6px 12px;
   border: 3px solid #000;
@@ -3973,24 +4005,35 @@ body.high-contrast[data-theme="dark"] {
   box-shadow: 4px 4px 0px #000;
 }
 
-/* Карточка добавления канала */
+/* Карточка добавления канала - унифицированная */
 .channels-add-card {
   background: var(--card-color);
-  border: 3px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border: var(--card-border) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-margin);
   box-shadow: var(--box-shadow);
+  transition: all 0.2s ease;
+}
+
+.channels-add-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px var(--border-color);
 }
 
 .channels-section-subtitle {
   font-family: var(--font-pixel);
-  font-size: 18px;
+  font-size: var(--subtitle-size);
   font-weight: 700;
   color: var(--text-color);
-  margin: 0 0 12px 0;
-  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
   letter-spacing: 1px;
+  margin-bottom: 15px;
+  margin-top: 20px;
+}
+
+.channels-add-card .channels-section-subtitle {
+  margin-top: 0;
 }
 
 .channels-section-description {
@@ -4218,14 +4261,20 @@ body.high-contrast[data-theme="dark"] {
   color: white;
 }
 
-/* Карточка активных каналов */
+/* Карточка активных каналов - унифицированная */
 .channels-active-card {
   background: var(--card-color);
-  border: 3px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border: var(--card-border) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-margin);
   box-shadow: var(--box-shadow);
+  transition: all 0.2s ease;
+}
+
+.channels-active-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px var(--border-color);
 }
 
 /* Заголовок списка каналов */
@@ -4457,57 +4506,46 @@ body.high-contrast[data-theme="dark"] {
 /* === УНИФИЦИРОВАННЫЕ СТИЛИ ДЛЯ ВНЕШНЕГО ВИДА === */
 
 .appearance-window-header {
-  background: linear-gradient(135deg, #6A1B9A 0%, #8E24AA 100%);
+  background: var(--header-gradient-appearance);
   color: white;
   padding: 18px 24px;
-  margin: -20px -20px 20px -20px;
-  border-radius: 8px 8px 0 0;
+  margin: 0px;
+  border-radius: 8px 8px 0px 0px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+  border: none;
+  margin-bottom: 0px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .appearance-window-title {
   font-family: var(--font-pixel);
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
 }
 
-.appearance-pixel-counter {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+/* Счетчик убран из вкладки "Внешний вид" - там нечего считать */
 
-.appearance-pixel-bar {
-  font-family: monospace;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.appearance-count {
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-  min-width: 40px;
-  text-align: center;
-}
-
-.appearance-add-card {
+.appearance-theme-card,
+.appearance-preview-card,
+.appearance-options-card {
   background: var(--card-color);
-  border: 4px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  margin-top: 0;
+  border: var(--card-border) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-margin);
   box-shadow: var(--box-shadow);
   transition: all 0.2s ease;
 }
 
-.appearance-add-card:hover {
+.appearance-theme-card:hover,
+.appearance-preview-card:hover,
+.appearance-options-card:hover {
   transform: translateY(-2px);
   box-shadow: 6px 6px 0px var(--border-color);
 }
@@ -4529,7 +4567,7 @@ body.high-contrast[data-theme="dark"] {
 
 .appearance-section-subtitle {
   font-family: var(--font-pixel);
-  font-size: 14px;
+  font-size: var(--subtitle-size);
   font-weight: 700;
   color: var(--text-color);
   text-transform: uppercase;
@@ -4538,7 +4576,7 @@ body.high-contrast[data-theme="dark"] {
   margin-top: 20px;
 }
 
-.appearance-add-card .appearance-section-subtitle {
+.appearance-theme-card .appearance-section-subtitle {
   margin-top: 0;
 }
 
@@ -4549,11 +4587,22 @@ body.high-contrast[data-theme="dark"] {
   font-weight: 500;
 }
 
-.appearance-theme-container {
+/* Контейнер переключателя темы */
+.theme-toggle-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 20px;
+  margin: 20px 0;
+  padding: 20px;
+  background: var(--secondary-bg);
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+}
+
+.theme-label {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .theme-toggle-group {
@@ -4562,10 +4611,26 @@ body.high-contrast[data-theme="dark"] {
   gap: 15px;
 }
 
+/* Предварительный просмотр тем */
 .theme-preview-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
-  justify-content: center;
+  margin: 20px 0;
+}
+
+.theme-preview-item {
+  background: var(--card-color);
+  border: 3px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.theme-preview-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0px var(--border-color);
 }
 
 .preview-label {
@@ -4576,47 +4641,147 @@ body.high-contrast[data-theme="dark"] {
   color: var(--hint-color);
 }
 
-.appearance-preset-actions {
+/* Кнопки действий */
+.appearance-options {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 20px;
 }
 
 .appearance-action-btn {
-  border: 2px solid var(--border-color);
-  padding: 12px 16px;
+  padding: var(--button-padding);
+  border: 3px solid var(--border-color);
   border-radius: 6px;
-  font-family: var(--font-pixel);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: var(--box-shadow);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-}
-
-.appearance-action-btn.appearance-action-success {
-  background: var(--accent-green);
-  color: white;
-}
-
-.appearance-action-btn.appearance-action-info {
-  background: var(--accent-blue);
-  color: white;
+  background: var(--button-bg);
+  color: var(--button-text);
 }
 
 .appearance-action-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 4px 4px 0px var(--border-color);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-pressed);
 }
 
-.appearance-action-btn:active {
-  transform: translateY(1px);
-  box-shadow: 2px 2px 0px var(--border-color);
+.appearance-action-success {
+  background: var(--accent-green);
+  color: white;
+  border-color: var(--accent-green);
+}
+
+.appearance-action-info {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.appearance-action-warning {
+  background: var(--accent-yellow);
+  color: var(--text-color);
+  border-color: var(--accent-yellow);
+}
+
+/* Дублирующиеся стили удалены - используются унифицированные */
+
+/* === УНИФИЦИРОВАННЫЕ КЛАССЫ ДЛЯ НАСТРОЕК === */
+
+/* Базовый унифицированный заголовок окна */
+.unified-window-header {
+  color: white;
+  padding: 18px 24px;
+  margin: -20px -20px 20px -20px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Унифицированная карточка */
+.unified-card {
+  background: var(--card-color);
+  border: var(--card-border) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-margin);
+  box-shadow: var(--box-shadow);
+  transition: all 0.2s ease;
+}
+
+.unified-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px var(--border-color);
+}
+
+/* Унифицированные заголовки секций */
+.unified-section-subtitle {
+  font-family: var(--font-pixel);
+  font-size: var(--subtitle-size);
+  font-weight: 700;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  margin-top: 20px;
+}
+
+.unified-section-description {
+  font-size: var(--description-size);
+  color: var(--text-color);
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+/* Унифицированный счетчик */
+.unified-pixel-counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.unified-pixel-bar {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.unified-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 6px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Унифицированная кнопка */
+.unified-button {
+  padding: var(--button-padding);
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--box-shadow);
+  background: var(--button-bg);
+  color: var(--button-text);
+}
+
+.unified-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-pressed);
 }
