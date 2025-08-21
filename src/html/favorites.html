@@ -11,13 +11,13 @@
   <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
   
   <!-- Preload критических файлов -->
-  <link rel="preload" href="style.css" as="style">
-  <link rel="preload" href="favorites.js" as="script">
-  <link rel="preload" href="utils.min.js" as="script">
-  <link rel="preload" href="config.js" as="script">
+  <link rel="preload" href="../css/style.css" as="style">
+  <link rel="preload" href="../js/favorites.js" as="script">
+  <link rel="preload" href="../js/utils.min.js" as="script">
+  <link rel="preload" href="../js/config.js" as="script">
   
   <!-- Critical CSS для быстрого First Paint -->
-  <link rel="stylesheet" href="critical.css">
+  <link rel="stylesheet" href="../css/critical.css">
   
   <!-- Критический CSS для предотвращения мерцания темы -->
   <style>
@@ -73,7 +73,7 @@
   </style>
   
   <!-- Async CSS Loading for non-critical styles -->
-  <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="../css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   
   <!-- Fonts loaded asynchronously -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -151,11 +151,11 @@
   tryNextCdn();
 })();
 </script>
-<script src="template-loader.js"></script>
-<script src="config.js"></script>
-<script src="utils.min.js"></script>
-<script src="theme-manager.js"></script>
-<script src="swipe-handler.js"></script>
-<script src="favorites.js"></script>
+<script src="../js/template-loader.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/utils.min.js"></script>
+<script src="../js/theme-manager.js"></script>
+<script src="../js/swipe-handler.js"></script>
+<script src="../js/favorites.js"></script>
 </body>
 </html>
