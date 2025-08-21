@@ -689,11 +689,15 @@
     }
     channelsListContainer.innerHTML = '<p class="empty-list">Загрузка каналов...</p>';
     try {
+      console.log('[DEBUG] Загружаю каналы из:', `${API_ENDPOINTS.CHANNELS}?select=*`);
+      console.log('[DEBUG] Headers:', createSupabaseHeaders());
+      
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?select=*`, {
         headers: createSupabaseHeaders()
       });
       
       if (!response.ok) {
+        console.error('[DEBUG] Response error:', response.status, response.statusText);
         if (response.status === 401) {
           throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
         }
@@ -701,10 +705,14 @@
       }
       
       const data = await response.json();
+      console.log('[DEBUG] Полученные данные каналов:', data);
+      
       channelsListContainer.innerHTML = '';
       if (data && data.length > 0) {
+          console.log('[DEBUG] Отображаю', data.length, 'каналов');
           data.forEach(item => renderChannel(item));
       } else {
+          console.log('[DEBUG] Список каналов пуст');
           channelsListContainer.innerHTML = '<p class="empty-list">-- Список каналов пуст --</p>';
       }
       
