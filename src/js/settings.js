@@ -75,6 +75,43 @@
   const deleteAllBtn = document.getElementById('delete-all-btn');
   const loadDefaultsChannelsBtn = document.getElementById('load-defaults-channels-btn');
 
+  // Функция обновления состояния крестика для ключевых слов
+  function updateKeywordsInputState() {
+    const keywordsInputWrapper = document.querySelector('.keywords-input-wrapper');
+    if (keywordsInputWrapper && newKeywordInput) {
+      const hasText = newKeywordInput.value.length > 0;
+      keywordsInputWrapper.classList.toggle('has-text', hasText);
+    }
+  }
+
+  // Обновление состояния кнопки удаления выбранных
+  function updateDeleteSelectedButton() {
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const selectedCount = document.querySelectorAll('.channel-select-checkbox:checked').length;
+    
+    if (deleteSelectedBtn) {
+      deleteSelectedBtn.disabled = selectedCount === 0;
+      deleteSelectedBtn.textContent = `Удалить выбранные (${selectedCount})`;
+    }
+  }
+
+  // Обновление состояния кнопки переключения всех
+  function updateToggleAllButton() {
+    const toggleAllBtn = document.getElementById('channels-toggle-all');
+    const checkboxes = document.querySelectorAll('.channel-select-checkbox');
+    const selectedCount = document.querySelectorAll('.channel-select-checkbox:checked').length;
+    
+    if (toggleAllBtn && checkboxes.length > 0) {
+      if (selectedCount === 0) {
+        toggleAllBtn.textContent = 'Выбрать все';
+      } else if (selectedCount === checkboxes.length) {
+        toggleAllBtn.textContent = 'Снять выбор';
+      } else {
+        toggleAllBtn.textContent = 'Выбрать все';
+      }
+    }
+  }
+
   /**
    * Валидирует и форматирует ID канала
    * @param {string} input - Входная строка (username, t.me ссылка или @username)
@@ -1426,33 +1463,7 @@
      updateToggleAllButton();
   }
 
-     // Обновление состояния кнопки удаления выбранных
-   function updateDeleteSelectedButton() {
-     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-     const selectedCount = document.querySelectorAll('.channel-select-checkbox:checked').length;
-     
-     if (deleteSelectedBtn) {
-       deleteSelectedBtn.disabled = selectedCount === 0;
-       deleteSelectedBtn.textContent = `Удалить выбранные (${selectedCount})`;
-     }
-   }
 
-   // Обновление состояния кнопки переключения всех
-   function updateToggleAllButton() {
-     const toggleAllBtn = document.getElementById('channels-toggle-all');
-     const checkboxes = document.querySelectorAll('.channel-select-checkbox');
-     const selectedCount = document.querySelectorAll('.channel-select-checkbox:checked').length;
-     
-     if (toggleAllBtn && checkboxes.length > 0) {
-       if (selectedCount === 0) {
-         toggleAllBtn.textContent = 'Выбрать все';
-       } else if (selectedCount === checkboxes.length) {
-         toggleAllBtn.textContent = 'Снять выбор';
-       } else {
-         toggleAllBtn.textContent = 'Выбрать все';
-       }
-     }
-   }
 
   // === СЕКЦИЯ ВНЕШНЕГО ВИДА ===
   function initAppearanceSection() {
@@ -1931,9 +1942,9 @@
   const keywordsClearBtn = document.getElementById('keywords-clear-button');
   if (keywordsClearBtn) {
     keywordsClearBtn.addEventListener('click', () => {
-      if (newKeywordInputField) {
-        newKeywordInputField.value = '';
-        newKeywordInputField.focus();
+      if (newKeywordInput) {
+        newKeywordInput.value = '';
+        newKeywordInput.focus();
         // Обновляем состояние крестика
         updateKeywordsInputState();
       }
@@ -1941,26 +1952,19 @@
   }
 
   // Обработчики для обновления состояния крестика
-  if (newKeywordInputField) {
+  if (newKeywordInput) {
     // При вводе текста
-    newKeywordInputField.addEventListener('input', () => {
+    newKeywordInput.addEventListener('input', () => {
       updateKeywordsInputState();
     });
     
     // При фокусе
-    newKeywordInputField.addEventListener('focus', () => {
+    newKeywordInput.addEventListener('focus', () => {
       updateKeywordsInputState();
     });
   }
 
-  // Функция обновления состояния крестика
-  function updateKeywordsInputState() {
-    const keywordsInputWrapper = document.querySelector('.keywords-input-wrapper');
-    if (keywordsInputWrapper && newKeywordInputField) {
-      const hasText = newKeywordInputField.value.length > 0;
-      keywordsInputWrapper.classList.toggle('has-text', hasText);
-    }
-  }
+
 
 
 
