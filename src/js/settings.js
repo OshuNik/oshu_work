@@ -838,9 +838,9 @@
       
     } catch (error) {
       console.error('Ошибка загрузки стандартных каналов:', error);
-      safeAlert(`Не удалось добавить стандартные каналы: ${error.message}`);
+      uiToast(`Не удалось добавить стандартные каналы: ${error.message}`);
     } finally {
-      if (loadDefaultsBtn) loadDefaultsBtn.disabled = false;
+      if (loadDefaultsChannelsBtn) loadDefaultsChannelsBtn.disabled = false;
     }
   }
 
