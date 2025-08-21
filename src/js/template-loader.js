@@ -26,6 +26,7 @@ class TemplateLoader {
         templatePath,
         templatePath.replace('./', ''),  // без ./
         `../${templatePath}`,             // родительская папка
+        `src/html/${templatePath.replace('./', '')}`, // папка src/html
         `/${templatePath.replace('./', '')}` // от корня
       ];
       
@@ -76,7 +77,7 @@ class TemplateLoader {
    * @returns {Promise<boolean>}
    */
   static async loadVacancyCardTemplate() {
-    return await this.loadTemplate('./vacancy-card-template.html', 'body');
+    return await this.loadTemplate('src/html/vacancy-card-template.html', 'body');
   }
 
   /**
