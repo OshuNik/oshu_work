@@ -31,25 +31,18 @@ class TemplateLoader {
         `/${templatePath.replace('./', '')}` // от корня
       ];
       
-      console.log('[DEBUG] Template paths to try:', fallbackPaths);
-      
       let templateHTML = null;
       let successPath = null;
       
       for (const path of fallbackPaths) {
         try {
-          console.log(`[DEBUG] Trying path: ${path}`);
           const response = await fetch(path);
           if (response.ok) {
             templateHTML = await response.text();
             successPath = path;
-            console.log(`[DEBUG] Template loaded from: ${path}`);
             break;
-          } else {
-            console.log(`[DEBUG] Path ${path} returned status: ${response.status}`);
           }
         } catch (error) {
-          console.log(`[DEBUG] Path ${path} failed:`, error.message);
           // Продолжаем пробовать следующий путь
           continue;
         }
@@ -87,11 +80,9 @@ class TemplateLoader {
   static async loadVacancyCardTemplate() {
     // Проверяем, не загружен ли уже шаблон
     if (this.isTemplateReady('vacancy-card-template')) {
-      console.log('[DEBUG] Template already loaded, skipping...');
       return true;
     }
     
-    console.log('[DEBUG] Loading vacancy-card-template...');
     return await this.loadTemplate('vacancy-card-template.html', 'body');
   }
 
@@ -132,8 +123,6 @@ class TemplateLoader {
       return true;
     }
     
-    console.log(`[DEBUG] Waiting for template ${templateId}...`);
-    
     return new Promise((resolve) => {
       const startTime = Date.now();
       
@@ -141,7 +130,6 @@ class TemplateLoader {
       const checkInterval = setInterval(() => {
         if (this.isTemplateReady(templateId)) {
           clearInterval(checkInterval);
-          console.log(`[DEBUG] Template ${templateId} ready after ${Date.now() - startTime}ms`);
           resolve(true);
           return;
         }
@@ -149,7 +137,6 @@ class TemplateLoader {
         // Проверяем таймаут
         if (Date.now() - startTime > timeout) {
           clearInterval(checkInterval);
-          console.warn(`[DEBUG] Template ${templateId} timeout after ${timeout}ms`);
           resolve(false);
           return;
         }
@@ -160,7 +147,6 @@ class TemplateLoader {
         if (this.isTemplateReady(templateId)) {
           clearInterval(checkInterval);
           window.removeEventListener('templateReady', handleTemplateReady);
-          console.log(`[DEBUG] Template ${templateId} ready via event`);
           resolve(true);
         }
       };
@@ -222,31 +208,23 @@ window.TEMPLATE_READY = false;
 document.addEventListener('DOMContentLoaded', async () => {
   // Загружаем vacancy-card-template СИНХРОННО если нужен
   if (document.querySelector('.vacancy-list') || document.querySelector('#favorites-list')) {
-    console.log('[DEBUG] Loading vacancy-card-template synchronously...');
     await TemplateLoader.loadVacancyCardTemplate();
     window.TEMPLATE_READY = true;
-    console.log('[DEBUG] Template loading completed, setting TEMPLATE_READY = true');
     
     // Уведомляем приложение что шаблон готов
     window.dispatchEvent(new CustomEvent('templateReady'));
   }
 });
 
-// ДОПОЛНИТЕЛЬНО: Загружаем шаблон сразу при загрузке скрипта
-// Это гарантирует, что шаблон будет доступен до инициализации приложения
-if (document.readyState === 'loading') {
-  // Страница еще загружается
-  document.addEventListener('DOMContentLoaded', async () => {
-    await TemplateLoader.loadVacancyCardTemplate();
-    window.TEMPLATE_READY = true;
-    window.dispatchEvent(new CustomEvent('templateReady'));
-  });
-} else {
-  // Страница уже загружена
+// Загружаем шаблон немедленно если страница уже готова
+if (document.readyState !== 'loading') {
+  // Страница уже загружена, загружаем сразу
   (async () => {
-    await TemplateLoader.loadVacancyCardTemplate();
-    window.TEMPLATE_READY = true;
-    window.dispatchEvent(new CustomEvent('templateReady'));
+    if (document.querySelector('.vacancy-list') || document.querySelector('#favorites-list')) {
+      await TemplateLoader.loadVacancyCardTemplate();
+      window.TEMPLATE_READY = true;
+      window.dispatchEvent(new CustomEvent('templateReady'));
+    }
   })();
 }
 
