@@ -85,6 +85,13 @@ class TemplateLoader {
    * @returns {Promise<boolean>}
    */
   static async loadVacancyCardTemplate() {
+    // Проверяем, не загружен ли уже шаблон
+    if (this.isTemplateReady('vacancy-card-template')) {
+      console.log('[DEBUG] Template already loaded, skipping...');
+      return true;
+    }
+    
+    console.log('[DEBUG] Loading vacancy-card-template...');
     return await this.loadTemplate('vacancy-card-template.html', 'body');
   }
 
@@ -95,6 +102,23 @@ class TemplateLoader {
    */
   static isTemplateReady(templateId) {
     return document.getElementById(templateId) !== null;
+  }
+
+  /**
+   * Принудительно загружает шаблон если он не готов
+   * @param {string} templateId - ID template для проверки
+   * @returns {Promise<boolean>}
+   */
+  static async ensureTemplateReady(templateId) {
+    if (this.isTemplateReady(templateId)) {
+      return true;
+    }
+    
+    console.log(`[DEBUG] Template ${templateId} not ready, loading...`);
+    if (templateId === 'vacancy-card-template') {
+      return await this.loadVacancyCardTemplate();
+    }
+    return false;
   }
 
   /**
@@ -145,11 +169,25 @@ class TemplateLoader {
 
 // Автозагрузка базовых template при загрузке страницы
 document.addEventListener('DOMContentLoaded', async () => {
-  // Загружаем vacancy-card-template если нужен
+  // Загружаем vacancy-card-template СИНХРОННО если нужен
   if (document.querySelector('.vacancy-list') || document.querySelector('#favorites-list')) {
+    console.log('[DEBUG] Loading vacancy-card-template synchronously...');
     await TemplateLoader.loadVacancyCardTemplate();
+    console.log('[DEBUG] Template loading completed');
   }
 });
+
+// ДОПОЛНИТЕЛЬНО: Загружаем шаблон сразу при загрузке скрипта
+// Это гарантирует, что шаблон будет доступен до инициализации приложения
+if (document.readyState === 'loading') {
+  // Страница еще загружается
+  document.addEventListener('DOMContentLoaded', () => {
+    TemplateLoader.loadVacancyCardTemplate();
+  });
+} else {
+  // Страница уже загружена
+  TemplateLoader.loadVacancyCardTemplate();
+}
 
 // Экспорт для использования в других модулях
 window.TemplateLoader = TemplateLoader;
