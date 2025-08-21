@@ -26,22 +26,29 @@ class TemplateLoader {
         templatePath,
         templatePath.replace('./', ''),  // без ./
         `../${templatePath}`,             // родительская папка
-        `src/html/${templatePath.replace('./', '')}`, // папка src/html
+        `../../${templatePath}`,          // два уровня вверх (для favorites.html)
         `/${templatePath.replace('./', '')}` // от корня
       ];
+      
+      console.log('[DEBUG] Template paths to try:', fallbackPaths);
       
       let templateHTML = null;
       let successPath = null;
       
       for (const path of fallbackPaths) {
         try {
+          console.log(`[DEBUG] Trying path: ${path}`);
           const response = await fetch(path);
           if (response.ok) {
             templateHTML = await response.text();
             successPath = path;
+            console.log(`[DEBUG] Template loaded from: ${path}`);
             break;
+          } else {
+            console.log(`[DEBUG] Path ${path} returned status: ${response.status}`);
           }
         } catch (error) {
+          console.log(`[DEBUG] Path ${path} failed:`, error.message);
           // Продолжаем пробовать следующий путь
           continue;
         }
@@ -77,7 +84,7 @@ class TemplateLoader {
    * @returns {Promise<boolean>}
    */
   static async loadVacancyCardTemplate() {
-    return await this.loadTemplate('src/html/vacancy-card-template.html', 'body');
+    return await this.loadTemplate('./vacancy-card-template.html', 'body');
   }
 
   /**
