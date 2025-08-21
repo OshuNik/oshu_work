@@ -266,6 +266,46 @@
     return true;
   }
 
+  function addKeywords(input) {
+    const keywords = input.split(',').map(k => k.trim()).filter(k => k.length > 0);
+    
+    if (keywords.length === 0) {
+      safeAlert('Введите хотя бы одно ключевое слово');
+      return false;
+    }
+    
+    let addedCount = 0;
+    let skippedCount = 0;
+    
+    for (const keyword of keywords) {
+      if (keyword.length > 30) {
+        safeAlert(`Ключевое слово "${keyword}" слишком длинное (максимум 30 символов)`);
+        continue;
+      }
+      
+      const trimmed = keyword.toLowerCase();
+      if (!currentKeywords.map(k => k.toLowerCase()).includes(trimmed)) {
+        currentKeywords.push(trimmed);
+        addedCount++;
+      } else {
+        skippedCount++;
+      }
+    }
+    
+    if (addedCount > 0) {
+      debouncedSave();
+      displayKeywordTags();
+      
+      if (skippedCount > 0) {
+        safeAlert(`Добавлено ${addedCount} слов, пропущено ${skippedCount} дубликатов`);
+      }
+    } else if (skippedCount > 0) {
+      safeAlert('Все введённые слова уже существуют');
+    }
+    
+    return addedCount > 0;
+  }
+
   function removeKeyword(keyword) {
     const index = currentKeywords.findIndex(k => k.toLowerCase() === keyword.toLowerCase());
     if (index > -1) {
@@ -790,9 +830,11 @@
   // Обработчики для визуальных тегов ключевых слов
   if (addKeywordBtn) {
     addKeywordBtn.addEventListener('click', () => {
-      const keyword = newKeywordInput?.value?.trim();
-      if (keyword && addKeyword(keyword)) {
+      const input = newKeywordInput?.value?.trim();
+      if (input && addKeywords(input)) {
         newKeywordInput.value = '';
+        // Обновляем состояние крестика
+        updateKeywordsInputState();
       }
     });
   }
@@ -801,8 +843,8 @@
     newKeywordInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const keyword = newKeywordInput.value.trim();
-        if (keyword && addKeyword(keyword)) {
+        const input = newKeywordInput.value.trim();
+        if (input && addKeywords(input)) {
           newKeywordInput.value = '';
           // Обновляем состояние крестика
           updateKeywordsInputState();
@@ -1661,28 +1703,7 @@
 
 
 
-  // Добавить ключевое слово
-  function addKeyword(keyword) {
-    if (!keyword || keyword.trim() === '') return false;
-    
-    const trimmedKeyword = keyword.trim();
-    if (currentKeywords.includes(trimmedKeyword)) {
-      uiToast('Такое ключевое слово уже существует');
-      return false;
-    }
 
-    currentKeywords.push(trimmedKeyword);
-    displayKeywordTags();
-    updateKeywordsCount();
-    
-    // Автосохранение через 1 секунду
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      saveKeywordToDatabase();
-    }, 1000);
-
-    return true;
-  }
 
   // Удалить ключевое слово
   function removeKeyword(keyword) {
@@ -1875,49 +1896,7 @@
     });
   }
 
-  // Обработчик для Enter в поле добавления ключевого слова
-  if (newKeywordInput) {
-    newKeywordInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const keyword = newKeywordInput.value.trim();
-        if (keyword && addKeyword(keyword)) {
-          newKeywordInput.value = '';
-          // Обновляем состояние крестика
-          updateKeywordsInputState();
-        }
-      }
-    });
-  }
 
-  // Обработчик для Enter в новом поле ввода
-  const newKeywordInputField = document.getElementById('new-keyword-input');
-  if (newKeywordInputField) {
-    newKeywordInputField.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const keyword = newKeywordInputField.value.trim();
-        if (keyword && addKeyword(keyword)) {
-          newKeywordInputField.value = '';
-          // Обновляем состояние крестика
-          updateKeywordsInputState();
-        }
-      }
-    });
-  }
-
-  // Обработчик для кнопки "+" рядом с полем ввода
-  const addKeywordBtnField = document.getElementById('add-keyword-btn');
-  if (addKeywordBtnField) {
-    addKeywordBtnField.addEventListener('click', () => {
-      const keyword = newKeywordInputField?.value?.trim();
-      if (keyword && addKeyword(keyword)) {
-        newKeywordInputField.value = '';
-        // Обновляем состояние крестика
-        updateKeywordsInputState();
-      }
-    });
-  }
 
   // Обработчик для кнопки очистки поля ввода
   const keywordsClearBtn = document.getElementById('keywords-clear-button');
