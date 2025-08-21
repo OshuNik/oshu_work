@@ -509,7 +509,10 @@ input[type="search"]::-webkit-search-cancel-button { display: none; }
     padding: 15px;
     margin-bottom: 20px;
     position: relative;
-    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+    /* Улучшенная индивидуальная тень для каждой карточки */
+    box-shadow: 
+        4px 4px 0px var(--border-color),
+        0px 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-out;
     overflow: hidden;
     will-change: transform; /* Оптимизация анимаций карточек */
@@ -1025,7 +1028,8 @@ mark.highlight {
   border-top: none;
   border-radius: 0px 0px 8px 8px;
   padding: 0px;
-  box-shadow: var(--box-shadow);
+  /* Убираем сплошную тень у списка */
+  box-shadow: none;
 }
 .vacancy-list.active, .settings-tab-content.active {
     display: block !important;
@@ -2436,7 +2440,10 @@ body.high-contrast[data-theme="dark"] {
 
 /* Убираем тени у карточек в темной теме для лучшей интеграции */
 [data-theme="dark"] .vacancy-card {
-  box-shadow: none;
+  /* Улучшенная индивидуальная тень для темной темы */
+  box-shadow: 
+    4px 4px 0px var(--border-color),
+    0px 2px 8px rgba(255, 255, 255, 0.05);
   border-color: var(--border-color);
 }
 
