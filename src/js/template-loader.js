@@ -122,6 +122,54 @@ class TemplateLoader {
   }
 
   /**
+   * Ожидает готовности шаблона
+   * @param {string} templateId - ID template для ожидания
+   * @param {number} timeout - таймаут в миллисекундах
+   * @returns {Promise<boolean>}
+   */
+  static async waitForTemplate(templateId, timeout = 5000) {
+    if (this.isTemplateReady(templateId)) {
+      return true;
+    }
+    
+    console.log(`[DEBUG] Waiting for template ${templateId}...`);
+    
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      
+      // Проверяем каждые 100мс
+      const checkInterval = setInterval(() => {
+        if (this.isTemplateReady(templateId)) {
+          clearInterval(checkInterval);
+          console.log(`[DEBUG] Template ${templateId} ready after ${Date.now() - startTime}ms`);
+          resolve(true);
+          return;
+        }
+        
+        // Проверяем таймаут
+        if (Date.now() - startTime > timeout) {
+          clearInterval(checkInterval);
+          console.warn(`[DEBUG] Template ${templateId} timeout after ${timeout}ms`);
+          resolve(false);
+          return;
+        }
+      }, 100);
+      
+      // Также слушаем событие templateReady
+      const handleTemplateReady = () => {
+        if (this.isTemplateReady(templateId)) {
+          clearInterval(checkInterval);
+          window.removeEventListener('templateReady', handleTemplateReady);
+          console.log(`[DEBUG] Template ${templateId} ready via event`);
+          resolve(true);
+        }
+      };
+      
+      window.addEventListener('templateReady', handleTemplateReady);
+    });
+  }
+
+  /**
    * Встроенный fallback template для карточки вакансии
    * @returns {string}
    */
@@ -167,13 +215,20 @@ class TemplateLoader {
   }
 }
 
+// Глобальный флаг готовности шаблона
+window.TEMPLATE_READY = false;
+
 // Автозагрузка базовых template при загрузке страницы
 document.addEventListener('DOMContentLoaded', async () => {
   // Загружаем vacancy-card-template СИНХРОННО если нужен
   if (document.querySelector('.vacancy-list') || document.querySelector('#favorites-list')) {
     console.log('[DEBUG] Loading vacancy-card-template synchronously...');
     await TemplateLoader.loadVacancyCardTemplate();
-    console.log('[DEBUG] Template loading completed');
+    window.TEMPLATE_READY = true;
+    console.log('[DEBUG] Template loading completed, setting TEMPLATE_READY = true');
+    
+    // Уведомляем приложение что шаблон готов
+    window.dispatchEvent(new CustomEvent('templateReady'));
   }
 });
 
@@ -181,12 +236,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Это гарантирует, что шаблон будет доступен до инициализации приложения
 if (document.readyState === 'loading') {
   // Страница еще загружается
-  document.addEventListener('DOMContentLoaded', () => {
-    TemplateLoader.loadVacancyCardTemplate();
+  document.addEventListener('DOMContentLoaded', async () => {
+    await TemplateLoader.loadVacancyCardTemplate();
+    window.TEMPLATE_READY = true;
+    window.dispatchEvent(new CustomEvent('templateReady'));
   });
 } else {
   // Страница уже загружена
-  TemplateLoader.loadVacancyCardTemplate();
+  (async () => {
+    await TemplateLoader.loadVacancyCardTemplate();
+    window.TEMPLATE_READY = true;
+    window.dispatchEvent(new CustomEvent('templateReady'));
+  })();
 }
 
 // Экспорт для использования в других модулях
