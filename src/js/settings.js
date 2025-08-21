@@ -1255,9 +1255,14 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
   
   // Инициализация улучшенных секций настроек
   function initEnhancedSettings() {
+    console.log('[DEBUG] initEnhancedSettings вызвана');
+    
+    console.log('[DEBUG] Инициализирую секции...');
     initKeywordsSection();
     initChannelsSection();
     initAppearanceSection();
+    
+    console.log('[DEBUG] Все секции инициализированы');
   }
 
   // === СЕКЦИЯ КЛЮЧЕВЫХ СЛОВ ===
@@ -1621,6 +1626,10 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
     initTheme();
     initBurgerMenu();
     initSidebarTabs();
+    
+    // КРИТИЧНО: Инициализация секций настроек
+    console.log('[DEBUG] Вызываю initEnhancedSettings()...');
+    initEnhancedSettings();
     
     // Добавляем CSS анимации
     const style = document.createElement('style');
