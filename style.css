@@ -3920,6 +3920,18 @@ body.high-contrast[data-theme="dark"] {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+  position: relative;
+}
+
+.channels-window-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-red), var(--accent-blue), var(--accent-green));
+  border-radius: 8px 8px 0 0;
 }
 
 .channels-window-title {
@@ -3963,7 +3975,7 @@ body.high-contrast[data-theme="dark"] {
 
 /* Карточка добавления канала */
 .channels-add-card {
-  background: var(--accent-yellow);
+  background: var(--card-color);
   border: 3px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
@@ -4208,7 +4220,7 @@ body.high-contrast[data-theme="dark"] {
 
 /* Карточка активных каналов */
 .channels-active-card {
-  background: var(--accent-yellow);
+  background: var(--card-color);
   border: 3px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
