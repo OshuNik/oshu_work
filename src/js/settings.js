@@ -1,3 +1,10 @@
+// settings.js - v12.3.1 (с отладкой загрузки каналов)
+// Версия: 2024-01-XX
+// Проблема: каналы не загружаются из базы данных
+
+// Принудительная очистка кэша
+console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOString());
+
 // settings.js — страница настроек
 (function() {
   'use strict';
@@ -1355,14 +1362,24 @@
 
 
      // === СЕКЦИЯ КАНАЛОВ ===
-   function initChannelsSection() {
-     const toggleAllBtn = document.getElementById('channels-toggle-all');
-     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-     const exampleBtns = document.querySelectorAll('.example-btn');
-     const channelInput = document.getElementById('channel-input');
+     function initChannelsSection() {
+    console.log('[DEBUG] initChannelsSection вызвана');
+    
+    const toggleAllBtn = document.getElementById('channels-toggle-all');
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const exampleBtns = document.querySelectorAll('.example-btn');
+    const channelInput = document.getElementById('channel-input');
 
-     // Загружаем каналы из базы данных
-     loadChannels();
+    console.log('[DEBUG] Элементы найдены:', {
+      toggleAllBtn: !!toggleAllBtn,
+      deleteSelectedBtn: !!deleteSelectedBtn,
+      exampleBtns: exampleBtns.length,
+      channelInput: !!channelInput
+    });
+
+    // Загружаем каналы из базы данных
+    console.log('[DEBUG] Вызываю loadChannels()...');
+    loadChannels();
 
      // Переключение выбора всех каналов
      if (toggleAllBtn) {
@@ -1599,6 +1616,8 @@
 
   // Инициализация при загрузке страницы
   document.addEventListener('DOMContentLoaded', function() {
+    console.log('[DEBUG] DOMContentLoaded сработал, начинаю инициализацию...');
+    
     initTheme();
     initBurgerMenu();
     initSidebarTabs();
