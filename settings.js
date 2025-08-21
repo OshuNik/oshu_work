@@ -1497,6 +1497,35 @@
         updateThemePreviews('dark');
       });
     }
+
+    // Обработчики для новых кнопок унифицированной структуры
+    const applyThemeBtn = document.querySelector('.appearance-action-btn.appearance-action-success');
+    const statsBtn = document.querySelector('.appearance-action-btn.appearance-action-info');
+
+    if (applyThemeBtn) {
+      applyThemeBtn.addEventListener('click', () => {
+        const currentTheme = localStorage.getItem('app-theme') || 'light';
+        // Применяем текущую тему с анимацией
+        document.body.style.transition = 'all 0.3s ease';
+        setTimeout(() => {
+          document.body.style.transition = '';
+        }, 300);
+        
+        uiToast(`Тема "${currentTheme === 'light' ? 'Светлая' : 'Темная'}" применена!`);
+      });
+    }
+
+    if (statsBtn) {
+      statsBtn.addEventListener('click', () => {
+        const currentTheme = localStorage.getItem('app-theme') || 'light';
+        const themeStats = {
+          light: 'Используется светлая тема. Подходит для дневного времени.',
+          dark: 'Используется темная тема. Подходит для ночного времени и экономии батареи.'
+        };
+        
+        uiToast(themeStats[currentTheme]);
+      });
+    }
   }
 
   // Обновление предварительного просмотра тем

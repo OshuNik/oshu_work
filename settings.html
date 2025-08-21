@@ -253,49 +253,84 @@
     </div>
 
     <div id="tab-appearance" class="settings-tab-content">
-      <div class="appearance-header">
-        <h3>🎨 Тема оформления</h3>
-        <p class="appearance-description">Выберите предпочитаемую тему интерфейса</p>
-      </div>
-      
-      <!-- Ретро переключатель темы -->
-      <div class="retro-theme-toggle">
-        <div class="theme-toggle-container">
-          <span class="theme-label-text">☀️ Светлая</span>
-          <div class="retro-toggle-switch">
-            <input type="checkbox" id="theme-toggle" />
-            <label for="theme-toggle" class="retro-toggle-slider">
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-          <span class="theme-label-text">🌙 Темная</span>
+      <!-- 1. ЗАГОЛОВОК ОКНА -->
+      <div class="appearance-window-header">
+        <span class="appearance-window-title">ВНЕШНИЙ ВИД</span>
+        <div class="appearance-pixel-counter">
+          <span class="appearance-pixel-bar">■■■</span>
+          <span id="appearance-count" class="appearance-count">🎨</span>
+          <span class="appearance-pixel-bar">■■■</span>
         </div>
+      </div>
+
+      <!-- 2. НАСТРОЙКИ -->
+      <div class="appearance-add-card">
+        <h3 class="appearance-section-subtitle">НАСТРОЙКИ</h3>
         
-        <!-- Ретро предварительный просмотр темы -->
-        <div class="retro-theme-preview">
-          <div class="retro-preview-card light-theme" id="light-preview">
-            <div class="retro-preview-header">
-              <div class="retro-dot"></div>
-              <div class="retro-dot"></div>
-              <div class="retro-dot"></div>
+        <!-- 3. Описание -->
+        <p class="appearance-section-description">Выберите предпочитаемую цветовую схему интерфейса:</p>
+        
+        <!-- 4. Переключатель темы -->
+        <div class="appearance-theme-container">
+          <div class="theme-toggle-group">
+            <span class="theme-label-text">☀️ Светлая</span>
+            <div class="retro-toggle-switch">
+              <input type="checkbox" id="theme-toggle" />
+              <label for="theme-toggle" class="retro-toggle-slider">
+                <span class="toggle-thumb"></span>
+              </label>
             </div>
-            <div class="retro-preview-content">
-              <div class="retro-line short"></div>
-              <div class="retro-line medium"></div>
-              <div class="retro-line long"></div>
+            <span class="theme-label-text">🌙 Темная</span>
+          </div>
+          
+          <!-- Предварительный просмотр тем -->
+          <div class="theme-preview-container">
+            <div class="retro-preview-card light-theme" id="light-preview">
+              <div class="retro-preview-header">
+                <div class="retro-dot"></div>
+                <div class="retro-dot"></div>
+                <div class="retro-dot"></div>
+              </div>
+              <div class="retro-preview-content">
+                <div class="retro-line short"></div>
+                <div class="retro-line medium"></div>
+                <div class="retro-line long"></div>
+              </div>
+              <div class="preview-label">Светлая</div>
+            </div>
+            
+            <div class="retro-preview-card dark-theme" id="dark-preview">
+              <div class="retro-preview-header">
+                <div class="retro-dot"></div>
+                <div class="retro-dot"></div>
+                <div class="retro-dot"></div>
+              </div>
+              <div class="retro-preview-content">
+                <div class="retro-line short"></div>
+                <div class="retro-line medium"></div>
+                <div class="retro-line long"></div>
+              </div>
+              <div class="preview-label">Темная</div>
             </div>
           </div>
-          <div class="retro-preview-card dark-theme" id="dark-preview">
-            <div class="retro-preview-header">
-              <div class="retro-dot"></div>
-              <div class="retro-dot"></div>
-              <div class="retro-dot"></div>
-            </div>
-            <div class="retro-preview-content">
-              <div class="retro-line short"></div>
-              <div class="retro-line medium"></div>
-              <div class="retro-line long"></div>
-            </div>
+        </div>
+      </div>
+
+      <!-- 5. ИНФОРМАЦИЯ -->
+      <div class="appearance-active-card">
+        <h3 class="appearance-section-subtitle">ИНФОРМАЦИЯ:</h3>
+        
+        <!-- 6. Информационная карточка -->
+        <div class="theme-info-section">
+          <div class="info-card">
+            <h5>ℹ️ О применении тем</h5>
+            <p>Выбранная тема применяется ко всему интерфейсу приложения и сохраняется между сеансами.</p>
+          </div>
+          
+          <!-- Дополнительная информация -->
+          <div class="appearance-preset-actions">
+            <button class="appearance-action-btn appearance-action-success">📱 Применить тему</button>
+            <button class="appearance-action-btn appearance-action-info">📊 Статистика использования</button>
           </div>
         </div>
       </div>
