@@ -1,10 +1,3 @@
-// settings.js - v12.3.1 (с отладкой загрузки каналов)
-// Версия: 2024-01-XX
-// Проблема: каналы не загружаются из базы данных
-
-// Принудительная очистка кэша
-console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOString());
-
 // settings.js — страница настроек
 (function() {
   'use strict';
@@ -696,15 +689,11 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
     }
     channelsListContainer.innerHTML = '<p class="empty-list">Загрузка каналов...</p>';
     try {
-      console.log('[DEBUG] Загружаю каналы из:', `${API_ENDPOINTS.CHANNELS}?select=*`);
-      console.log('[DEBUG] Headers:', createSupabaseHeaders());
-      
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?select=*`, {
         headers: createSupabaseHeaders()
       });
       
       if (!response.ok) {
-        console.error('[DEBUG] Response error:', response.status, response.statusText);
         if (response.status === 401) {
           throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
         }
@@ -712,14 +701,11 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
       }
       
       const data = await response.json();
-      console.log('[DEBUG] Полученные данные каналов:', data);
       
       channelsListContainer.innerHTML = '';
       if (data && data.length > 0) {
-          console.log('[DEBUG] Отображаю', data.length, 'каналов');
           data.forEach(item => renderChannel(item));
       } else {
-          console.log('[DEBUG] Список каналов пуст');
           channelsListContainer.innerHTML = '<p class="empty-list">-- Список каналов пуст --</p>';
       }
       
@@ -1255,14 +1241,9 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
   
   // Инициализация улучшенных секций настроек
   function initEnhancedSettings() {
-    console.log('[DEBUG] initEnhancedSettings вызвана');
-    
-    console.log('[DEBUG] Инициализирую секции...');
     initKeywordsSection();
     initChannelsSection();
     initAppearanceSection();
-    
-    console.log('[DEBUG] Все секции инициализированы');
   }
 
   // === СЕКЦИЯ КЛЮЧЕВЫХ СЛОВ ===
@@ -1368,22 +1349,12 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
 
      // === СЕКЦИЯ КАНАЛОВ ===
      function initChannelsSection() {
-    console.log('[DEBUG] initChannelsSection вызвана');
-    
     const toggleAllBtn = document.getElementById('channels-toggle-all');
     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
     const exampleBtns = document.querySelectorAll('.example-btn');
     const channelInput = document.getElementById('channel-input');
 
-    console.log('[DEBUG] Элементы найдены:', {
-      toggleAllBtn: !!toggleAllBtn,
-      deleteSelectedBtn: !!deleteSelectedBtn,
-      exampleBtns: exampleBtns.length,
-      channelInput: !!channelInput
-    });
-
     // Загружаем каналы из базы данных
-    console.log('[DEBUG] Вызываю loadChannels()...');
     loadChannels();
 
      // Переключение выбора всех каналов
@@ -1621,14 +1592,11 @@ console.log('[DEBUG] settings.js v12.3.1 загружен:', new Date().toISOStr
 
   // Инициализация при загрузке страницы
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] DOMContentLoaded сработал, начинаю инициализацию...');
-    
     initTheme();
     initBurgerMenu();
     initSidebarTabs();
     
-    // КРИТИЧНО: Инициализация секций настроек
-    console.log('[DEBUG] Вызываю initEnhancedSettings()...');
+    // Инициализация секций настроек
     initEnhancedSettings();
     
     // Добавляем CSS анимации
