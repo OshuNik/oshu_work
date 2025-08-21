@@ -3989,6 +3989,47 @@ body.high-contrast[data-theme="dark"] {
   font-weight: 600;
 }
 
+/* Кликабельные примеры для каналов */
+.channels-input-examples {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.example-label {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.example-btn {
+  background: var(--accent-blue);
+  color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--box-shadow);
+}
+
+.example-btn:hover {
+  background: var(--accent-blue);
+  transform: translateY(-1px);
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.example-btn:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
 /* Контейнер ввода канала */
 .channels-input-container {
   display: flex;
@@ -4175,6 +4216,68 @@ body.high-contrast[data-theme="dark"] {
   box-shadow: var(--box-shadow);
 }
 
+/* Заголовок списка каналов */
+.channels-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.channels-list-header h4 {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--text-color);
+  margin: 0;
+  font-weight: 600;
+}
+
+.channels-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.control-btn {
+  padding: 6px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--box-shadow);
+}
+
+.control-btn.secondary {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.control-btn.destructive {
+  background: var(--accent-red);
+  color: white;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.control-btn:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Контейнер тегов каналов */
 .channels-tags-container {
   display: flex;
@@ -4232,6 +4335,71 @@ body.high-contrast[data-theme="dark"] {
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Действия с каналами */
+.channels-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.button-secondary {
+  background: var(--accent-blue);
+  color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--box-shadow);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button-secondary:hover {
+  background: var(--accent-blue);
+  transform: translateY(-1px);
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.button-secondary:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
+.button-delete {
+  background: var(--accent-red);
+  color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--box-shadow);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button-delete:hover {
+  background: var(--accent-red);
+  transform: translateY(-1px);
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.button-delete:active {
+  transform: translateY(0px);
+  box-shadow: var(--box-shadow-pressed);
+}
+
 /* Действия с пресетами каналов */
 .channels-preset-actions {
   display: flex;
@@ -4239,6 +4407,26 @@ body.high-contrast[data-theme="dark"] {
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 20px;
+}
+
+/* Список каналов */
+.channels-list {
+  margin-bottom: 16px;
+  min-height: 40px;
+}
+
+.channels-list .empty-list {
+  text-align: center;
+  color: var(--hint-color);
+  font-style: italic;
+  padding: 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.channels-list .error-list {
+  color: var(--accent-red);
+  font-weight: 600;
 }
 
 /* Анимация для счетчика каналов */

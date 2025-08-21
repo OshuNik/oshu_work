@@ -66,19 +66,14 @@
   const loadDefaultsKeywordsBtn = document.getElementById('load-defaults-keywords-btn');
   
   // Channels elements
-  const newChannelInput = document.getElementById('new-channel-input');
-  const newChannelUrl = document.getElementById('new-channel-url');
-  const channelTypeSelect = document.getElementById('channel-type-select');
   const addChannelBtn = document.getElementById('add-channel-btn');
-  const channelsTagsContainer = document.getElementById('current-channels-tags');
+  const channelInput = document.getElementById('channel-input');
+  const channelsListContainer = document.getElementById('channels-list');
   const channelsCount = document.getElementById('channels-count');
   
   // Channels buttons
   const deleteAllBtn = document.getElementById('delete-all-btn');
   const loadDefaultsChannelsBtn = document.getElementById('load-defaults-channels-btn');
-  
-  // Legacy channels elements (для совместимости)
-  const channelsListContainer = document.getElementById('channels-list');
 
   /**
    * Валидирует и форматирует ID канала
@@ -1963,142 +1958,62 @@
 
 
 
-  // Обработчики для новой структуры каналов
-  if (newChannelInput) {
-    // При вводе текста
-    newChannelInput.addEventListener('input', () => {
-      updateChannelsInputState();
-    });
-    
-    // При фокусе
-    newChannelInput.addEventListener('focus', () => {
-      updateChannelsInputState();
-    });
-
-    // При нажатии Enter
-    newChannelInput.addEventListener('keypress', (e) => {
+  // Обработчик для Enter в поле добавления канала
+  if (channelInput) {
+    channelInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        addNewChannel();
+        const channelId = validateAndFormatChannelId(channelInput.value);
+        if (channelId) {
+          addChannel();
+          setTimeout(() => {
+            updateDeleteSelectedButton();
+          }, 100);
+        }
       }
     });
   }
 
-  if (newChannelUrl) {
-    // При вводе текста
-    newChannelUrl.addEventListener('input', () => {
-      updateChannelsUrlState();
-    });
-    
-    // При фокусе
-    newChannelUrl.addEventListener('focus', () => {
-      updateChannelsUrlState();
-    });
-
-    // При нажатии Enter
-    newChannelUrl.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addNewChannel();
+  // Обработчик для кликабельных примеров
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('example-btn')) {
+      const example = e.target.dataset.example;
+      if (channelInput && example) {
+        channelInput.value = example;
+        channelInput.focus();
+        // Обновляем состояние крестика
+        updateChannelsInputState();
       }
-    });
+    }
+  });
+
+  // Функция обновления состояния крестика для каналов
+  function updateChannelsInputState() {
+    const channelsInputWrapper = document.querySelector('.channels-input-wrapper');
+    if (channelsInputWrapper && channelInput) {
+      const hasText = channelInput.value.length > 0;
+      channelsInputWrapper.classList.toggle('has-text', hasText);
+    }
   }
 
-  // Кнопка добавления канала
-  if (addChannelBtn) {
-    addChannelBtn.addEventListener('click', addNewChannel);
-  }
-
-  // Кнопки очистки для каналов
+  // Обработчик для кнопки очистки каналов
   const channelsClearBtn = document.getElementById('channels-clear-button');
   if (channelsClearBtn) {
     channelsClearBtn.addEventListener('click', () => {
-      if (newChannelInput) {
-        newChannelInput.value = '';
-        newChannelInput.focus();
+      if (channelInput) {
+        channelInput.value = '';
+        channelInput.focus();
         updateChannelsInputState();
       }
     });
   }
 
-  const channelsUrlClearBtn = document.getElementById('channels-url-clear-button');
-  if (channelsUrlClearBtn) {
-    channelsUrlClearBtn.addEventListener('click', () => {
-      if (newChannelUrl) {
-        newChannelUrl.value = '';
-        newChannelUrl.focus();
-        updateChannelsUrlState();
-      }
-    });
+  // Обработчик для ввода в поле каналов
+  if (channelInput) {
+    channelInput.addEventListener('input', updateChannelsInputState);
+    channelInput.addEventListener('focus', updateChannelsInputState);
   }
 
-  // Функции обновления состояния крестиков для каналов
-  function updateChannelsInputState() {
-    const channelsInputWrapper = document.querySelector('.channels-input-wrapper');
-    if (channelsInputWrapper && newChannelInput) {
-      const hasText = newChannelInput.value.length > 0;
-      channelsInputWrapper.classList.toggle('has-text', hasText);
-    }
-  }
-
-  function updateChannelsUrlState() {
-    // Находим wrapper для URL поля
-    const channelsUrlWrapper = newChannelUrl?.closest('.channels-url-wrapper');
-    if (channelsUrlWrapper && newChannelUrl) {
-      const hasText = newChannelUrl.value.length > 0;
-      channelsUrlWrapper.classList.toggle('has-text', hasText);
-    }
-  }
-
-  // Функция добавления нового канала
-  async function addNewChannel() {
-    const channelName = newChannelInput?.value?.trim();
-    const channelUrl = newChannelUrl?.value?.trim();
-    const channelType = channelTypeSelect?.value || 'telegram';
-
-    if (!channelName) {
-      uiToast('Введите название канала');
-      return;
-    }
-
-    if (!channelUrl) {
-      uiToast('Введите ссылку на канал');
-      return;
-    }
-
-    try {
-      // Здесь будет логика добавления канала в базу данных
-      // Пока что просто показываем уведомление
-      uiToast(`Канал "${channelName}" добавлен`);
-      
-      // Очищаем поля
-      if (newChannelInput) newChannelInput.value = '';
-      if (newChannelUrl) newChannelUrl.value = '';
-      
-      // Обновляем состояние крестиков
-      updateChannelsInputState();
-      updateChannelsUrlState();
-      
-      // Обновляем счетчик
-      updateChannelsCount();
-      
-    } catch (error) {
-      console.error('Ошибка добавления канала:', error);
-      uiToast('Ошибка добавления канала');
-    }
-  }
-
-  // Функция обновления счетчика каналов
-  function updateChannelsCount() {
-    if (channelsCount) {
-      // Здесь будет логика подсчета каналов из базы данных
-      // Пока что просто увеличиваем на 1
-      const currentCount = parseInt(channelsCount.textContent) || 0;
-      channelsCount.textContent = currentCount + 1;
-    }
-  }
-
-  // Инициализация состояния крестиков при загрузке
+  // Инициализация состояния крестика при загрузке
   updateChannelsInputState();
-  updateChannelsUrlState();
 })();
