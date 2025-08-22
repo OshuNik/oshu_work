@@ -151,7 +151,11 @@
   async function isChannelExists(channelId) {
     try {
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?channel_id=eq.${encodeURIComponent(channelId)}&select=id`, {
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (response.ok) {
@@ -186,7 +190,12 @@
     
     const response = await fetch(API_ENDPOINTS.CHANNELS, {
       method: 'POST',
-      headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders({ prefer: 'return=representation' }) : {},
+      headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
       body: JSON.stringify(newChannelData)
     });
     
@@ -379,7 +388,11 @@
       // Пробуем PATCH для обновления существующей записи
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {},
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -391,7 +404,12 @@
           // Если записи нет, пробуем создать новую через POST
           const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
             method: 'POST',
-            headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }) : {},
+            headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
             body: JSON.stringify({ update_key: 1, keywords: keywordsString })
           });
           
@@ -423,7 +441,11 @@
     keywordsTagsContainer.innerHTML = '<div class="loading-indicator">Загрузка...</div>';
     try {
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -467,7 +489,11 @@
       // Используем PATCH для обновления как в updateKeywordsInDatabase
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {},
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -479,7 +505,12 @@
           // Если записи нет, пробуем создать новую через POST
           const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
             method: 'POST',
-            headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }) : {},
+            headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
             body: JSON.stringify({ update_key: 1, keywords: keywordsString })
           });
           
@@ -566,7 +597,11 @@
         
         const response = await fetch(deleteUrl, {
           method: 'DELETE',
-          headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+          headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
         });
         
         console.log('[DEBUG] Ответ удаления:', response.status, response.statusText);
@@ -605,7 +640,11 @@
         
         const response = await fetch(updateUrl, {
           method: 'PATCH',
-          headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {},
+          headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
           body: JSON.stringify({ is_enabled: is_enabled })
         });
         
@@ -690,7 +729,11 @@
     channelsListContainer.innerHTML = '<p class="empty-list">Загрузка каналов...</p>';
     try {
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?select=*`, {
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -782,7 +825,11 @@
     try {
       // Сначала получаем текущие каналы
       const currentChannelsResponse = await fetch(`${API_ENDPOINTS.CHANNELS}?select=channel_id`, {
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!currentChannelsResponse.ok) {
@@ -794,7 +841,11 @@
       
       // Получаем стандартные каналы
       const response = await fetch(`${API_ENDPOINTS.DEFAULT_CHANNELS}?select=channel_id`, {
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -825,7 +876,12 @@
       
       const addResponse = await fetch(API_ENDPOINTS.CHANNELS, {
         method: 'POST',
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders({ prefer: 'return=representation' }) : {},
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
         body: JSON.stringify(channelsToUpsert)
       });
       
@@ -853,7 +909,11 @@
     try {
       await fetch(`${API_ENDPOINTS.CHANNELS}?id=gt.0`, {
         method: 'DELETE',
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       channelsListContainer.innerHTML = '<p class="empty-list">-- Список каналов пуст --</p>';
       uiToast(MESSAGES.SUCCESS.ALL_DELETED);
@@ -1400,7 +1460,11 @@
                      // Удаляем из базы данных
                      const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
                        method: 'DELETE',
-                       headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+                       headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
                      });
                      
                      if (response.ok) {
@@ -1778,7 +1842,11 @@
     
     try {
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -1813,7 +1881,11 @@
       
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {},
+        headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -1825,7 +1897,12 @@
           // Если записи нет, создаем новую
           const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
             method: 'POST',
-            headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }) : {},
+            headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
             body: JSON.stringify({ update_key: 1, keywords: keywordsString })
           });
           
@@ -1886,7 +1963,11 @@
         try {
           const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
             method: 'PATCH',
-            headers: UTIL?.createSupabaseHeaders ? UTIL.createSupabaseHeaders() : {},
+            headers: {
+          'apikey': CFG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CFG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
             body: JSON.stringify({ keywords: '' })
           });
           

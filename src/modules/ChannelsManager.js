@@ -89,7 +89,11 @@ export class ChannelsManager {
   async isChannelExists(channelId) {
     try {
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?channel_id=eq.${encodeURIComponent(channelId)}&select=id`, {
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (response.ok) {
@@ -245,7 +249,11 @@ export class ChannelsManager {
         
         const response = await fetch(deleteUrl, {
           method: 'DELETE',
-          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+          headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
         });
         
         log('log', '[DEBUG] Ответ удаления:', response.status, response.statusText);
@@ -288,7 +296,11 @@ export class ChannelsManager {
         
         const response = await fetch(updateUrl, {
           method: 'PATCH',
-          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
+          headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
           body: JSON.stringify({ is_enabled: is_enabled })
         });
         
@@ -367,7 +379,11 @@ export class ChannelsManager {
     
     try {
       const response = await fetch(API_ENDPOINTS.CHANNELS, {
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -450,7 +466,11 @@ export class ChannelsManager {
       try {
         const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${id}`, {
           method: 'DELETE',
-          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+          headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
         });
         
         if (response.ok) {
@@ -495,7 +515,11 @@ export class ChannelsManager {
     try {
       const response = await fetch(API_ENDPOINTS.CHANNELS, {
         method: 'DELETE',
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (response.ok) {
@@ -525,7 +549,11 @@ export class ChannelsManager {
   async loadDefaultChannels() {
     try {
       const response = await fetch(API_ENDPOINTS.DEFAULT_CHANNELS, {
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {

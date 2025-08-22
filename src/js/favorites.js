@@ -176,7 +176,11 @@
 
       const url  = `${CFG.SUPABASE_URL}/rest/v1/vacancies?${p.toString()}`;
 
-      const headers = window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {};
+      const headers = {
+        'apikey': CFG.SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${CFG.SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      };
       console.log('Favorites.js: URL:', url);
       console.log('Favorites.js: Headers:', headers);
       console.log('Favorites.js: CFG:', CFG);

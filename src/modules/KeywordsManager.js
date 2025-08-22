@@ -234,7 +234,11 @@ export class KeywordsManager {
       // Пробуем PATCH для обновления существующей записи
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -285,7 +289,11 @@ export class KeywordsManager {
     
     try {
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -331,7 +339,11 @@ export class KeywordsManager {
       // Используем PATCH для обновления как в updateKeywordsInDatabase
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -390,7 +402,11 @@ export class KeywordsManager {
       try {
         const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
           method: 'PATCH',
-          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
+          headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
           body: JSON.stringify({ keywords: '' })
         });
         
