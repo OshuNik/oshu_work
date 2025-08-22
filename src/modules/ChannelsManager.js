@@ -557,28 +557,63 @@ export class ChannelsManager {
       }
       
       const defaultChannels = await response.json();
-      let addedCount = 0;
-      let existingCount = 0;
       
-      // Добавляем каждый стандартный канал
-      for (const defaultChannel of defaultChannels) {
-        const exists = await this.isChannelExists(defaultChannel.channel_id);
-        if (!exists) {
-          await this.createChannel(defaultChannel.channel_id);
-          addedCount++;
-        } else {
-          existingCount++;
+      // Проверяем существующие каналы одним запросом
+      const existingResponse = await fetch(API_ENDPOINTS.CHANNELS + '?select=channel_id', {
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
         }
+      });
+      
+      const existingChannels = existingResponse.ok ? await existingResponse.json() : [];
+      const existingIds = new Set(existingChannels.map(ch => ch.channel_id));
+      
+      // Фильтруем только новые каналы
+      const newChannels = defaultChannels.filter(ch => !existingIds.has(ch.channel_id));
+      
+      if (newChannels.length === 0) {
+        if (this.utils.uiToast) {
+          this.utils.uiToast('Все стандартные каналы уже добавлены');
+        }
+        return;
       }
       
-      // Показываем соответствующее сообщение
+      // Подготавливаем данные для batch-создания
+      const channelsData = newChannels.map(ch => ({
+        channel_id: ch.channel_id,
+        channel_title: ch.channel_id,
+        is_enabled: true
+      }));
+      
+      // Создаем все каналы одним batch-запросом
+      const createResponse = await fetch(API_ENDPOINTS.CHANNELS, {
+        method: 'POST',
+        headers: {
+          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(channelsData)
+      });
+      
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        throw new Error(`HTTP ${createResponse.status}: ${errorText}`);
+      }
+      
+      const createdChannels = await createResponse.json();
+      log('log', `Batch-создано ${createdChannels.length} каналов`);
+      
+      // Показываем сообщение
       if (this.utils.uiToast) {
-        if (addedCount > 0 && existingCount > 0) {
-          this.utils.uiToast(`Добавлено ${addedCount} каналов, ${existingCount} уже существовали`);
-        } else if (addedCount > 0) {
-          this.utils.uiToast(`Добавлено ${addedCount} стандартных каналов`);
-        } else if (existingCount > 0) {
-          this.utils.uiToast('Все стандартные каналы уже добавлены');
+        const existingCount = defaultChannels.length - newChannels.length;
+        if (existingCount > 0) {
+          this.utils.uiToast(`Добавлено ${createdChannels.length} каналов, ${existingCount} уже существовали`);
+        } else {
+          this.utils.uiToast(`Добавлено ${createdChannels.length} стандартных каналов`);
         }
       }
       
