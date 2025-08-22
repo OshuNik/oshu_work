@@ -694,13 +694,13 @@ input:checked + .toggle-slider:before {
 
 /* === СПИСОК КАНАЛОВ === */
 .channels-list {
-  margin-bottom: 15px;
-  max-height: 300px;
-  overflow-y: auto;
-  border: var(--border-width) solid var(--border-color);
-  border-radius: var(--card-radius);
-  padding: 10px;
-  background: var(--card-color);
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin-bottom: 15px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
 }
 
 .channels-list-header {
@@ -851,24 +851,7 @@ input:checked + .toggle-slider:before {
   outline-offset: 2px;
 }
 
-/* Стили для скроллбара */
-.channels-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.channels-list::-webkit-scrollbar-track {
-  background: var(--background-color);
-  border-radius: 4px;
-}
-
-.channels-list::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-.channels-list::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-blue);
-}
+/* Скролл-стили удалены - теперь каналы отображаются как теги */
 
 /* === ИНДИКАТОР ЗАГРУЗКИ === */
 .loading-indicator {
