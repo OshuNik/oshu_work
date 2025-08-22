@@ -22,17 +22,6 @@
       <button class="theme-toggle" id="theme-toggle">☀️</button>
     </header>
 
-    <!-- Навигация по вкладкам -->
-    <nav class="settings-tabs">
-      <button class="tab-button keywords active" data-target="keywords-section">
-        <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
-        <span class="tab-count" id="keywords-tab-count">0</span>
-      </button>
-      <button class="tab-button channels" data-target="channels-section">
-        <span class="tab-label">КАНАЛЫ</span>
-        <span class="tab-count" id="channels-tab-count">0</span>
-      </button>
-    </nav>
 
     <!-- Контент -->
     <div class="settings-content">
@@ -158,6 +147,20 @@
     </div>
   </div>
 
+<!-- Навигация по вкладкам (внизу как на главной странице) -->
+<div id="category-tabs" class="category-tabs" role="tablist" aria-label="Разделы настроек">
+  <button id="tab-keywords" class="tab-button keywords active" data-target="keywords-section" data-category-name="КЛЮЧЕВЫЕ СЛОВА" 
+        role="tab" aria-selected="true" aria-controls="keywords-section">
+    <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
+    <span id="keywords-tab-count" class="tab-count">0</span>
+  </button>
+  <button id="tab-channels" class="tab-button channels" data-target="channels-section" data-category-name="КАНАЛЫ"
+        role="tab" aria-selected="false" aria-controls="channels-section">
+    <span class="tab-label">КАНАЛЫ</span>
+    <span id="channels-tab-count" class="tab-count">0</span>
+  </button>
+</div>
+
   <!-- Скрипты -->
   <script src="src/js/config.js"></script>
   <script type="module">
@@ -263,8 +266,8 @@
 
     // Функция обновления счетчиков на вкладках
     function updateTabCounters() {
-      const keywordsCount = document.getElementById('keywords-count').textContent;
-      const channelsCount = document.getElementById('channels-count').textContent;
+      const keywordsCount = document.getElementById('keywords-count')?.textContent || '0';
+      const channelsCount = document.getElementById('channels-count')?.textContent || '0';
       
       const keywordsTabCount = document.getElementById('keywords-tab-count');
       const channelsTabCount = document.getElementById('channels-tab-count');
