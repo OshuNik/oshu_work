@@ -694,13 +694,15 @@ input:checked + .toggle-slider:before {
 
 /* === СПИСОК КАНАЛОВ === */
 .channels-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin-bottom: 15px;
-  max-height: 300px;
-  overflow-y: auto;
-  border: var(--border-width) solid var(--border-color);
-  border-radius: var(--card-radius);
-  padding: 10px;
-  background: var(--card-color);
+  padding: 0;
+  border: none;
+  background: none;
+  overflow: visible;
+  max-height: none;
 }
 
 .channels-list-header {
@@ -851,24 +853,7 @@ input:checked + .toggle-slider:before {
   outline-offset: 2px;
 }
 
-/* Стили для скроллбара */
-.channels-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.channels-list::-webkit-scrollbar-track {
-  background: var(--background-color);
-  border-radius: 4px;
-}
-
-.channels-list::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-.channels-list::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-blue);
-}
+/* Убираем скроллбар для двухколоночной сетки каналов */
 
 /* === ИНДИКАТОР ЗАГРУЗКИ === */
 .loading-indicator {
@@ -1074,6 +1059,18 @@ input:checked + .toggle-slider:before {
   .preset-item p {
     font-size: 12px;
   }
+
+  /* Адаптивность для списка каналов на мобильных */
+  .channels-list {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .channels-list .tag {
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
 }
 
 /* === АНИМАЦИИ === */
@@ -1250,13 +1247,12 @@ input:checked + .toggle-slider:before {
   background: var(--card-color);
   border: var(--border-width) solid var(--border-color);
   border-radius: var(--card-radius);
-  padding: 8px 12px;
-  margin: 4px 0;
+  padding: 8px 10px;
+  margin: 0;
   box-shadow: var(--box-shadow);
   transition: var(--transition-normal);
-  gap: 8px;
-  width: auto;
-  max-width: 280px;
+  gap: 6px;
+  width: 100%;
   box-sizing: border-box;
 }
 
