@@ -57,6 +57,7 @@
           <div class="input-container">
             <div class="input-wrapper">
               <input type="text" class="input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
+              <button class="input-clear-btn" aria-label="Очистить поле"></button>
             </div>
             <button id="add-keyword-btn" class="add-button">+</button>
           </div>
@@ -105,6 +106,7 @@
           <div class="input-container">
             <div class="input-wrapper">
               <input type="text" class="input-field" placeholder="Введите @username или ссылку на канал..." id="channel-input">
+              <button class="input-clear-btn" aria-label="Очистить поле"></button>
             </div>
             <button id="add-channel-btn" class="add-button">+</button>
           </div>
@@ -251,6 +253,35 @@
         const input = e.target.closest('.settings-card').querySelector('.input-field');
         input.value = e.target.textContent;
         input.focus();
+        // Показываем крестик
+        updateClearButtonVisibility(input);
+      }
+    });
+
+    // Функция для обновления видимости кнопки очистки
+    function updateClearButtonVisibility(input) {
+      const wrapper = input.closest('.input-wrapper');
+      if (input.value.trim()) {
+        wrapper.classList.add('has-text');
+      } else {
+        wrapper.classList.remove('has-text');
+      }
+    }
+
+    // Обработка ввода в поля для показа/скрытия крестика
+    document.addEventListener('input', (e) => {
+      if (e.target.classList.contains('input-field')) {
+        updateClearButtonVisibility(e.target);
+      }
+    });
+
+    // Обработка кликов по крестикам
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('input-clear-btn')) {
+        const input = e.target.closest('.input-wrapper').querySelector('.input-field');
+        input.value = '';
+        input.focus();
+        updateClearButtonVisibility(input);
       }
     });
 
