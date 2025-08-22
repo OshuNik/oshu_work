@@ -181,9 +181,6 @@
         'Authorization': `Bearer ${CFG.SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json'
       };
-      console.log('Favorites.js: URL:', url);
-      console.log('Favorites.js: Headers:', headers);
-      console.log('Favorites.js: CFG:', CFG);
       
       const resp = await fetchWithRetry(url, {
         headers: headers
