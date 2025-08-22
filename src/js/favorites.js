@@ -177,7 +177,7 @@
       const url  = `${CFG.SUPABASE_URL}/rest/v1/vacancies?${p.toString()}`;
 
       const resp = await fetchWithRetry(url, {
-        headers: createSupabaseHeaders()
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
       }, RETRY_OPTIONS);
       if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
 
