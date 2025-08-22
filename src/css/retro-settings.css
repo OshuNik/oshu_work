@@ -974,3 +974,81 @@ input:checked + .toggle-slider:before {
     transform: translateY(0) scale(1); 
   }
 }
+
+/* === СТИЛИ ДЛЯ ТЕГОВ КЛЮЧЕВЫХ СЛОВ === */
+.keyword-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 8px 12px;
+  margin: 4px;
+  box-shadow: var(--box-shadow);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  transition: var(--transition-normal);
+}
+
+.keyword-tag:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--shadow-offset) + 1px) calc(var(--shadow-offset) + 1px) 0px var(--border-color);
+}
+
+.keyword-tag-text {
+  margin-right: 8px;
+  user-select: none;
+}
+
+.keyword-tag-remove {
+  background: var(--accent-red);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.keyword-tag-remove:before {
+  content: '×';
+  line-height: 1;
+}
+
+.keyword-tag-remove:hover {
+  background: #FF3030;
+  transform: scale(1.1);
+}
+
+.keyword-tag-remove:active {
+  transform: scale(0.95);
+}
+
+/* Анимация удаления тега */
+.keyword-tag.removing {
+  animation: tagRemove 0.3s ease-out forwards;
+}
+
+@keyframes tagRemove {
+  0% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.5; 
+    transform: scale(0.8); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(0) rotate(180deg); 
+  }
+}
