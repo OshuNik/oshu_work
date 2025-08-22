@@ -7,7 +7,8 @@ import {
   getUtil,
   log,
   getElement,
-  elementExists
+  elementExists,
+  createSupabaseHeaders
 } from './SettingsUtils.js';
 
 /**
@@ -32,7 +33,7 @@ export class KeywordsManager {
     this.utils = {
       uiToast: getUtil('uiToast'),
       safeAlert: getUtil('safeAlert'),
-      createSupabaseHeaders: getUtil('createSupabaseHeaders'),
+      createSupabaseHeaders: createSupabaseHeaders,
       escapeHtml: getUtil('escapeHtml')
     };
 

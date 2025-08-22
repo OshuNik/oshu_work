@@ -107,6 +107,23 @@ export function getConfigValue(key, defaultValue = null) {
 }
 
 /**
+ * Создать заголовки для Supabase API
+ * @param {Object} additionalHeaders - Дополнительные заголовки
+ * @returns {Object} Заголовки для запроса
+ */
+export function createSupabaseHeaders(additionalHeaders = {}) {
+  const config = getConfig();
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': config.SUPABASE_ANON_KEY || '',
+    'Authorization': `Bearer ${config.SUPABASE_ANON_KEY || ''}`,
+    ...additionalHeaders
+  };
+  
+  return headers;
+}
+
+/**
  * Логирование с префиксом модуля
  * @param {string} level - Уровень логирования (log, warn, error)
  * @param {string} message - Сообщение для логирования
@@ -298,6 +315,7 @@ export default {
   checkDependencies,
   getUtil,
   getConfigValue,
+  createSupabaseHeaders,
   log,
   elementExists,
   getElement,

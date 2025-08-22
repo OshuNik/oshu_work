@@ -7,7 +7,8 @@ import {
   getUtil,
   log,
   getElement,
-  createElement
+  createElement,
+  createSupabaseHeaders
 } from './SettingsUtils.js';
 
 /**
@@ -33,7 +34,7 @@ export class ChannelsManager {
       uiToast: getUtil('uiToast'),
       safeAlert: getUtil('safeAlert'),
       showCustomConfirm: getUtil('showCustomConfirm'),
-      createSupabaseHeaders: getUtil('createSupabaseHeaders'),
+      createSupabaseHeaders: createSupabaseHeaders,
       escapeHtml: getUtil('escapeHtml')
     };
 
