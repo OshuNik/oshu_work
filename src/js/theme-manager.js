@@ -50,30 +50,30 @@
     }
   }
   
-  // Принудительное применение темной темы
+  // Принудительное применение темной темы - улучшенные цвета Material Design 2024
   function applyDarkTheme() {
     const root = document.documentElement;
     const darkColors = {
-      '--background-color': '#0F0F0F',
-      '--card-color': '#1E1E1E',
-      '--text-color': '#F5F5F5',
-      '--hint-color': '#A0A0A0',
-      '--border-color': '#3A3A3A',
-      '--input-bg': '#2A2A2A',
-      '--input-border': '#4A4A4A',
-      '--secondary-bg': '#161616',
-      '--header-bg': '#1E1E1E',
-      '--button-bg': '#2D2D2D',
-      '--button-text': '#F5F5F5',
-      '--destructive-color': '#FF6B6B',
-      '--link-color': '#64B5F6',
-      '--section-separator': '#2A2A2A',
-      '--accent-red': '#F44336',           /* Более яркий красный для темной темы */
-      '--accent-yellow': '#FFC107',        /* Более яркий желтый для темной темы */
-      '--accent-green': '#4CAF50',         /* Более яркий зеленый для темной темы */
-      '--accent-blue': '#64B5F6',
-      '--box-shadow': 'none',
-      '--box-shadow-pressed': 'none'
+      '--background-color': '#121212',     /* Material Design рекомендация */
+      '--card-color': '#1E1E1E',           /* Достаточный контраст 15.8:1+ */
+      '--text-color': '#E8E8E8',           /* Не яркий белый - мягче для глаз */
+      '--hint-color': '#A0A0A0',           /* Серый с достаточным контрастом */
+      '--border-color': '#333333',         /* Более видимые границы */
+      '--input-bg': '#2C2C2C',             /* Поля ввода с хорошим контрастом */
+      '--input-border': '#404040',         /* Видимые границы полей */
+      '--secondary-bg': '#1A1A1A',         /* Вторичный фон темнее основного */
+      '--header-bg': '#1E1E1E',            /* Фон заголовка как карточки */
+      '--button-bg': '#2D2D2D',            /* Кнопки с хорошим контрастом */
+      '--button-text': '#E8E8E8',          /* Текст кнопок */
+      '--destructive-color': '#F48FB1',    /* Менее агрессивный красный */
+      '--link-color': '#82B1FF',           /* Более мягкий синий для ссылок */
+      '--section-separator': '#2A2A2A',    /* Разделители */
+      '--accent-red': '#EF5350',           /* Десатурированный красный (-20% saturation) */
+      '--accent-yellow': '#FFCA28',        /* Десатурированный желтый (-20% saturation) */
+      '--accent-green': '#66BB6A',         /* Десатурированный зеленый (-20% saturation) */
+      '--accent-blue': '#42A5F5',          /* Десатурированный синий (-20% saturation) */
+      '--box-shadow': '4px 4px 0px rgba(0, 0, 0, 0.5)',        /* Мягкие тени */
+      '--box-shadow-pressed': '2px 2px 0px rgba(0, 0, 0, 0.5)' /* Мягкие тени */
     };
     
     Object.entries(darkColors).forEach(([property, value]) => {

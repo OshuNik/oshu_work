@@ -67,34 +67,34 @@
     --font-pixel: 'Press Start 2P', 'Courier New', monospace;
 }
 
-/* Темная тема */
+/* Темная тема - улучшенная схема по Material Design и лучшим практикам 2024 */
 [data-theme="dark"], 
 .dark-theme {
-    /* Основные цвета для темной темы - улучшенная схема */
-    --background-color: #0F0F0F;          /* Очень темный фон для лучшего контраста */
-    --card-color: #1E1E1E;                /* Карточки немного светлее фона */
-    --text-color: #F5F5F5;                /* Почти белый текст для максимальной читаемости */
-    --hint-color: #A0A0A0;                /* Более светлые подсказки */
-    --border-color: #3A3A3A;              /* Границы с достаточным контрастом */
-    --input-bg: #2A2A2A;                  /* Поля ввода с хорошим контрастом */
-    --input-border: #4A4A4A;              /* Границы полей ввода */
-    --secondary-bg: #161616;              /* Вторичный фон */
-    --header-bg: #1E1E1E;                 /* Фон заголовка */
-    --button-bg: #2D2D2D;                 /* Фон кнопок */
-    --button-text: #F5F5F5;               /* Текст кнопок */
-    --destructive-color: #FF6B6B;         /* Цвет удаления */
-    --link-color: #64B5F6;                /* Более яркие ссылки */
-    --section-separator: #2A2A2A;         /* Разделители секций */
+    /* Основные цвета (Material Design Dark Theme + лучшие практики) */
+    --background-color: #121212;          /* Material Design рекомендация вместо чистого черного */
+    --card-color: #1E1E1E;                /* Карточки с достаточным контрастом 15.8:1+ */
+    --text-color: #E8E8E8;                /* Не яркий белый - мягче для глаз */
+    --hint-color: #A0A0A0;                /* Серый с достаточным контрастом */
+    --border-color: #333333;              /* Более видимые границы */
+    --input-bg: #2C2C2C;                  /* Поля ввода с хорошим контрастом */
+    --input-border: #404040;              /* Видимые границы полей */
+    --secondary-bg: #1A1A1A;              /* Вторичный фон темнее основного */
+    --header-bg: #1E1E1E;                 /* Фон заголовка как карточки */
+    --button-bg: #2D2D2D;                 /* Кнопки с хорошим контрастом */
+    --button-text: #E8E8E8;               /* Текст кнопок */
+    --destructive-color: #F48FB1;         /* Менее агрессивный красный */
+    --link-color: #82B1FF;                /* Более мягкий синий для ссылок */
+    --section-separator: #2A2A2A;         /* Разделители */
     
-    /* Улучшенные акцентные цвета для темной темы */
-    --accent-red: #FF6B6B;                /* Красный с хорошим контрастом */
-    --accent-yellow: #FFD54F;             /* Желтый с улучшенной видимостью */
-    --accent-green: #81C784;              /* Зеленый с достаточным контрастом */
-    --accent-blue: #64B5F6;               /* Синий с хорошей видимостью */
+    /* Десатурированные акцентные цвета (-20% saturation для темной темы) */
+    --accent-red: #EF5350;                /* Менее насыщенный красный */
+    --accent-yellow: #FFCA28;             /* Менее насыщенный желтый */
+    --accent-green: #66BB6A;              /* Менее насыщенный зеленый */
+    --accent-blue: #42A5F5;               /* Менее насыщенный синий */
     
-    /* Улучшенные тени для темной темы */
-    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.4);
-    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.4);
+    /* Мягкие тени для темной темы */
+    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.5);
+    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px rgba(0, 0, 0, 0.5);
 }
 
 /* Убираем автоматическую темную тему для предотвращения мерцания */
