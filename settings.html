@@ -117,6 +117,10 @@
         <div class="settings-card">
           <h3 class="card-subtitle">АКТИВНЫЕ КАНАЛЫ</h3>
           
+          <div class="channels-list" id="channels-list">
+            <div class="loading-indicator">Загрузка каналов...</div>
+          </div>
+          
           <div class="tags-container" id="current-channels-tags">
             <div class="loading-indicator">Загрузка...</div>
           </div>
@@ -155,6 +159,7 @@
   </div>
 
   <!-- Скрипты -->
+  <script src="src/js/config.js"></script>
   <script type="module">
     import { SettingsMain } from './modules/SettingsMain.js';
     

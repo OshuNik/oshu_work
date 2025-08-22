@@ -7,7 +7,10 @@ import {
   getUtil,
   log,
   getElement,
-  elementExists
+  elementExists,
+  fetchFromLocalStorage,
+  saveToLocalStorage,
+  updateLocalStorage
 } from './SettingsUtils.js';
 
 /**
@@ -284,19 +287,9 @@ export class KeywordsManager {
     this.container.innerHTML = '<div class="loading-indicator">Загрузка...</div>';
     
     try {
-      const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Ошибка авторизации: недействительный API ключ. Обратитесь к разработчику для обновления конфигурации.');
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      const keywords = data.length > 0 ? data[0].keywords : '';
+      // Используем localStorage вместо API
+      const data = fetchFromLocalStorage(API_ENDPOINTS.SETTINGS);
+      const keywords = data.keywords || '';
       
       // Парсим ключевые слова
       this.currentKeywords = keywords ? keywords.split(',').map(k => k.trim()).filter(k => k) : [];
@@ -305,11 +298,7 @@ export class KeywordsManager {
       this.displayKeywordTags();
     } catch (error) {
       log('error', 'loadKeywords: произошла ошибка', error);
-      if (error.message.includes('авторизации')) {
-        this.container.innerHTML = `<div class="loading-indicator error-indicator">${error.message}</div>`;
-      } else {
-        this.container.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
-      }
+      this.container.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
     }
   }
 
@@ -328,32 +317,8 @@ export class KeywordsManager {
       // Формируем строку ключевых слов из массива
       const keywordsString = this.currentKeywords.join(', ');
       
-      // Используем PATCH для обновления как в updateKeywordsInDatabase
-      const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
-        method: 'PATCH',
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
-        body: JSON.stringify({ keywords: keywordsString })
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Ошибка авторизации: недействительный API ключ. Очистите кэш браузера (Ctrl+Shift+R) и перезагрузите страницу.');
-        }
-        if (response.status === 404) {
-          // Если записи нет, пробуем создать новую через POST
-          const postResponse = await fetch(API_ENDPOINTS.SETTINGS, {
-            method: 'POST',
-            headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders({ prefer: 'resolution=merge-duplicates' }) : {},
-            body: JSON.stringify({ update_key: 1, keywords: keywordsString })
-          });
-          
-          if (!postResponse.ok) {
-            throw new Error(`POST failed: HTTP ${postResponse.status}: ${postResponse.statusText}`);
-          }
-        } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-      }
+      // Используем localStorage вместо API
+      updateLocalStorage(API_ENDPOINTS.SETTINGS, { keywords: keywordsString });
       
       if (this.utils.uiToast) {
         this.utils.uiToast(MESSAGES.SUCCESS.KEYWORDS_SAVED);
@@ -361,11 +326,7 @@ export class KeywordsManager {
     } catch (error) {
       log('error', 'saveKeywords: произошла ошибка', error);
       if (this.utils.safeAlert) {
-        if (error.message.includes('авторизации')) {
-          this.utils.safeAlert(error.message);
-        } else {
-          this.utils.safeAlert('Не удалось сохранить настройки. Проверьте подключение к интернету.');
-        }
+        this.utils.safeAlert('Не удалось сохранить настройки.');
       }
     }
   }
