@@ -504,21 +504,21 @@ body {
 }
 
 .tag {
-  background: var(--accent-blue);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid var(--border-color);
-  box-shadow: 1px 1px 0px var(--border-color);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all var(--transition-fast);
-  position: relative;
-  overflow: hidden;
+  background: var(--accent-blue) !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 1px 1px 0px var(--border-color) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all var(--transition-fast) !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 
@@ -567,20 +567,20 @@ body {
 }
 
 .tag-remove {
-  background: var(--accent-red);
-  border: none;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 700;
-  color: white;
-  box-shadow: 1px 1px 0px var(--border-color);
-  transition: all var(--transition-fast);
+  background: var(--accent-red) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 16px !important;
+  height: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  box-shadow: 1px 1px 0px var(--border-color) !important;
+  transition: all var(--transition-fast) !important;
 }
 
 .tag-remove:hover {
