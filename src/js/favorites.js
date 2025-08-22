@@ -176,8 +176,13 @@
 
       const url  = `${CFG.SUPABASE_URL}/rest/v1/vacancies?${p.toString()}`;
 
+      const headers = window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {};
+      console.log('Favorites.js: URL:', url);
+      console.log('Favorites.js: Headers:', headers);
+      console.log('Favorites.js: CFG:', CFG);
+      
       const resp = await fetchWithRetry(url, {
-        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
+        headers: headers
       }, RETRY_OPTIONS);
       if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
 
