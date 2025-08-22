@@ -86,9 +86,10 @@ body {
   position: relative;
 }
 
-.header-center {
+.header-left {
   flex: 1;
-  text-align: center;
+  text-align: left;
+  padding-left: var(--card-padding);
 }
 
 .header-controls {
@@ -127,12 +128,12 @@ body {
   box-shadow: 2px 2px 0px var(--border-color);
 }
 
-.header-center {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  justify-content: center;
+.back-arrow {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1;
 }
+
 
 .settings-header h1 {
   font-family: var(--font-pixel);
@@ -140,7 +141,6 @@ body {
   letter-spacing: 1px;
   margin: 0;
   color: var(--text-color);
-  text-shadow: 2px 2px 0px var(--border-color);
 }
 
 .theme-toggle {
