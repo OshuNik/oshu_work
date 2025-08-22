@@ -194,6 +194,8 @@
         renderEmptyState(container, '-- В избранном пусто --');
       } else {
         const frag = document.createDocumentFragment();
+        console.log('CFG в favorites:', CFG);
+        console.log('CFG.CATEGORIES:', CFG.CATEGORIES);
         allFavorites.forEach(v => {
           const card = createVacancyCard(v, { pageType: 'favorites' });
           
