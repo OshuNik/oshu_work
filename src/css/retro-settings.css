@@ -694,13 +694,13 @@ input:checked + .toggle-slider:before {
 
 /* === СПИСОК КАНАЛОВ === */
 .channels-list {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  margin-bottom: 15px !important;
-  padding: 0 !important;
-  border: none !important;
-  background: none !important;
+  margin-bottom: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 10px;
+  background: var(--card-color);
 }
 
 .channels-list-header {
@@ -851,7 +851,24 @@ input:checked + .toggle-slider:before {
   outline-offset: 2px;
 }
 
-/* Скролл-стили удалены - теперь каналы отображаются как теги */
+/* Стили для скроллбара */
+.channels-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.channels-list::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 4px;
+}
+
+.channels-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.channels-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
 
 /* === ИНДИКАТОР ЗАГРУЗКИ === */
 .loading-indicator {
@@ -1227,48 +1244,25 @@ input:checked + .toggle-slider:before {
 
 /* === СТИЛИ ДЛЯ ЭЛЕМЕНТОВ КАНАЛОВ === */
 .channel-item {
-  display: inline-flex !important;
-  align-items: center !important;
-  background: var(--accent-green) !important;
-  color: white !important;
-  padding: 4px 8px !important;
-  border-radius: 8px !important;
-  font-family: var(--font-mono) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 1px 1px 0px var(--border-color) !important;
-  gap: 6px !important;
-  transition: all var(--transition-fast) !important;
-  position: relative !important;
-  overflow: hidden !important;
-  height: 24px !important;
-  line-height: 1 !important;
-  margin: 4px !important;
-  width: auto !important;
-  box-sizing: border-box !important;
-}
-
-/* Глянцевый эффект для каналов */
-.channel-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.channel-item:hover::before {
-  left: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 8px 12px;
+  margin: 4px 0;
+  box-shadow: var(--box-shadow);
+  transition: var(--transition-normal);
+  gap: 8px;
+  width: auto;
+  max-width: 280px;
+  box-sizing: border-box;
 }
 
 .channel-item:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 2px 2px 0px var(--border-color) !important;
-  filter: brightness(1.1) !important;
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--shadow-offset) + 1px) calc(var(--shadow-offset) + 1px) 0px var(--border-color);
 }
 
 .channel-item-toggle {
@@ -1288,22 +1282,21 @@ input:checked + .toggle-slider:before {
 }
 
 .channel-item-title {
-  font-family: var(--font-mono) !important;
-  font-weight: 600 !important;
-  font-size: 11px !important;
-  color: white !important;
-  text-decoration: none !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  margin: 0 !important;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-color);
+  text-decoration: none;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .channel-item-title:hover {
-  text-decoration: underline !important;
-  color: white !important;
+  text-decoration: underline;
+  color: var(--accent-blue);
 }
 
 .channel-item-id {
@@ -1319,18 +1312,18 @@ input:checked + .toggle-slider:before {
 
 /* Контейнер для правых кнопок */
 .channel-controls {
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  flex-shrink: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 /* Слайдер-переключатель */
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 32px !important;
-  height: 18px !important;
+  width: 44px;
+  height: 24px;
   flex-shrink: 0;
 }
 
@@ -1349,18 +1342,18 @@ input:checked + .toggle-slider:before {
   right: 0;
   bottom: 0;
   background: var(--hint-color);
-  border: 1px solid var(--border-color) !important;
-  border-radius: 9px !important;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
   transition: var(--transition-fast);
 }
 
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 12px !important;
-  width: 12px !important;
-  left: 2px !important;
-  top: 2px !important;
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  top: 2px;
   background: white;
   border: 1px solid var(--border-color);
   border-radius: 50%;
@@ -1373,7 +1366,7 @@ input:checked + .toggle-slider:before {
 }
 
 .toggle-input:checked + .toggle-slider:before {
-  transform: translateX(12px) !important;
+  transform: translateX(18px);
 }
 
 .toggle-slider:hover {
@@ -1420,26 +1413,26 @@ input:checked + .toggle-slider:before {
 }
 
 .channel-item-delete {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: none !important;
-  border-radius: 50% !important;
-  width: 16px !important;
-  height: 16px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  color: white !important;
-  flex-shrink: 0 !important;
-  transition: var(--transition-fast) !important;
+  background: var(--accent-red);
+  border: 2px solid var(--border-color);
+  border-radius: var(--card-radius);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  flex-shrink: 0;
+  transition: var(--transition-fast);
 }
 
 .channel-item-delete:hover {
-  background: var(--accent-red) !important;
-  transform: scale(1.1) !important;
+  background: #FF3030;
+  transform: scale(1.05);
 }
 
 .channel-item-delete svg {
-  width: 10px !important;
-  height: 10px !important;
+  width: 14px;
+  height: 14px;
 }
