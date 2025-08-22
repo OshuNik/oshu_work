@@ -10,12 +10,12 @@ export const CHANNEL_VALIDATION = {
 };
 
 /**
- * API endpoints для настроек (используем localStorage для локального хранения)
+ * API endpoints для настроек
  */
 export const API_ENDPOINTS = {
-  SETTINGS: 'local://settings',
-  CHANNELS: 'local://channels',
-  DEFAULT_CHANNELS: 'local://default_channels'
+  SETTINGS: `${window.APP_CONFIG?.SUPABASE_URL}/rest/v1/settings`,
+  CHANNELS: `${window.APP_CONFIG?.SUPABASE_URL}/rest/v1/channels`,
+  DEFAULT_CHANNELS: `${window.APP_CONFIG?.SUPABASE_URL}/rest/v1/default_channels`
 };
 
 /**
@@ -100,33 +100,7 @@ export function getUtil(name) {
  * @returns {*} Значение конфигурации
  */
 
-/**
- * Функции для работы с localStorage вместо Supabase
- */
-export function createLocalStorageHeaders() {
-  return { 'Content-Type': 'application/json' };
-}
 
-export function fetchFromLocalStorage(endpoint) {
-  const key = endpoint.replace('local://', '');
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
-}
-
-export function saveToLocalStorage(endpoint, data) {
-  const key = endpoint.replace('local://', '');
-  localStorage.setItem(key, JSON.stringify(data));
-  return { ok: true };
-}
-
-export function updateLocalStorage(endpoint, data) {
-  const key = endpoint.replace('local://', '');
-  const existing = localStorage.getItem(key);
-  const existingData = existing ? JSON.parse(existing) : {};
-  const updatedData = { ...existingData, ...data };
-  localStorage.setItem(key, JSON.stringify(updatedData));
-  return { ok: true };
-}
 export function getConfigValue(key, defaultValue = null) {
   const config = getConfig();
   return config[key] !== undefined ? config[key] : defaultValue;

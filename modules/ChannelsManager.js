@@ -7,10 +7,7 @@ import {
   getUtil,
   log,
   getElement,
-  createElement,
-  fetchFromLocalStorage,
-  saveToLocalStorage,
-  updateLocalStorage
+  createElement
 } from './SettingsUtils.js';
 
 /**
@@ -91,9 +88,17 @@ export class ChannelsManager {
    */
   async isChannelExists(channelId) {
     try {
-      // Используем localStorage вместо API
-      const existingChannels = fetchFromLocalStorage(API_ENDPOINTS.CHANNELS);
-      return existingChannels.some(channel => channel.channel_id === channelId);
+      const response = await fetch(`${API_ENDPOINTS.CHANNELS}?channel_id=eq.${encodeURIComponent(channelId)}&select=id`, {
+        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+      });
+      
+      if (response.ok) {
+        const existingChannels = await response.json();
+        return existingChannels.length > 0;
+      } else {
+        log('warn', '⚠️ Ошибка проверки дубликатов:', response.status, response.statusText);
+        return false;
+      }
     } catch (error) {
       log('error', 'Ошибка проверки существования канала:', error);
       return false;
@@ -116,22 +121,34 @@ export class ChannelsManager {
     
     log('log', '[DEBUG] Отправляемые данные:', newChannelData);
     
-    try {
-      // Используем localStorage вместо API
-      const existingChannels = fetchFromLocalStorage(API_ENDPOINTS.CHANNELS);
-      existingChannels.push(newChannelData);
-      saveToLocalStorage(API_ENDPOINTS.CHANNELS, existingChannels);
-      
-      this.renderChannel(newChannelData);
+    const response = await fetch(API_ENDPOINTS.CHANNELS, {
+      method: 'POST',
+      headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders({ prefer: 'return=representation' }) : {},
+      body: JSON.stringify(newChannelData)
+    });
+    
+    log('log', '[DEBUG] Ответ сервера:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      log('error', '[DEBUG] Ошибка API:', errorText);
+      throw new Error(`Ошибка API: ${response.status} ${response.statusText}. ${errorText}`);
+    }
+    
+    const data = await response.json();
+    log('log', '[DEBUG] Полученные данные:', data);
+    
+    if (data && data.length > 0) {
+      this.renderChannel(data[0]);
       if (this.input) this.input.value = '';
       if (this.utils.uiToast) {
         this.utils.uiToast(MESSAGES.SUCCESS.CHANNEL_ADDED);
       }
-      log('log', '[DEBUG] Канал успешно создан:', newChannelData);
-      return newChannelData;
-    } catch (error) {
-      log('error', '[DEBUG] Ошибка создания канала:', error);
-      throw new Error('Ошибка создания канала');
+      log('log', '[DEBUG] Канал успешно создан:', data[0]);
+      return data[0];
+    } else {
+      log('error', '[DEBUG] API не вернул данные о канале');
+      throw new Error('API не вернул данные о добавленном канале');
     }
   }
 
@@ -348,8 +365,18 @@ export class ChannelsManager {
     this.container.innerHTML = '<div class="loading-indicator">Загрузка каналов...</div>';
     
     try {
-      // Используем localStorage вместо API
-      const data = fetchFromLocalStorage(API_ENDPOINTS.CHANNELS);
+      const response = await fetch(API_ENDPOINTS.CHANNELS, {
+        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Ошибка авторизации: недействительный API ключ.');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
       this.channels = data || [];
       
       // Очищаем контейнер
@@ -420,11 +447,15 @@ export class ChannelsManager {
     
     for (const id of selectedIds) {
       try {
-        // Используем localStorage вместо API
-        this.channels = this.channels.filter(channel => channel.id !== id);
-        saveToLocalStorage(API_ENDPOINTS.CHANNELS, this.channels);
-        deletedCount++;
-        this.selectedChannels.delete(id);
+        const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${id}`, {
+          method: 'DELETE',
+          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+        });
+        
+        if (response.ok) {
+          deletedCount++;
+          this.selectedChannels.delete(id);
+        }
       } catch (error) {
         log('error', `Ошибка удаления канала ${id}:`, error);
       }
@@ -461,16 +492,23 @@ export class ChannelsManager {
     if (!ok) return;
     
     try {
-      // Используем localStorage вместо API
-      this.channels = [];
-      this.selectedChannels.clear();
-      saveToLocalStorage(API_ENDPOINTS.CHANNELS, []);
-      this.container.innerHTML = '<div class="loading-indicator">-- каналы не заданы --</div>';
-      this.updateChannelsCount();
-      this.updateDeleteSelectedButton();
+      const response = await fetch(API_ENDPOINTS.CHANNELS, {
+        method: 'DELETE',
+        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+      });
       
-      if (this.utils.uiToast) {
-        this.utils.uiToast(MESSAGES.SUCCESS.ALL_DELETED);
+      if (response.ok) {
+        this.channels = [];
+        this.selectedChannels.clear();
+        this.container.innerHTML = '<div class="loading-indicator">-- каналы не заданы --</div>';
+        this.updateChannelsCount();
+        this.updateDeleteSelectedButton();
+        
+        if (this.utils.uiToast) {
+          this.utils.uiToast(MESSAGES.SUCCESS.ALL_DELETED);
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       log('error', 'Ошибка удаления всех каналов:', error);
@@ -485,12 +523,15 @@ export class ChannelsManager {
    */
   async loadDefaultChannels() {
     try {
-      // Используем localStorage вместо API - добавляем стандартные каналы
-      const defaultChannels = [
-        { channel_id: '@job_search', channel_title: 'Поиск работы' },
-        { channel_id: '@vacancies', channel_title: 'Вакансии' },
-        { channel_id: '@career', channel_title: 'Карьера' }
-      ];
+      const response = await fetch(API_ENDPOINTS.DEFAULT_CHANNELS, {
+        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const defaultChannels = await response.json();
       
       // Добавляем каждый стандартный канал
       for (const defaultChannel of defaultChannels) {
