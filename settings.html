@@ -22,6 +22,12 @@
       <button class="theme-toggle" id="theme-toggle">☀️</button>
     </header>
 
+    <!-- Навигация по вкладкам -->
+    <nav class="settings-tabs">
+      <button class="tab-button active" data-target="keywords-section">КЛЮЧЕВЫЕ СЛОВА</button>
+      <button class="tab-button" data-target="channels-section">КАНАЛЫ</button>
+    </nav>
+
     <!-- Контент -->
     <div class="settings-content">
       
@@ -105,71 +111,47 @@
         <div class="settings-card">
           <h3 class="card-subtitle">АКТИВНЫЕ КАНАЛЫ</h3>
           
-          <div class="channels-list-header">
-            <h4>Текущие каналы</h4>
-            <div class="channels-controls">
-              <button id="channels-toggle-all" class="action-button success">Выбрать все</button>
-              <button id="delete-selected-btn" class="action-button danger" disabled>Удалить выбранные</button>
-            </div>
+          <div class="tags-container" id="current-channels-tags">
+            <div class="loading-indicator">Загрузка...</div>
           </div>
-          <div id="channels-list" class="channels-list"></div>
           
           <div class="actions-container">
-            <button id="delete-all-btn" class="action-button danger">Удалить все каналы</button>
+            <button id="save-channels-preset-btn" class="action-button success">Сохранить как пресет</button>
+            <button id="clear-all-channels-btn" class="action-button danger">Удалить все</button>
           </div>
         </div>
       </div>
-
-      
-    </div>
-    
-    <!-- Вкладки категорий внизу -->
-    <div id="category-tabs" class="category-tabs" role="tablist" aria-label="Категории настроек">
-      <button id="tab-keywords" class="tab-button keywords active" data-target="keywords-section" data-category-name="КЛЮЧЕВЫЕ СЛОВА" 
-            role="tab" aria-selected="true" aria-controls="keywords-section">
-        <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
-        <span id="count-keywords" class="tab-count">0</span>
-      </button>
-      <button id="tab-channels" class="tab-button channels" data-target="channels-section" data-category-name="КАНАЛЫ"
-              role="tab" aria-selected="false" aria-controls="channels-section">
-        <span class="tab-label">КАНАЛЫ</span>
-        <span id="count-channels" class="tab-count">0</span>
-      </button>
     </div>
   </div>
 
-  <!-- Модальное окно для пресетов -->
-  <div id="presets-modal" class="modal">
+  <!-- Модальное окно пресетов -->
+  <div class="modal" id="presets-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Выберите пресет</h3>
-        <button class="modal-close">&times;</button>
+        <h3>ВЫБРАТЬ ПРЕСЕТ</h3>
+        <button class="modal-close">×</button>
       </div>
       <div class="modal-body">
-        <div class="preset-list">
-          <div class="preset-item" data-preset="video">
-            <h4>Видеомонтаж</h4>
-            <p>монтаж, анимация, эффекты, цветокоррекция, звук, титры</p>
-          </div>
-          <div class="preset-item" data-preset="design">
-            <h4>Дизайн</h4>
-            <p>UI/UX, веб-дизайн, логотипы, брендинг, иллюстрации</p>
-          </div>
-          <div class="preset-item" data-preset="development">
-            <h4>Разработка</h4>
-            <p>JavaScript, React, Node.js, Python, базы данных</p>
-          </div>
+        <div class="preset-item" data-preset="default">
+          <span class="preset-name">Стандартный</span>
+          <span class="preset-description">Базовые настройки для начала работы</span>
+        </div>
+        <div class="preset-item" data-preset="developer">
+          <span class="preset-name">Разработчик</span>
+          <span class="preset-description">Настройки для IT-специалистов</span>
+        </div>
+        <div class="preset-item" data-preset="designer">
+          <span class="preset-name">Дизайнер</span>
+          <span class="preset-description">Настройки для творческих профессий</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Основной скрипт -->
+  <!-- Скрипты -->
   <script type="module">
-    // Импортируем модули настроек
-    import { SettingsMain } from 'modules/SettingsMain.js';
+    import { SettingsMain } from './modules/SettingsMain.js';
     
-    // Инициализация приложения настроек
     let settingsApp = null;
     
     document.addEventListener('DOMContentLoaded', async function() {

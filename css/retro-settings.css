@@ -13,6 +13,7 @@
   --accent-yellow: #FFD93D;
   --accent-green: #6BCB77;
   --accent-blue: #41A6FF;
+  --secondary-bg: #E8E8E8;
   
   --card-padding: 20px;
   --card-margin: 20px;
@@ -46,6 +47,28 @@
 }
 
 [data-theme="dark"] .tab-button.active {
+  color: var(--text-color);
+}
+
+/* Темная тема для навигации */
+[data-theme="dark"] .settings-tabs {
+  background: var(--card-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .settings-tabs .tab-button {
+  background: var(--card-color);
+  color: var(--hint-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .settings-tabs .tab-button.active {
+  background: var(--accent-blue);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .settings-tabs .tab-button:hover:not(.active) {
+  background: #2a2a2a;
   color: var(--text-color);
 }
 
@@ -110,6 +133,65 @@ body {
   transform: translateY(1px);
   box-shadow: 2px 2px 0px var(--border-color);
 }
+
+/* === НАВИГАЦИЯ ПО ВКЛАДКАМ === */
+.settings-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--card-color);
+  border-bottom: var(--card-border) solid var(--border-color);
+  box-shadow: var(--box-shadow);
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+}
+
+.settings-tabs .tab-button {
+  flex: 1;
+  background: var(--card-color);
+  color: var(--hint-color);
+  border: var(--border-width) solid var(--border-color);
+  border-bottom: none;
+  padding: 15px 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  top: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+
+
+
+
+.settings-tabs .tab-button.active {
+  color: var(--text-color);
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  top: 0;
+  box-shadow: none;
+}
+
+.settings-tabs .tab-button.keywords.active { 
+  background-color: var(--accent-blue); 
+}
+
+.settings-tabs .tab-button.channels.active { 
+  background-color: var(--accent-green); 
+}
+
+.settings-tabs .tab-button:hover:not(.active) {
+  background: var(--secondary-bg);
+  color: var(--text-color);
+}
+
+
 
 /* === ВКЛАДКИ КАТЕГОРИЙ === */
 .category-tabs {
@@ -205,7 +287,6 @@ body {
 /* === КОНТЕНТ === */
 .settings-content {
   padding: var(--card-padding);
-  padding-bottom: 100px; /* Место для фиксированных вкладок */
   min-height: calc(100vh - 200px);
 }
 
@@ -331,11 +412,14 @@ body {
   display: flex;
   gap: 8px;
   margin-bottom: 15px;
-  align-items: center;
+  align-items: stretch;
+  flex-direction: row;
 }
 
 .input-wrapper {
   flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .input-field {
@@ -372,6 +456,8 @@ body {
   transition: all var(--transition-fast);
   color: white;
   font-weight: 700;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .add-button:hover {
@@ -622,6 +708,9 @@ input:checked + .toggle-slider:before {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
 }
 
 .action-button {

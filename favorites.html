@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org https://cdn.interactjs.io https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: raw.githubusercontent.com; connect-src 'self' *.supabase.co;">
+  <title>Избранное - oshu://work v12.3</title>
+  <!-- Preload критических ресурсов для быстрого First Paint -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
+  
+  <!-- Preload критических файлов -->
+  <link rel="preload" href="src/css/style.css" as="style">
+  <link rel="preload" href="src/js/favorites.js" as="script">
+  <link rel="preload" href="src/js/utils.min.js" as="script">
+  <link rel="preload" href="src/js/config.js" as="script">
+  
+  <!-- Critical CSS для быстрого First Paint -->
+  <link rel="stylesheet" href="src/css/critical.css">
+  
+  <!-- Критический CSS для предотвращения мерцания темы -->
+  <style>
+    /* Предотвращаем мерцание темной темы при загрузке */
+    :root {
+      --background-color: #F0F0F0 !important;
+      --card-color: #FFFFFF !important;
+      --text-color: #000000 !important;
+      --hint-color: #666666 !important;
+      --border-color: #000000 !important;
+      --input-bg: #FFFFFF !important;
+      --input-border: #CCCCCC !important;
+      --secondary-bg: #E8E8E8 !important;
+      --header-bg: #FFFFFF !important;
+      --button-bg: #FFFFFF !important;
+      --button-text: #000000 !important;
+      --destructive-color: #FF5C5C !important;
+      --link-color: #41A6FF !important;
+      --section-separator: #E0E0E0 !important;
+      --accent-red: #FF5C5C !important;
+      --accent-yellow: #FFD93D !important;
+      --accent-green: #6BCB77 !important;
+      --accent-blue: #41A6FF !important;
+      --box-shadow: 4px 4px 0px #000000 !important;
+      --box-shadow-pressed: 2px 2px 0px #000000 !important;
+    }
+    
+    /* Принудительно устанавливаем светлую тему до загрузки JavaScript */
+    body {
+      background-color: #F0F0F0 !important;
+      color: #000000 !important;
+    }
+    
+    .main-wrapper {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .header {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .search-container {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .content {
+      background-color: #F0F0F0 !important;
+    }
+    
+    .category-tabs {
+      background-color: transparent !important;
+    }
+  </style>
+  
+  <!-- Async CSS Loading for non-critical styles -->
+  <link rel="preload" href="src/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  
+  <!-- Fonts loaded asynchronously -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="main-wrapper">
+  <div class="ptr-bar"><div class="ptr-text">Потяните для обновления</div></div>
+
+  <header class="header header-centered">
+    <div class="retro-header">
+      <h1>ИЗБРАННОЕ</h1>
+      <div class="pixel-counter">
+        <span class="pixel-bar">■■■</span>
+        <span id="favorites-count" class="favorites-count">0</span>
+        <span class="pixel-bar">■■■</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="header-button">← Назад</a>
+    </div>
+  </header>
+
+  <div class="search-container" id="search-container-fav">
+    <div class="search-input-wrapper">
+      <input type="text" class="search-input" placeholder="Поиск в избранном..." id="favorites-search">
+      <button class="search-button" id="favorites-search-btn">🔍</button>
+    </div>
+  </div>
+
+  <div class="content" id="favorites-content">
+    <div class="loading-indicator">Загрузка избранного...</div>
+  </div>
+</div>
+
+<!-- Скрипты -->
+<script src="src/js/utils.min.js"></script>
+<script src="src/js/config.js"></script>
+<script src="src/js/favorites.js"></script>
+
+</body>
+</html>
