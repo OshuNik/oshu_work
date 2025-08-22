@@ -104,12 +104,13 @@ body {
   background: var(--card-color);
   border: var(--border-width) solid var(--border-color);
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px;
   font-size: 16px;
   cursor: pointer;
   box-shadow: var(--box-shadow);
   transition: all var(--transition-fast);
-  min-width: 40px;
+  width: 40px;
+  height: 40px;
   text-align: center;
   text-decoration: none;
   color: var(--text-color);
@@ -141,14 +142,18 @@ body {
   background: var(--card-color);
   border: var(--border-width) solid var(--border-color);
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px;
   font-size: 16px;
   cursor: pointer;
   box-shadow: var(--box-shadow);
   transition: all var(--transition-fast);
-  min-width: 40px;
+  width: 40px;
+  height: 40px;
   text-align: center;
   color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .theme-toggle:hover {
