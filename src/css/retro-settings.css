@@ -503,7 +503,27 @@ body {
   margin-bottom: 15px;
 }
 
+/* Основные стили для всех тегов */
 .tag {
+  background: var(--accent-blue);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Специальные компактные стили только для тегов ключевых слов */
+#current-keywords-tags .tag {
   background: var(--accent-blue) !important;
   color: white !important;
   padding: 2px 6px !important;
@@ -541,6 +561,11 @@ body {
 }
 
 .tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px var(--border-color);
+}
+
+#current-keywords-tags .tag:hover {
   transform: scale(1.05) !important;
   box-shadow: none !important;
   filter: brightness(1.1) !important;
@@ -570,6 +595,28 @@ body {
 }
 
 .tag-remove {
+  background: var(--accent-red);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 1px 1px 0px var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.tag-remove:hover {
+  transform: scale(1.1);
+}
+
+/* Специальная кнопка удаления для компактных тегов ключевых слов */
+#current-keywords-tags .tag-remove {
   background: rgba(255, 255, 255, 0.2) !important;
   border: none !important;
   border-radius: 50% !important;
@@ -586,7 +633,7 @@ body {
   transition: all var(--transition-fast) !important;
 }
 
-.tag-remove:hover {
+#current-keywords-tags .tag-remove:hover {
   background: var(--accent-red) !important;
   transform: scale(1.1) !important;
 }
