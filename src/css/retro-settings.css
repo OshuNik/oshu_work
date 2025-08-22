@@ -484,6 +484,7 @@ body {
   color: white;
   font-weight: 500;
   font-size: 18px;
+  box-shadow: var(--box-shadow);
 }
 
 .add-button:hover {
