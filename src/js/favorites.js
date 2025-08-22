@@ -59,8 +59,8 @@
   }
 
   const container = document.getElementById('favorites-list');
-  const searchInputFav = document.getElementById('search-input-fav');
-  const searchClearBtnFav = document.getElementById('search-clear-btn-fav');
+  const searchInputFav = document.getElementById('favorites-search');
+  const searchClearBtnFav = document.getElementById('favorites-search-btn');
   const searchInputWrapperFav = searchInputFav?.parentElement;
   
   // Проверяем критические элементы

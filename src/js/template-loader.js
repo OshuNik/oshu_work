@@ -83,7 +83,7 @@ class TemplateLoader {
       return true;
     }
     
-    return await this.loadTemplate('vacancy-card-template.html', 'body');
+    return await this.loadTemplate('src/html/vacancy-card-template.html', 'body');
   }
 
   /**
