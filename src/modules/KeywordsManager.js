@@ -234,7 +234,7 @@ export class KeywordsManager {
       // Пробуем PATCH для обновления существующей записи
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -285,7 +285,7 @@ export class KeywordsManager {
     
     try {
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?select=keywords`, {
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
       });
       
       if (!response.ok) {
@@ -331,7 +331,7 @@ export class KeywordsManager {
       // Используем PATCH для обновления как в updateKeywordsInDatabase
       const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
         method: 'PATCH',
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
         body: JSON.stringify({ keywords: keywordsString })
       });
       
@@ -390,7 +390,7 @@ export class KeywordsManager {
       try {
         const response = await fetch(`${API_ENDPOINTS.SETTINGS}?update_key=eq.1`, {
           method: 'PATCH',
-          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
+          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
           body: JSON.stringify({ keywords: '' })
         });
         

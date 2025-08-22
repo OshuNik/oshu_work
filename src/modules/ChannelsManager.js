@@ -89,7 +89,7 @@ export class ChannelsManager {
   async isChannelExists(channelId) {
     try {
       const response = await fetch(`${API_ENDPOINTS.CHANNELS}?channel_id=eq.${encodeURIComponent(channelId)}&select=id`, {
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
       });
       
       if (response.ok) {
@@ -245,7 +245,7 @@ export class ChannelsManager {
         
         const response = await fetch(deleteUrl, {
           method: 'DELETE',
-          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
         });
         
         log('log', '[DEBUG] Ответ удаления:', response.status, response.statusText);
@@ -288,7 +288,7 @@ export class ChannelsManager {
         
         const response = await fetch(updateUrl, {
           method: 'PATCH',
-          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
+          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {},
           body: JSON.stringify({ is_enabled: is_enabled })
         });
         
@@ -367,7 +367,7 @@ export class ChannelsManager {
     
     try {
       const response = await fetch(API_ENDPOINTS.CHANNELS, {
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
       });
       
       if (!response.ok) {
@@ -450,7 +450,7 @@ export class ChannelsManager {
       try {
         const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${id}`, {
           method: 'DELETE',
-          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+          headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
         });
         
         if (response.ok) {
@@ -495,7 +495,7 @@ export class ChannelsManager {
     try {
       const response = await fetch(API_ENDPOINTS.CHANNELS, {
         method: 'DELETE',
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
       });
       
       if (response.ok) {
@@ -525,7 +525,7 @@ export class ChannelsManager {
   async loadDefaultChannels() {
     try {
       const response = await fetch(API_ENDPOINTS.DEFAULT_CHANNELS, {
-        headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {}
+        headers: window.utils?.createSupabaseHeaders ? window.utils.createSupabaseHeaders() : {}
       });
       
       if (!response.ok) {
