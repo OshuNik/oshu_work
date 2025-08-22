@@ -128,7 +128,12 @@ export class ChannelsManager {
     
     const response = await fetch(API_ENDPOINTS.CHANNELS, {
       method: 'POST',
-      headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders({ prefer: 'return=representation' }) : {},
+      headers: {
+        'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
       body: JSON.stringify(newChannelData)
     });
     
@@ -195,13 +200,6 @@ export class ChannelsManager {
       dataset: { dbId: channel.id }
     });
     
-    // Переключатель включения/отключения
-    const toggleInput = createElement('input', {
-      type: 'checkbox',
-      className: 'channel-toggle',
-      checked: channel.is_enabled || false
-    });
-    
     // Получаем @username из channel_id - убираем все лишнее
     let username = channel.channel_id || '';
     if (username.includes('t.me/')) {
@@ -220,6 +218,29 @@ export class ChannelsManager {
     const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(username) : username;
     titleLink.textContent = escapedTitle;
     
+    // Контейнер для правых кнопок
+    const rightControls = createElement('div', {
+      className: 'channel-controls'
+    });
+    
+    // Слайдер-переключатель включения/отключения
+    const toggleWrapper = createElement('label', {
+      className: 'toggle-switch'
+    });
+    
+    const toggleInput = createElement('input', {
+      type: 'checkbox',
+      className: 'toggle-input',
+      checked: channel.is_enabled || false
+    });
+    
+    const toggleSlider = createElement('span', {
+      className: 'toggle-slider'
+    });
+    
+    toggleWrapper.appendChild(toggleInput);
+    toggleWrapper.appendChild(toggleSlider);
+    
     // Кнопка удаления
     const deleteButton = createElement('button', { className: 'channel-item-delete' });
     deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
@@ -232,7 +253,11 @@ export class ChannelsManager {
       try {
         const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
           method: 'PATCH',
-          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
+          headers: {
+            'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({ is_enabled: isEnabled })
         });
         
@@ -314,10 +339,13 @@ export class ChannelsManager {
       }
     };
     
-    // Собираем элементы - переключатель, username-ссылка и кнопка удаления
-    channelItem.appendChild(toggleInput);
+    // Собираем правые элементы управления
+    rightControls.appendChild(toggleWrapper);
+    rightControls.appendChild(deleteButton);
+    
+    // Собираем итоговый элемент канала
     channelItem.appendChild(titleLink);
-    channelItem.appendChild(deleteButton);
+    channelItem.appendChild(rightControls);
     
     // Добавляем обработчики
     toggleInput.addEventListener('change', toggleHandler);
