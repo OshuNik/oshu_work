@@ -24,8 +24,14 @@
 
     <!-- Навигация по вкладкам -->
     <nav class="settings-tabs">
-      <button class="tab-button active" data-target="keywords-section">КЛЮЧЕВЫЕ СЛОВА</button>
-      <button class="tab-button" data-target="channels-section">КАНАЛЫ</button>
+      <button class="tab-button keywords active" data-target="keywords-section">
+        <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
+        <span class="tab-count" id="keywords-tab-count">0</span>
+      </button>
+      <button class="tab-button channels" data-target="channels-section">
+        <span class="tab-label">КАНАЛЫ</span>
+        <span class="tab-count" id="channels-tab-count">0</span>
+      </button>
     </nav>
 
     <!-- Контент -->
@@ -249,6 +255,47 @@
         modal.classList.add('active');
       }
     });
+
+    // Функция обновления счетчиков на вкладках
+    function updateTabCounters() {
+      const keywordsCount = document.getElementById('keywords-count').textContent;
+      const channelsCount = document.getElementById('channels-count').textContent;
+      
+      const keywordsTabCount = document.getElementById('keywords-tab-count');
+      const channelsTabCount = document.getElementById('channels-tab-count');
+      
+      if (keywordsTabCount && keywordsCount) {
+        keywordsTabCount.textContent = keywordsCount;
+        keywordsTabCount.classList.add('updating');
+        setTimeout(() => keywordsTabCount.classList.remove('updating'), 200);
+      }
+      
+      if (channelsTabCount && channelsCount) {
+        channelsTabCount.textContent = channelsCount;
+        channelsTabCount.classList.add('updating');
+        setTimeout(() => channelsTabCount.classList.remove('updating'), 200);
+      }
+    }
+
+    // Наблюдатель за изменениями счетчиков
+    const observer = new MutationObserver(() => {
+      updateTabCounters();
+    });
+
+    // Начинаем наблюдение за счетчиками
+    const keywordsCountEl = document.getElementById('keywords-count');
+    const channelsCountEl = document.getElementById('channels-count');
+    
+    if (keywordsCountEl) {
+      observer.observe(keywordsCountEl, { childList: true, subtree: true });
+    }
+    
+    if (channelsCountEl) {
+      observer.observe(channelsCountEl, { childList: true, subtree: true });
+    }
+
+    // Инициализация счетчиков при загрузке
+    setTimeout(updateTabCounters, 100);
   </script>
 </body>
 </html>

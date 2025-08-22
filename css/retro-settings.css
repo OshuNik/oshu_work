@@ -136,34 +136,41 @@ body {
 
 /* === НАВИГАЦИЯ ПО ВКЛАДКАМ === */
 .settings-tabs {
-  display: flex;
-  gap: 0;
-  background: var(--card-color);
-  border-bottom: var(--card-border) solid var(--border-color);
-  box-shadow: var(--box-shadow);
-  position: sticky;
-  top: 56px;
-  z-index: 99;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background-color: transparent;
+  padding: 0 10px;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 10;
+  border-top: none;
 }
 
 .settings-tabs .tab-button {
-  flex: 1;
-  background: var(--card-color);
+  font-family: 'Roboto Mono', monospace;
+  background: #e0e0e0;
   color: var(--hint-color);
   border: var(--border-width) solid var(--border-color);
   border-bottom: none;
-  padding: 15px 20px;
-  font-family: var(--font-mono);
-  font-size: 14px;
+  padding: 10px 12px;
   font-weight: 700;
+  border-radius: 8px 8px 0 0;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  transition: all 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  top: 0;
+  top: 10px;
   box-shadow: none;
-  border-radius: 0;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
 }
 
 
@@ -171,11 +178,11 @@ body {
 
 
 .settings-tabs .tab-button.active {
-  color: var(--text-color);
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
   top: 0;
-  box-shadow: none;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  color: var(--text-color);
+  box-shadow: var(--shadow-offset) 0px 0px var(--border-color);
 }
 
 .settings-tabs .tab-button.keywords.active { 
@@ -189,6 +196,64 @@ body {
 .settings-tabs .tab-button:hover:not(.active) {
   background: var(--secondary-bg);
   color: var(--text-color);
+}
+
+/* Анимация длинного тапа для вкладок */
+.settings-tabs .tab-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.2s ease-out;
+}
+
+.settings-tabs .tab-button.pressing::after {
+  transform: scaleX(1);
+}
+
+.settings-tabs .tab-button .tab-label { 
+  font-size: 13px; 
+}
+
+.settings-tabs .tab-button .tab-count { 
+  font-family: 'Roboto Mono', monospace;
+  font-size: 11px; 
+  font-weight: 700;
+  margin-top: 2px; 
+  color: rgba(102, 102, 102, 0.7);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  min-width: auto;
+  text-align: center;
+  display: block;
+  line-height: 1.2;
+  transition: all 0.2s ease-out;
+  position: relative;
+}
+
+/* Анимация при обновлении счетчика */
+.settings-tabs .tab-button .tab-count.updating {
+  transform: scale(1.1);
+}
+
+/* Счетчики активных табов - яркие и заметные */
+.settings-tabs .tab-button.keywords.active .tab-count { 
+  color: var(--text-color);
+  opacity: 1;
+  font-weight: 700;
+}
+
+.settings-tabs .tab-button.channels.active .tab-count { 
+  color: var(--text-color);
+  opacity: 1;
+  font-weight: 700;
 }
 
 
@@ -287,6 +352,7 @@ body {
 /* === КОНТЕНТ === */
 .settings-content {
   padding: var(--card-padding);
+  padding-bottom: 100px; /* Место для фиксированных вкладок */
   min-height: calc(100vh - 200px);
 }
 
