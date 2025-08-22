@@ -204,11 +204,11 @@ export class SettingsUI {
     }
     
     // Кнопка удаления всех каналов
-    const deleteAllBtn = getElement('delete-all-btn');
-    if (deleteAllBtn) {
-      const handler = () => this.handleDeleteAllChannels();
-      deleteAllBtn.addEventListener('click', handler);
-      this.eventHandlers.set('delete-all-channels', { element: deleteAllBtn, event: 'click', handler });
+    const clearAllChannelsBtn = getElement('clear-all-channels-btn');
+    if (clearAllChannelsBtn) {
+      const handler = () => this.handleClearAllChannels();
+      clearAllChannelsBtn.addEventListener('click', handler);
+      this.eventHandlers.set('clear-all-channels', { element: clearAllChannelsBtn, event: 'click', handler });
     }
     
     // Кнопка добавления ключевых слов пачкой
@@ -382,6 +382,15 @@ export class SettingsUI {
   handleClearAllKeywords() {
     // Эмитируем событие для KeywordsManager
     const event = new CustomEvent('clearAllKeywords');
+    document.dispatchEvent(event);
+  }
+
+  /**
+   * Обработать удаление всех каналов
+   */
+  handleClearAllChannels() {
+    // Эмитируем событие для ChannelsManager
+    const event = new CustomEvent('deleteAllChannels');
     document.dispatchEvent(event);
   }
 

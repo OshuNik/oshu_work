@@ -195,44 +195,20 @@ export class ChannelsManager {
       dataset: { dbId: channel.id }
     });
     
-    // Добавляем чекбокс для выбора
-    const selectContainer = createElement('div', { className: 'channel-item-toggle' });
-    const selectInput = createElement('input', { type: 'checkbox', className: 'channel-select-checkbox' });
-    
-    const infoDiv = createElement('div', { className: 'channel-item-info' });
-    
+    // Получаем @username из channel_id
     const cleanId = channel.channel_id.replace('@', '');
+    const username = `@${cleanId}`;
+    
+    // Создаем простой элемент с @username
     const titleSpan = createElement('span', { className: 'channel-item-title' });
-    
-    // Санитизируем текст для безопасности и сокращаем для лучшего отображения
-    let title = channel.channel_title || cleanId;
-    
-    // Сокращаем длинные названия до @... формата
-    if (title.length > 15) {
-      title = `@${cleanId.substring(0, 12)}...`;
-    } else if (!title.startsWith('@')) {
-      title = `@${cleanId}`;
-    }
-    
-    const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(title) : title;
+    const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(username) : username;
     titleSpan.textContent = escapedTitle;
     
-    const idLink = createElement('a', {
-      className: 'channel-item-id',
-      href: `https://t.me/${cleanId}`,
-      target: '_blank',
-      rel: 'noopener noreferrer'
-    }, `@${cleanId}`);
-    
-    const toggleContainer = createElement('div', { className: 'channel-item-toggle' });
-    const toggleLabel = createElement('label', { className: 'toggle-switch' });
-    const toggleInput = createElement('input', { type: 'checkbox', checked: channel.is_enabled });
-    const toggleSlider = createElement('span', { className: 'toggle-slider' });
-    
+    // Кнопка удаления
     const deleteButton = createElement('button', { className: 'channel-item-delete' });
-    deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
     
-    // Создаем обработчики как отдельные функции для возможности cleanup
+    // Обработчик удаления
     const deleteHandler = async () => {
       const dbId = channelItem.dataset.dbId;
       log('log', '[DEBUG] Удаление канала:', { dbId, channel_id: channel.channel_id });
@@ -289,90 +265,18 @@ export class ChannelsManager {
       }
     };
     
-    const toggleHandler = async (event) => {
-      const dbId = channelItem.dataset.dbId;
-      const is_enabled = event.target.checked;
-      log('log', '[DEBUG] Переключение канала:', { dbId, is_enabled, channel_id: channel.channel_id });
-      
-      if (!dbId) {
-        log('error', '[DEBUG] Отсутствует dbId для канала:', channel.channel_id);
-        return;
-      }
-      
-      try {
-        const updateUrl = `${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`;
-        log('log', '[DEBUG] URL обновления:', updateUrl);
-        
-        const response = await fetch(updateUrl, {
-          method: 'PATCH',
-          headers: {
-          'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${window.APP_CONFIG?.SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json'
-        },
-          body: JSON.stringify({ is_enabled: is_enabled })
-        });
-        
-        log('log', '[DEBUG] Ответ обновления статуса:', response.status, response.statusText);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          log('error', '[DEBUG] Ошибка обновления:', errorText);
-          throw new Error(`Ошибка ответа сети: ${response.status} ${errorText}`);
-        }
-        
-        log('log', '[DEBUG] Статус канала успешно обновлен');
-        if (this.utils.uiToast) {
-          this.utils.uiToast(is_enabled ? MESSAGES.SUCCESS.CHANNEL_TOGGLED : MESSAGES.SUCCESS.CHANNEL_DISABLED);
-        }
-      } catch (error) {
-        log('error', '[DEBUG] Ошибка обновления статуса канала:', error);
-        if (this.utils.safeAlert) {
-          this.utils.safeAlert(MESSAGES.ERRORS.UPDATE_FAILED);
-        }
-        event.target.checked = !is_enabled;
-      }
-    };
-
-    // Обработчик для чекбокса выбора
-    const selectHandler = () => {
-      if (selectInput.checked) {
-        channelItem.classList.add('selected');
-        this.selectedChannels.add(channel.id);
-      } else {
-        channelItem.classList.remove('selected');
-        this.selectedChannels.delete(channel.id);
-      }
-      this.updateDeleteSelectedButton();
-    };
-
-    // Собираем элементы
-    selectContainer.appendChild(selectInput);
-    infoDiv.appendChild(titleSpan);
-    infoDiv.appendChild(idLink);
-    toggleLabel.appendChild(toggleInput);
-    toggleLabel.appendChild(toggleSlider);
-    toggleContainer.appendChild(toggleLabel);
-    
-    channelItem.appendChild(selectContainer);
-    channelItem.appendChild(infoDiv);
-    channelItem.appendChild(toggleContainer);
+    // Собираем элементы - только username и кнопка удаления
+    channelItem.appendChild(titleSpan);
     channelItem.appendChild(deleteButton);
     
-    // Добавляем обработчики событий
-    selectInput.addEventListener('change', selectHandler);
-    toggleInput.addEventListener('change', toggleHandler);
+    // Добавляем обработчик удаления
     deleteButton.addEventListener('click', deleteHandler);
     
     // Добавляем в контейнер
     this.container.appendChild(channelItem);
     
-    // Сохраняем ссылки на обработчики для возможности cleanup
-    channelItem._handlers = {
-      select: selectHandler,
-      toggle: toggleHandler,
-      delete: deleteHandler
-    };
+    // Сохраняем ссылку на обработчик для cleanup
+    channelItem._handlers = { delete: deleteHandler };
   }
 
   /**
@@ -570,17 +474,29 @@ export class ChannelsManager {
       }
       
       const defaultChannels = await response.json();
+      let addedCount = 0;
+      let existingCount = 0;
       
       // Добавляем каждый стандартный канал
       for (const defaultChannel of defaultChannels) {
         const exists = await this.isChannelExists(defaultChannel.channel_id);
         if (!exists) {
           await this.createChannel(defaultChannel.channel_id);
+          addedCount++;
+        } else {
+          existingCount++;
         }
       }
       
+      // Показываем соответствующее сообщение
       if (this.utils.uiToast) {
-        this.utils.uiToast(MESSAGES.SUCCESS.DEFAULTS_LOADED);
+        if (addedCount > 0 && existingCount > 0) {
+          this.utils.uiToast(`Добавлено ${addedCount} каналов, ${existingCount} уже существовали`);
+        } else if (addedCount > 0) {
+          this.utils.uiToast(`Добавлено ${addedCount} стандартных каналов`);
+        } else if (existingCount > 0) {
+          this.utils.uiToast('Все стандартные каналы уже добавлены');
+        }
       }
       
       // Перезагружаем список каналов

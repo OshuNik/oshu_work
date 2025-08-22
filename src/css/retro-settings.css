@@ -95,6 +95,8 @@ body {
 .header-controls {
   position: absolute;
   right: var(--card-padding);
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 8px;
