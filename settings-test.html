@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Настройки - Тест - oshu://work</title>
+  
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <style>
+    /* === CSS ПЕРЕМЕННЫЕ === */
+    :root {
+      --background-color: #F0F0F0;
+      --card-color: #FFFFFF;
+      --text-color: #000000;
+      --hint-color: #666666;
+      --border-color: #000000;
+      --accent-red: #FF5C5C;
+      --accent-yellow: #FFD93D;
+      --accent-green: #6BCB77;
+      --accent-blue: #41A6FF;
+      
+      --card-padding: 20px;
+      --card-margin: 20px;
+      --card-border: 4px;
+      --card-radius: 8px;
+      --border-width: 2px;
+      --shadow-offset: 4px;
+      --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+      --transition-fast: 0.1s ease-out;
+      --transition-normal: 0.2s ease-out;
+      
+      --font-mono: 'Roboto Mono', 'Courier New', monospace;
+      --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+    }
+
+    /* Темная тема */
+    [data-theme="dark"] {
+      --background-color: #0F0F0F;
+      --card-color: #1E1E1E;
+      --text-color: #F5F5F5;
+      --hint-color: #A0A0A0;
+      --border-color: #3A3A3A;
+      --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Темная тема для вкладок */
+    [data-theme="dark"] .tab-button {
+      background: #2a2a2a;
+      color: var(--hint-color);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .tab-button.active {
+      color: var(--text-color);
+    }
+
+    /* === БАЗОВЫЕ СТИЛИ === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-mono);
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* === ЗАГОЛОВОК === */
+    .settings-header {
+      height: 56px;
+      padding: 0 var(--card-padding);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-color);
+      border-bottom: var(--card-border) solid var(--border-color);
+      box-shadow: var(--box-shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .settings-header h1 {
+      font-family: var(--font-pixel);
+      font-size: 20px;
+      letter-spacing: 1px;
+      margin: 0;
+      color: var(--text-color);
+      text-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .theme-toggle {
+      background: var(--card-color);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      transition: all var(--transition-fast);
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 5px 5px 0px var(--border-color);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(1px);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    /* === ВКЛАДКИ КАТЕГОРИЙ ВАКАНСИЙ === */
+    .category-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      background-color: transparent;
+      padding: 0 10px;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 10;
+      border-top: none;
+    }
+
+    .tab-button {
+      font-family: 'Roboto Mono', monospace;
+      background: #e0e0e0;
+      color: var(--hint-color);
+      border: var(--border-width) solid var(--border-color);
+      border-bottom: none;
+      padding: 10px 12px;
+      font-weight: 700;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      top: 10px;
+      box-shadow: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      overflow: visible;
+    }
+
+    .tab-label { 
+      font-size: 13px; 
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-count { 
+      font-family: 'Roboto Mono', monospace;
+      font-size: 11px; 
+      font-weight: 700;
+      margin-top: 2px; 
+      color: rgba(102, 102, 102, 0.7);
+      background: none;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      min-width: auto;
+      text-align: center;
+      display: block;
+      line-height: 1.2;
+      transition: all 0.2s ease-out;
+    }
+
+    .tab-button.active {
+      top: 0;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      color: var(--text-color);
+      box-shadow: var(--shadow-offset) 0px 0px var(--border-color);
+    }
+
+    .tab-button.keywords.active { 
+      background-color: var(--accent-blue); 
+    }
+
+    .tab-button.channels.active { 
+      background-color: var(--accent-green); 
+    }
+
+    .tab-button.keywords.active .tab-count { 
+      color: var(--text-color);
+      opacity: 1;
+      font-weight: 700;
+    }
+
+    .tab-button.channels.active .tab-count { 
+      color: var(--text-color);
+      opacity: 1;
+      font-weight: 700;
+    }
+
+    /* === КОНТЕНТ === */
+    .settings-content {
+      padding: var(--card-padding);
+      padding-bottom: 100px; /* Место для фиксированных вкладок */
+      min-height: calc(100vh - 200px);
+    }
+
+    .settings-section {
+      display: none;
+    }
+
+    .settings-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* === ЗАГОЛОВКИ СЕКЦИЙ === */
+    .section-header {
+      background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+      color: white;
+      padding: 18px 24px;
+      margin: 0 0 20px 0;
+      border-radius: var(--card-radius);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .channels-section .section-header {
+      background: linear-gradient(135deg, #6BCB77 0%, #4CAF50 100%);
+    }
+
+    .section-title {
+      font-family: var(--font-pixel);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Пиксельный счетчик для секций - ИСПРАВЛЕНО ПОЗИЦИОНИРОВАНИЕ */
+    .pixel-counter {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      font-family: var(--font-pixel);
+      font-size: 16px;
+      font-weight: 700;
+      margin-left: auto;
+    }
+
+    .pixel-counter .pixel-bar {
+      color: white;
+      font-size: 18px;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+      animation: pixelPulse 3s infinite ease-in-out;
+    }
+
+    .pixel-counter .favorites-count {
+      background: var(--accent-yellow);
+      color: var(--text-color);
+      padding: 6px 12px;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 400;
+      box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+      min-width: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Анимации для счетчиков - КОНТРАСТНЫЕ ФОНУ */
+    .pixel-counter .favorites-count.updating {
+      animation: retroFlash 0.4s ease-out;
+    }
+
+    .pixel-counter .favorites-count.counting-up {
+      animation: countingUp 0.8s ease-in-out;
+    }
+
+    .pixel-counter .favorites-count.counting-complete {
+      animation: countingComplete 0.4s ease-out;
+    }
+
+    /* === КАРТОЧКИ === */
+    .settings-card {
+      background: var(--card-color);
+      border: var(--card-border) solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: var(--card-padding);
+      margin-bottom: var(--card-margin);
+      box-shadow: var(--box-shadow);
+      transition: all var(--transition-normal);
+    }
+
+    .settings-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 0px var(--border-color);
+    }
+
+    .card-subtitle {
+      font-family: var(--font-pixel);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      margin-top: 0;
+    }
+
+    .card-description {
+      font-size: 14px;
+      color: var(--hint-color);
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    /* === ПОЛЯ ВВОДА === */
+    .input-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .input-wrapper {
+      flex: 1;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 15px;
+      border: var(--card-border) solid var(--border-color);
+      border-radius: var(--card-radius);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      background: var(--card-color);
+      box-shadow: var(--box-shadow);
+      transition: all var(--transition-normal);
+      box-sizing: border-box;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(65, 166, 255, 0.1);
+    }
+
+    .add-button {
+      background: var(--accent-green);
+      border: var(--card-border) solid var(--border-color);
+      border-radius: var(--card-radius);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      transition: all var(--transition-fast);
+      color: white;
+      font-weight: 700;
+    }
+
+    .add-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 5px 5px 0px var(--border-color);
+    }
+
+    .add-button:active {
+      transform: translateY(1px);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    /* === ТЕГИ === */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .tag {
+      background: var(--accent-blue);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+
+    .tag:hover {
+      transform: translateY(-1px);
+      box-shadow: 3px 3px 0px var(--border-color);
+    }
+
+    .example-tag {
+      background: var(--accent-yellow) !important;
+      color: var(--text-color) !important;
+      border-color: var(--text-color) !important;
+      font-weight: 700 !important;
+    }
+
+    .tag-remove {
+      background: var(--accent-red);
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      box-shadow: 1px 1px 0px var(--border-color);
+      transition: all var(--transition-fast);
+    }
+
+    .tag-remove:hover {
+      transform: scale(1.1);
+    }
+
+    /* === ТУМБЛЕРЫ КАНАЛОВ === */
+    .channel-toggle {
+      position: relative;
+      display: inline-block;
+      width: 24px;
+      height: 14px;
+      margin-right: 8px;
+    }
+
+    .channel-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 10px;
+      width: 10px;
+      left: 2px;
+      bottom: 1px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--accent-green);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(10px);
+    }
+
+    .channel-toggle:hover .toggle-slider {
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* === КНОПКИ ДЕЙСТВИЙ === */
+    .actions-container {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .action-button {
+      background: var(--card-color);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 12px 20px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      transition: all var(--transition-fast);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .action-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 5px 5px 0px var(--border-color);
+    }
+
+    .action-button:active {
+      transform: translateY(1px);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .action-button.success {
+      background: var(--accent-green);
+      color: white;
+      border-color: var(--accent-green);
+    }
+
+    .action-button.danger {
+      background: var(--accent-red);
+      color: white;
+      border-color: var(--accent-red);
+    }
+
+    .action-button.info {
+      background: var(--accent-blue);
+      color: white;
+      border-color: var(--accent-blue);
+    }
+
+    /* === АДАПТИВНОСТЬ === */
+    @media (max-width: 480px) {
+      .settings-header h1 {
+        font-size: 16px;
+      }
+      
+      .section-title {
+        font-size: 14px;
+      }
+      
+      .category-tabs {
+        padding: 0 5px;
+      }
+      
+      .tab-button {
+        padding: 8px 8px;
+      }
+      
+      .tab-label {
+        font-size: 11px;
+      }
+      
+      .tab-count {
+        font-size: 10px;
+      }
+
+      /* Анимация для счетчиков во вкладках */
+      .tab-count.updating {
+        transform: scale(1.1);
+        animation: retroFlash 0.4s ease-out;
+      }
+      
+      .actions-container {
+        flex-direction: column;
+      }
+      
+      .action-button {
+        width: 100%;
+      }
+    }
+
+    /* === АНИМАЦИИ === */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.8); }
+    }
+
+    @keyframes pixelPulse {
+      0%, 100% { 
+        color: white;
+        transform: scale(1);
+      }
+      50% { 
+        color: var(--accent-yellow);
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes retroFlash {
+      0% { background: var(--accent-yellow); }
+      25% { background: #FF4444; transform: scale(1.1); }
+      50% { background: #4444FF; }
+      75% { background: #44FF44; }
+      100% { background: var(--accent-yellow); transform: scale(1); }
+    }
+
+    @keyframes countingUp {
+      0% { 
+        background: var(--accent-yellow);
+        transform: scale(1);
+      }
+      100% { 
+        background: #44FF44;
+        transform: scale(1.1);
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    @keyframes countingComplete {
+      0% { 
+        background: #44FF44;
+        transform: scale(1.1);
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+      }
+      100% { 
+        background: var(--accent-yellow);
+        transform: scale(1);
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mini-app-settings">
+    <!-- Заголовок -->
+    <header class="settings-header">
+      <h1>НАСТРОЙКИ</h1>
+      <button class="theme-toggle" id="theme-toggle">☀️</button>
+    </header>
+    
+    <!-- Контент -->
+    <div class="settings-content">
+      
+      <!-- Секция ключевых слов -->
+      <div class="settings-section active" id="keywords-section">
+        <div class="section-header">
+          <span class="section-title">КЛЮЧЕВЫЕ СЛОВА</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="keywords-count" class="favorites-count">6</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+        
+        <!-- Добавление -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Одно слово или несколько через запятую:</p>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите ключевые слова..." value="монтаж, анимация, эффекты">
+            </div>
+            <button class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button class="action-button success">Загрузить пресет</button>
+          </div>
+        </div>
+        
+        <!-- Активные ключевые слова -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА</h3>
+          
+          <div class="tags-container">
+            <div class="tag">
+              монтаж
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              анимация
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              эффекты
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              цветокоррекция
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              звук
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              титры
+              <button class="tag-remove">×</button>
+            </div>
+          </div>
+          
+          <div class="actions-container">
+            <button class="action-button success">Сохранить как пресет</button>
+            <button class="action-button danger">Удалить все</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Секция каналов -->
+      <div class="settings-section" id="channels-section">
+        <div class="section-header">
+          <span class="section-title">КАНАЛЫ</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="channels-count" class="favorites-count">8</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+        
+        <!-- Добавление канала -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Кликабельные примеры:</p>
+          
+          <div class="tags-container" style="margin-bottom: 15px;">
+            <div class="tag example-tag" style="cursor: pointer;">@username</div>
+            <div class="tag example-tag" style="cursor: pointer;">t.me/channel</div>
+          </div>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите @username или ссылку на канал..." value="@videomontage">
+            </div>
+            <button class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button class="action-button info">Загрузить стандартные каналы</button>
+          </div>
+        </div>
+        
+        <!-- Активные каналы -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КАНАЛЫ</h3>
+          
+          <div class="tags-container">
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @videomontage
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @animation_pro
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @effects_master
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @color_correction
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @sound_design
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @titles_creator
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @transitions_pro
+              <button class="tag-remove">×</button>
+            </div>
+            <div class="tag">
+              <label class="channel-toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="margin-right: 8px;">✓</span>
+              @compositing_expert
+              <button class="tag-remove">×</button>
+            </div>
+          </div>
+          
+          <div class="actions-container">
+            <button class="action-button danger">Удалить все</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Вкладки категорий внизу -->
+    <div id="category-tabs" class="category-tabs" role="tablist" aria-label="Категории настроек">
+      <button id="tab-keywords" class="tab-button keywords active" data-target="keywords-section" data-category-name="КЛЮЧЕВЫЕ СЛОВА" 
+            role="tab" aria-selected="true" aria-controls="keywords-section">
+        <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
+        <span id="count-keywords" class="tab-count">6</span>
+      </button>
+      <button id="tab-channels" class="tab-button channels" data-target="channels-section" data-category-name="КАНАЛЫ"
+              role="tab" aria-selected="false" aria-controls="channels-section">
+        <span class="tab-label">КАНАЛЫ</span>
+        <span id="count-channels" class="tab-count">8</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // === ОСНОВНАЯ ЛОГИКА ===
+    
+    class SettingsApp {
+      constructor() {
+        this.currentSection = 0;
+        this.sections = ['keywords', 'channels'];
+        this.init();
+      }
+      
+      init() {
+        this.setupNavigation();
+        this.setupThemeToggle();
+      }
+      
+      // Настройка навигации
+      setupNavigation() {
+        // Вкладки категорий
+        document.querySelectorAll('.tab-button').forEach(tab => {
+          tab.addEventListener('click', (e) => {
+            const targetSection = e.currentTarget.dataset.target.replace('-section', '');
+            this.showSection(targetSection);
+          });
+        });
+      }
+      
+      // Показать секцию
+      showSection(sectionName) {
+        // Обновляем активную секцию
+        this.currentSection = this.sections.indexOf(sectionName);
+        
+        // Показываем нужную секцию
+        document.querySelectorAll('.settings-section').forEach(section => {
+          section.classList.toggle('active', section.id === `${sectionName}-section`);
+        });
+        
+        // Обновляем вкладки
+        this.updateTabs(sectionName);
+      }
+      
+      // Обновление вкладок
+      updateTabs(sectionName) {
+        document.querySelectorAll('.tab-button').forEach(tab => {
+          const isActive = tab.dataset.target === `${sectionName}-section`;
+          tab.classList.toggle('active', isActive);
+          tab.setAttribute('aria-selected', isActive);
+        });
+      }
+      
+      // Настройка переключения темы
+      setupThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        themeToggle.addEventListener('click', () => {
+          this.toggleTheme();
+        });
+      }
+      
+      // Переключение темы
+      toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        
+        // Обновляем иконку
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+      }
+    }
+    
+    // Инициализация приложения
+    document.addEventListener('DOMContentLoaded', () => {
+      new SettingsApp();
+    });
+    
+    // === ДЕМО-ФУНКЦИИ ===
+    
+    // Добавление тега
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('add-button')) {
+        const input = e.target.previousElementSibling.querySelector('.input-field');
+        if (input.value.trim()) {
+          console.log('Добавление:', input.value);
+          input.value = '';
+        }
+      }
+    });
+    
+    // Удаление тега
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tag-remove')) {
+        const tag = e.target.parentElement;
+        tag.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+          tag.remove();
+          // Обновляем счетчики
+          updateCounters();
+        }, 300);
+      }
+    });
+
+    // Обработка тумблеров каналов
+    document.addEventListener('change', (e) => {
+      if (e.target.type === 'checkbox' && e.target.closest('.channel-toggle')) {
+        const tag = e.target.closest('.tag');
+        const checkmark = tag.querySelector('span[style*="margin-right: 8px"]');
+        
+        if (e.target.checked) {
+          checkmark.textContent = '✓';
+          checkmark.style.color = 'white';
+        } else {
+          checkmark.textContent = '✗';
+          checkmark.style.color = '#FF5C5C';
+        }
+      }
+    });
+
+    // Функция обновления счетчиков с анимацией
+    function updateCounters() {
+      const keywordsCount = document.querySelectorAll('#keywords-section .tag').length;
+      const channelsCount = document.querySelectorAll('#channels-section .tag').length;
+      
+      // Обновляем счетчики в заголовках
+      const keywordsHeaderCount = document.getElementById('keywords-count');
+      const channelsHeaderCount = document.getElementById('channels-count');
+      
+      if (keywordsHeaderCount) {
+        keywordsHeaderCount.textContent = keywordsCount;
+        keywordsHeaderCount.classList.add('updating');
+        setTimeout(() => keywordsHeaderCount.classList.remove('updating'), 400);
+      }
+      
+      if (channelsHeaderCount) {
+        channelsHeaderCount.textContent = channelsCount;
+        channelsHeaderCount.classList.add('updating');
+        setTimeout(() => channelsHeaderCount.classList.remove('updating'), 400);
+      }
+      
+      // Обновляем счетчики во вкладках
+      const keywordsTabCount = document.getElementById('count-keywords');
+      const channelsTabCount = document.getElementById('count-channels');
+      
+      if (keywordsTabCount) {
+        keywordsTabCount.textContent = keywordsCount;
+        keywordsTabCount.classList.add('updating');
+        setTimeout(() => keywordsTabCount.classList.remove('updating'), 400);
+      }
+      
+      if (channelsTabCount) {
+        channelsTabCount.textContent = channelsCount;
+        channelsTabCount.classList.add('updating');
+        setTimeout(() => channelsTabCount.classList.remove('updating'), 400);
+      }
+    }
+    
+    // Кликабельные примеры
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tag') && e.target.style.background === 'var(--accent-yellow)') {
+        const input = e.target.closest('.settings-card').querySelector('.input-field');
+        input.value = e.target.textContent;
+        input.focus();
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -74,263 +74,135 @@
   
   <!-- Async CSS Loading for non-critical styles -->
   <link rel="preload" href="../css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="../css/retro-settings.css">
   
   <!-- Fonts loaded asynchronously -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <header class="header header-centered">
-    <div class="retro-header">
+  <div class="mini-app-settings">
+    <!-- Заголовок -->
+    <header class="settings-header">
       <h1>НАСТРОЙКИ</h1>
-    </div>
-    <div class="header-actions">
-      <a href="../../index.html" class="header-button">← Назад</a>
-    </div>
-    <button class="burger-menu-btn" id="burger-menu-btn" aria-label="Открыть меню">
-      <span class="burger-line"></span>
-      <span class="burger-line"></span>
-      <span class="burger-line"></span>
-    </button>
-  </header>
+      <button class="theme-toggle" id="theme-toggle">☀️</button>
+    </header>
 
-  <!-- Overlay для затемнения фона -->
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-  <!-- Боковая панель с навигацией -->
-  <div class="settings-sidebar" id="settings-sidebar">
-    <div class="sidebar-header">
-      <h2>МЕНЮ</h2>
-      <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Закрыть меню">
-        <span class="close-x">✕</span>
-      </button>
-    </div>
-    <nav class="sidebar-nav">
-      <button class="sidebar-tab-button active" data-target="tab-keywords">
-        <span class="sidebar-tab-icon">🔑</span>
-        <span class="sidebar-tab-label">Ключевые слова</span>
-        <span class="sidebar-tab-cursor">█</span>
-      </button>
-      <button class="sidebar-tab-button" data-target="tab-channels">
-        <span class="sidebar-tab-icon">📡</span>
-        <span class="sidebar-tab-label">Каналы</span>
-        <span class="sidebar-tab-cursor">█</span>
-      </button>
-      <button class="sidebar-tab-button" data-target="tab-appearance">
-        <span class="sidebar-tab-icon">🎨</span>
-        <span class="sidebar-tab-label">Внешний вид</span>
-        <span class="sidebar-tab-cursor">█</span>
-      </button>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="pixel-decoration">▓▓▓</div>
-    </div>
-  </div>
-
-  <main class="content">
-    <div id="tab-keywords" class="settings-tab-content active">
-      <!-- 1. ЗАГОЛОВОК ОКНА -->
-              <div class="keywords-window-header">
-          <span class="keywords-window-title">КЛЮЧЕВЫЕ СЛОВА</span>
-          <div class="keywords-pixel-counter">
-            <span class="keywords-pixel-bar">■■■</span>
-            <span id="keywords-count" class="keywords-count">0</span>
-            <span class="keywords-pixel-bar">■■■</span>
+    <!-- Контент -->
+    <div class="settings-content">
+      
+      <!-- Секция ключевых слов -->
+      <div class="settings-section active" id="keywords-section">
+        <div class="section-header">
+          <span class="section-title">КЛЮЧЕВЫЕ СЛОВА</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="keywords-count" class="favorites-count">6</span>
+            <span class="pixel-bar">■■■</span>
           </div>
         </div>
-
-      <!-- 2. ДОБАВИТЬ -->
-      <div class="keywords-add-card">
-        <h3 class="keywords-section-subtitle">ДОБАВИТЬ</h3>
         
-        <!-- 3. Одно слово или несколько через запятую: -->
-        <p class="keywords-section-description">Одно слово или несколько через запятую:</p>
-        
-        <!-- 4. Окно ввода -->
-        <div class="keywords-input-container">
-          <div class="keywords-input-wrapper">
-            <input type="text" class="keywords-input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
-            <button id="keywords-clear-button" class="keywords-clear-button" aria-label="Очистить"></button>
+        <!-- Добавление -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Одно слово или несколько через запятую:</p>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
+            </div>
+            <button id="add-keyword-btn" class="add-button">+</button>
           </div>
-          <button id="add-keyword-btn" class="keywords-add-button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
-          </button>
-        </div>
-        
-        <!-- 5. Кнопки действий -->
-        <div class="keywords-actions">
-          <button id="load-presets-btn" class="keywords-action-btn keywords-action-success">Загрузить пресет</button>
-        </div>
-      </div>
-
-      <!-- 5. АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА: -->
-      <div class="keywords-active-card">
-        <h3 class="keywords-section-subtitle">АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА:</h3>
-        
-        <!-- 6. Ключевые слова -->
-        <div class="keywords-tags-container" id="current-keywords-tags">
-          <div class="loading-indicator">Загрузка...</div>
-        </div>
-        
-        <!-- Действия с пресетами -->
-        <div class="keywords-preset-actions">
-          <button id="save-as-preset-btn" class="keywords-action-btn keywords-action-success">Сохранить как пресет</button>
-          <button id="clear-all-keywords-btn" class="keywords-action-btn keywords-action-danger">Удалить все</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-channels" class="settings-tab-content">
-      <!-- 1. ЗАГОЛОВОК ОКНА -->
-      <div class="channels-window-header">
-        <span class="channels-window-title">КАНАЛЫ</span>
-        <div class="channels-pixel-counter">
-          <span class="channels-pixel-bar">■■■</span>
-          <span id="channels-count" class="channels-count">0</span>
-          <span class="channels-pixel-bar">■■■</span>
-        </div>
-      </div>
-
-      <!-- 2. ДОБАВИТЬ -->
-      <div class="channels-add-card">
-        <h3 class="channels-section-subtitle">ДОБАВИТЬ</h3>
-        
-        <!-- 3. Кликабельные примеры -->
-        <div class="channels-input-examples">
-          <span class="example-label">Примеры:</span>
-          <button class="example-btn" data-example="@username">@username</button>
-          <button class="example-btn" data-example="https://t.me/channel">t.me/channel</button>
-        </div>
-        
-        <!-- 4. Окно ввода и плюсик добавить -->
-        <div class="channels-input-container">
-          <div class="channels-input-wrapper">
-            <input type="text" class="channels-input-field" placeholder="Введите @username или ссылку на канал..." id="channel-input">
-            <button id="channels-clear-button" class="channels-clear-button" aria-label="Очистить"></button>
+          
+          <div class="actions-container">
+            <button id="load-presets-btn" class="action-button success">Загрузить пресет</button>
           </div>
-          <button id="add-channel-btn" class="channels-add-button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
-          </button>
+        </div>
+        
+        <!-- Активные ключевые слова -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА</h3>
+          
+          <div class="tags-container" id="current-keywords-tags">
+            <div class="loading-indicator">Загрузка...</div>
+          </div>
+          
+          <div class="actions-container">
+            <button id="save-as-preset-btn" class="action-button success">Сохранить как пресет</button>
+            <button id="clear-all-keywords-btn" class="action-button danger">Удалить все</button>
+          </div>
         </div>
       </div>
 
-      <!-- 5. АКТИВНЫЕ КАНАЛЫ: -->
-      <div class="channels-active-card">
-        <h3 class="channels-section-subtitle">АКТИВНЫЕ КАНАЛЫ:</h3>
+      <!-- Секция каналов -->
+      <div class="settings-section" id="channels-section">
+        <div class="section-header">
+          <span class="section-title">КАНАЛЫ</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="channels-count" class="favorites-count">8</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
         
-        <!-- 6. Список каналов -->
-        <div class="channels-list-container">
+        <!-- Добавление канала -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Кликабельные примеры:</p>
+          
+          <div class="tags-container" style="margin-bottom: 15px;">
+            <div class="tag example-tag" style="cursor: pointer;">@username</div>
+            <div class="tag example-tag" style="cursor: pointer;">t.me/channel</div>
+          </div>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите @username или ссылку на канал..." id="channel-input">
+            </div>
+            <button id="add-channel-btn" class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button id="load-defaults-channels-btn" class="action-button info">Загрузить стандартные каналы</button>
+          </div>
+        </div>
+        
+        <!-- Активные каналы -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КАНАЛЫ</h3>
+          
           <div class="channels-list-header">
             <h4>Текущие каналы</h4>
             <div class="channels-controls">
-              <button id="channels-toggle-all" class="control-btn secondary">Выбрать все</button>
-              <button id="delete-selected-btn" class="control-btn destructive" disabled>Удалить выбранные</button>
+              <button id="channels-toggle-all" class="action-button success">Выбрать все</button>
+              <button id="delete-selected-btn" class="action-button danger" disabled>Удалить выбранные</button>
             </div>
           </div>
           <div id="channels-list" class="channels-list"></div>
-          <div class="channels-actions">
-            <button id="load-defaults-channels-btn" class="button-secondary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7,10 12,15 17,10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Загрузить стандартные каналы
-            </button>
-            <button id="delete-all-btn" class="button-delete">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              </svg>
-              Удалить все каналы
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-appearance" class="settings-tab-content">
-      <!-- 1. ЗАГОЛОВОК ОКНА -->
-      <div class="appearance-window-header">
-        <span class="appearance-window-title">ВНЕШНИЙ ВИД</span>
-      </div>
-
-      <!-- 2. НАСТРОЙКИ ТЕМЫ -->
-      <div class="appearance-theme-card">
-        <h3 class="appearance-section-subtitle">НАСТРОЙКИ ТЕМЫ</h3>
-        <p class="appearance-section-description">Выберите предпочитаемую цветовую схему интерфейса:</p>
-        
-        <!-- Переключатель темы -->
-        <div class="theme-toggle-container">
-          <span class="theme-label">☀️ Светлая</span>
-          <div class="retro-toggle-switch">
-            <input type="checkbox" id="theme-toggle" />
-            <label for="theme-toggle" class="retro-toggle-slider">
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-          <span class="theme-label">🌙 Темная</span>
-        </div>
-      </div>
-
-      <!-- 3. ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР -->
-      <div class="appearance-preview-card">
-        <h3 class="appearance-section-subtitle">ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР</h3>
-        <p class="appearance-section-description">Посмотрите, как будет выглядеть выбранная тема:</p>
-        
-        <div class="theme-preview-container">
-          <div class="theme-preview-item light-theme">
-            <div class="preview-header">
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-            </div>
-            <div class="preview-content">
-              <div class="preview-line short"></div>
-              <div class="preview-line medium"></div>
-              <div class="preview-line long"></div>
-            </div>
-            <div class="preview-label">Светлая тема</div>
-          </div>
           
-          <div class="theme-preview-item dark-theme">
-            <div class="preview-header">
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-              <div class="preview-dot"></div>
-            </div>
-            <div class="preview-content">
-              <div class="preview-line short"></div>
-              <div class="preview-line medium"></div>
-              <div class="preview-line long"></div>
-            </div>
-            <div class="preview-label">Темная тема</div>
+          <div class="actions-container">
+            <button id="delete-all-btn" class="action-button danger">Удалить все каналы</button>
           </div>
         </div>
       </div>
 
-      <!-- 4. ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ -->
-      <div class="appearance-options-card">
-        <h3 class="appearance-section-subtitle">ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ</h3>
-        <p class="appearance-section-description">Настройте дополнительные параметры интерфейса:</p>
-        
-        <div class="appearance-options">
-          <button class="appearance-action-btn appearance-action-success">
-            📱 Применить тему
-          </button>
-          <button class="appearance-action-btn appearance-action-info">
-            📊 Статистика использования
-          </button>
-          <button class="appearance-action-btn appearance-action-warning">
-            🔄 Сбросить настройки
-          </button>
-        </div>
-      </div>
+      
     </div>
-  </main>
+    
+    <!-- Вкладки категорий внизу -->
+    <div id="category-tabs" class="category-tabs" role="tablist" aria-label="Категории настроек">
+      <button id="tab-keywords" class="tab-button keywords active" data-target="keywords-section" data-category-name="КЛЮЧЕВЫЕ СЛОВА" 
+            role="tab" aria-selected="true" aria-controls="keywords-section">
+        <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
+        <span id="count-keywords" class="tab-count">6</span>
+      </button>
+      <button id="tab-channels" class="tab-button channels" data-target="channels-section" data-category-name="КАНАЛЫ"
+              role="tab" aria-selected="false" aria-controls="channels-section">
+        <span class="tab-label">КАНАЛЫ</span>
+        <span id="count-channels" class="tab-count">8</span>
+      </button>
+    </div>
+  </div>
   
   <div id="toast-container" class="toast-container"></div>
 
@@ -403,6 +275,52 @@
         modal.classList.remove('active');
       }
     }
+
+    // Инициализация новых вкладок
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      
+      tabButtons.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const target = this.dataset.target;
+          
+          // Убираем активность со всех вкладок
+          tabButtons.forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.remove('active');
+          });
+          
+          // Активируем выбранную вкладку
+          this.classList.add('active');
+          const targetSection = document.getElementById(target);
+          if (targetSection) {
+            targetSection.classList.add('active');
+          }
+        });
+      });
+
+      // Инициализация переключения темы
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          
+          document.documentElement.setAttribute('data-theme', newTheme);
+          themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+          
+          // Сохраняем в localStorage
+          localStorage.setItem('theme', newTheme);
+        });
+
+        // Загружаем сохраненную тему
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        }
+      }
+    });
   </script>
 </body>
 </html>
