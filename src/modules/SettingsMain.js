@@ -78,6 +78,14 @@ export class SettingsMain {
       }
     });
 
+    // Добавление ключевых слов (с поддержкой запятых)
+    document.addEventListener('addKeywords', (e) => {
+      const { value } = e.detail;
+      if (this.keywordsManager) {
+        this.keywordsManager.addKeywords(value);
+      }
+    });
+
     // Добавление ключевых слов пачкой
     document.addEventListener('addBatchKeywords', (e) => {
       const { value } = e.detail;

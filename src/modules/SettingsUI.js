@@ -334,8 +334,8 @@ export class SettingsUI {
     
     const value = this.keywordsInput.value.trim();
     if (value) {
-      // Эмитируем событие для KeywordsManager
-      const event = new CustomEvent('addKeyword', { detail: { value } });
+      // Эмитируем событие для KeywordsManager с поддержкой запятых
+      const event = new CustomEvent('addKeywords', { detail: { value } });
       document.dispatchEvent(event);
       
       this.clearKeywordsInput();
