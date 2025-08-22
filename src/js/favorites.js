@@ -60,7 +60,7 @@
 
   const container = document.getElementById('favorites-list');
   const searchInputFav = document.getElementById('favorites-search');
-  const searchClearBtnFav = document.getElementById('favorites-search-btn');
+  const searchClearBtnFav = document.getElementById('favorites-search-clear');
   const searchInputWrapperFav = searchInputFav?.parentElement;
   
   // Проверяем критические элементы
@@ -461,7 +461,12 @@
                 const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
                 const resp = await fetchWithRetry(url, {
                   method: 'PATCH',
-                  headers: createSupabaseHeaders({ prefer: 'return=minimal' }),
+                  headers: {
+                    'apikey': CFG.SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${CFG.SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                  },
                   body: JSON.stringify({ status: newStatus })
                 }, RETRY_OPTIONS);
 
