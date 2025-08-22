@@ -195,18 +195,67 @@ export class ChannelsManager {
       dataset: { dbId: channel.id }
     });
     
-    // Получаем @username из channel_id
-    const cleanId = channel.channel_id.replace('@', '');
-    const username = `@${cleanId}`;
+    // Переключатель включения/отключения
+    const toggleInput = createElement('input', {
+      type: 'checkbox',
+      className: 'channel-toggle',
+      checked: channel.is_enabled || false
+    });
     
-    // Создаем простой элемент с @username
-    const titleSpan = createElement('span', { className: 'channel-item-title' });
+    // Получаем @username из channel_id - убираем все лишнее
+    let username = channel.channel_id || '';
+    if (username.includes('t.me/')) {
+      username = '@' + username.split('t.me/')[1].split('/')[0];
+    } else if (!username.startsWith('@')) {
+      username = '@' + username.replace('@', '');
+    }
+    
+    // Создаем кликабельную ссылку с правильным @username
+    const titleLink = createElement('a', { 
+      className: 'channel-item-title',
+      href: `https://t.me/${username.replace('@', '')}`,
+      target: '_blank',
+      rel: 'noopener noreferrer'
+    });
     const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(username) : username;
-    titleSpan.textContent = escapedTitle;
+    titleLink.textContent = escapedTitle;
     
     // Кнопка удаления
     const deleteButton = createElement('button', { className: 'channel-item-delete' });
     deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    
+    // Обработчик переключения
+    const toggleHandler = async (e) => {
+      const isEnabled = e.target.checked;
+      const dbId = channelItem.dataset.dbId;
+      
+      try {
+        const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=eq.${dbId}`, {
+          method: 'PATCH',
+          headers: this.utils.createSupabaseHeaders ? this.utils.createSupabaseHeaders() : {},
+          body: JSON.stringify({ is_enabled: isEnabled })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Обновляем локальные данные
+        const channelIndex = this.channels.findIndex(ch => ch.id.toString() === dbId);
+        if (channelIndex !== -1) {
+          this.channels[channelIndex].is_enabled = isEnabled;
+        }
+        
+        log('log', `Канал ${channel.channel_id} ${isEnabled ? 'включен' : 'отключен'}`);
+      } catch (error) {
+        log('error', 'Ошибка переключения канала:', error);
+        // Возвращаем состояние переключателя обратно
+        e.target.checked = !isEnabled;
+        if (this.utils.safeAlert) {
+          this.utils.safeAlert('Ошибка переключения канала');
+        }
+      }
+    };
     
     // Обработчик удаления
     const deleteHandler = async () => {
@@ -265,18 +314,20 @@ export class ChannelsManager {
       }
     };
     
-    // Собираем элементы - только username и кнопка удаления
-    channelItem.appendChild(titleSpan);
+    // Собираем элементы - переключатель, username-ссылка и кнопка удаления
+    channelItem.appendChild(toggleInput);
+    channelItem.appendChild(titleLink);
     channelItem.appendChild(deleteButton);
     
-    // Добавляем обработчик удаления
+    // Добавляем обработчики
+    toggleInput.addEventListener('change', toggleHandler);
     deleteButton.addEventListener('click', deleteHandler);
     
     // Добавляем в контейнер
     this.container.appendChild(channelItem);
     
-    // Сохраняем ссылку на обработчик для cleanup
-    channelItem._handlers = { delete: deleteHandler };
+    // Сохраняем ссылки на обработчики для cleanup
+    channelItem._handlers = { toggle: toggleHandler, delete: deleteHandler };
   }
 
   /**
@@ -426,7 +477,9 @@ export class ChannelsManager {
     if (!ok) return;
     
     try {
-      const response = await fetch(API_ENDPOINTS.CHANNELS, {
+      // Для удаления всех записей в Supabase нужно использовать фильтр
+      // Используем id>0 чтобы удалить все записи (так как id всегда больше 0)
+      const response = await fetch(`${API_ENDPOINTS.CHANNELS}?id=gt.0`, {
         method: 'DELETE',
         headers: {
           'apikey': window.APP_CONFIG?.SUPABASE_ANON_KEY,
@@ -446,7 +499,9 @@ export class ChannelsManager {
           this.utils.uiToast(MESSAGES.SUCCESS.ALL_DELETED);
         }
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        log('error', 'Ошибка DELETE запроса:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}. ${errorText}`);
       }
     } catch (error) {
       log('error', 'Ошибка удаления всех каналов:', error);
