@@ -30,24 +30,31 @@
   
   function setTheme(theme) {
     const body = document.body;
+    const root = document.documentElement;
     
     // Удаляем все классы тем
     body.classList.remove('dark-theme');
     body.removeAttribute('data-theme');
+    root.removeAttribute('data-theme');
     
     switch (theme) {
       case 'dark':
         body.setAttribute('data-theme', 'dark');
+        root.setAttribute('data-theme', 'dark');
         // Принудительно применяем темную тему
         applyDarkTheme();
         break;
       case 'light':
       default:
         body.setAttribute('data-theme', 'light');
+        root.setAttribute('data-theme', 'light');
         // Принудительно применяем светлую тему
         applyLightTheme();
         break;
     }
+    
+    // Сохраняем выбранную тему
+    localStorage.setItem('app-theme', theme);
   }
   
   // Принудительное применение темной темы - улучшенные цвета Material Design 2024
@@ -81,9 +88,40 @@
     });
   }
   
-  // Принудительное применение светлой темы - точно как в оригинале
+  // Принудительное применение светлой темы - сброс всех темных переменных
   function applyLightTheme() {
     const root = document.documentElement;
+    
+    // Сначала удаляем все темные переменные
+    const darkVariables = [
+      '--background-color',
+      '--card-color',
+      '--text-color',
+      '--hint-color',
+      '--border-color',
+      '--input-bg',
+      '--input-border',
+      '--secondary-bg',
+      '--header-bg',
+      '--button-bg',
+      '--button-text',
+      '--destructive-color',
+      '--link-color',
+      '--section-separator',
+      '--accent-red',
+      '--accent-yellow',
+      '--accent-green',
+      '--accent-blue',
+      '--box-shadow',
+      '--box-shadow-pressed'
+    ];
+    
+    // Удаляем все темные переменные для возврата к исходным значениям CSS
+    darkVariables.forEach(property => {
+      root.style.removeProperty(property);
+    });
+    
+    // Теперь устанавливаем светлые значения (если нужны кастомные)
     const lightColors = {
       '--background-color': '#F0F0F0',
       '--card-color': '#FFFFFF',

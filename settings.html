@@ -230,6 +230,7 @@
           } else {
             // Fallback если ThemeManager не загружен
             document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('app-theme', newTheme);
           }
           
           // Обновляем иконку
@@ -237,9 +238,6 @@
           if (icon) {
             icon.className = newTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
           }
-          
-          // Сохраняем в localStorage (унифицированный ключ)
-          localStorage.setItem('app-theme', newTheme);
         });
 
         // Загружаем сохраненную тему (унифицированный ключ)
