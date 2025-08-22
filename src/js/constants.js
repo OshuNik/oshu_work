@@ -88,5 +88,11 @@
     PTR_CONFIG,
     PERFORMANCE
   };
+  
+  // Добавляем константы из CONFIG после его загрузки
+  if (window.APP_CONFIG) {
+    window.APP_CONSTANTS.CATEGORIES = window.APP_CONFIG.CATEGORIES;
+    window.APP_CONSTANTS.STATUSES = window.APP_CONFIG.STATUSES;
+  }
 
 })();
