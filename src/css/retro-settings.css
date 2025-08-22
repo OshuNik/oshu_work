@@ -418,29 +418,28 @@ body {
 }
 
 .add-button {
-  background: var(--accent-green);
-  border: var(--card-border) solid var(--border-color);
+  background: var(--hint-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--card-radius);
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--box-shadow);
   transition: all var(--transition-fast);
   color: white;
-  font-weight: 700;
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .add-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 5px 5px 0px var(--border-color);
+  background: var(--accent-green);
+  transform: scale(1.05);
 }
 
 .add-button:active {
-  transform: translateY(1px);
-  box-shadow: 2px 2px 0px var(--border-color);
+  transform: scale(0.95);
 }
 
 /* === ТЕГИ === */
@@ -776,7 +775,12 @@ input:checked + .toggle-slider:before {
   background: var(--card-color);
   border: var(--border-width) dashed var(--border-color);
   border-radius: var(--card-radius);
-  margin: 10px 0;
+  margin: 10px auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* === МОДАЛЬНОЕ ОКНО ПРЕСЕТОВ === */
