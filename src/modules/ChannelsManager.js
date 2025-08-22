@@ -204,8 +204,17 @@ export class ChannelsManager {
     const cleanId = channel.channel_id.replace('@', '');
     const titleSpan = createElement('span', { className: 'channel-item-title' });
     
-    // Санитизируем текст для безопасности
-    const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(channel.channel_title || cleanId) : (channel.channel_title || cleanId);
+    // Санитизируем текст для безопасности и сокращаем для лучшего отображения
+    let title = channel.channel_title || cleanId;
+    
+    // Сокращаем длинные названия до @... формата
+    if (title.length > 15) {
+      title = `@${cleanId.substring(0, 12)}...`;
+    } else if (!title.startsWith('@')) {
+      title = `@${cleanId}`;
+    }
+    
+    const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(title) : title;
     titleSpan.textContent = escapedTitle;
     
     const idLink = createElement('a', {
