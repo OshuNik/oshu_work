@@ -1052,3 +1052,127 @@ input:checked + .toggle-slider:before {
     transform: scale(0) rotate(180deg); 
   }
 }
+
+/* === СТИЛИ ДЛЯ ЭЛЕМЕНТОВ КАНАЛОВ === */
+.channel-item {
+  display: flex;
+  align-items: center;
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 12px;
+  margin: 8px 0;
+  box-shadow: var(--box-shadow);
+  transition: var(--transition-normal);
+}
+
+.channel-item:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--shadow-offset) + 1px) calc(var(--shadow-offset) + 1px) 0px var(--border-color);
+}
+
+.channel-item-toggle {
+  margin-right: 12px;
+}
+
+.channel-select-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.channel-item-info {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.channel-item-title {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-color);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.channel-item-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.channel-item-id:hover {
+  text-decoration: underline;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ccc;
+  border: 2px solid var(--border-color);
+  border-radius: 24px;
+  transition: var(--transition-normal);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition-normal);
+}
+
+input:checked + .toggle-slider {
+  background: var(--accent-green);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.channel-item-delete {
+  background: var(--accent-red);
+  border: 2px solid var(--border-color);
+  border-radius: var(--card-radius);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: var(--transition-fast);
+}
+
+.channel-item-delete:hover {
+  background: #FF3030;
+  transform: scale(1.05);
+}
+
+.channel-item-delete svg {
+  width: 16px;
+  height: 16px;
+}
