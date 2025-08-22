@@ -171,6 +171,7 @@
 
   <!-- Скрипты -->
   <script src="src/js/config.js"></script>
+  <script src="src/js/theme-manager.js"></script>
   <script type="module">
     import { SettingsMain } from './src/modules/SettingsMain.js';
     
@@ -223,7 +224,13 @@
           const currentTheme = document.documentElement.getAttribute('data-theme');
           const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
           
-          document.documentElement.setAttribute('data-theme', newTheme);
+          // Используем ThemeManager для правильного применения темы
+          if (window.ThemeManager) {
+            window.ThemeManager.setTheme(newTheme);
+          } else {
+            // Fallback если ThemeManager не загружен
+            document.documentElement.setAttribute('data-theme', newTheme);
+          }
           
           // Обновляем иконку
           const icon = themeToggle.querySelector('i');
@@ -231,12 +238,12 @@
             icon.className = newTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
           }
           
-          // Сохраняем в localStorage
-          localStorage.setItem('theme', newTheme);
+          // Сохраняем в localStorage (унифицированный ключ)
+          localStorage.setItem('app-theme', newTheme);
         });
 
-        // Загружаем сохраненную тему
-        const savedTheme = localStorage.getItem('theme');
+        // Загружаем сохраненную тему (унифицированный ключ)
+        const savedTheme = localStorage.getItem('app-theme');
         if (savedTheme) {
           document.documentElement.setAttribute('data-theme', savedTheme);
           const icon = themeToggle.querySelector('i');
