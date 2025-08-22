@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+  
   <!-- Стили -->
   <link rel="stylesheet" href="src/css/retro-settings.css">
 </head>
@@ -22,10 +25,12 @@
         <h1>НАСТРОЙКИ</h1>
       </div>
       <div class="header-controls">
-        <a href="index.html" class="back-button">
-          <span class="back-arrow">←</span>
+        <a href="index.html" class="back-button" title="Назад">
+          <i class="bi bi-arrow-left"></i>
         </a>
-        <button class="theme-toggle" id="theme-toggle">☀️</button>
+        <button class="theme-toggle" id="theme-toggle" title="Сменить тему">
+          <i class="bi bi-sun-fill"></i>
+        </button>
       </div>
     </header>
 
@@ -219,7 +224,12 @@
           const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
           
           document.documentElement.setAttribute('data-theme', newTheme);
-          themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+          
+          // Обновляем иконку
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.className = newTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+          }
           
           // Сохраняем в localStorage
           localStorage.setItem('theme', newTheme);
@@ -229,7 +239,10 @@
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
           document.documentElement.setAttribute('data-theme', savedTheme);
-          themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+          }
         }
       }
     });

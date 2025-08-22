@@ -97,19 +97,19 @@ body {
   right: var(--card-padding);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .back-button {
   background: var(--card-color);
   border: var(--border-width) solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 18px;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 16px;
   cursor: pointer;
   box-shadow: var(--box-shadow);
   transition: all var(--transition-fast);
-  min-width: 60px;
+  min-width: 40px;
   text-align: center;
   text-decoration: none;
   color: var(--text-color);
@@ -120,18 +120,12 @@ body {
 
 .back-button:hover {
   transform: translateY(-1px);
-  box-shadow: 5px 5px 0px var(--border-color);
+  box-shadow: 3px 3px 0px var(--border-color);
 }
 
 .back-button:active {
   transform: translateY(1px);
-  box-shadow: 2px 2px 0px var(--border-color);
-}
-
-.back-arrow {
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 1;
+  box-shadow: 1px 1px 0px var(--border-color);
 }
 
 
@@ -146,24 +140,25 @@ body {
 .theme-toggle {
   background: var(--card-color);
   border: var(--border-width) solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 18px;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 16px;
   cursor: pointer;
   box-shadow: var(--box-shadow);
   transition: all var(--transition-fast);
-  min-width: 60px;
+  min-width: 40px;
   text-align: center;
+  color: var(--text-color);
 }
 
 .theme-toggle:hover {
   transform: translateY(-1px);
-  box-shadow: 5px 5px 0px var(--border-color);
+  box-shadow: 3px 3px 0px var(--border-color);
 }
 
 .theme-toggle:active {
   transform: translateY(1px);
-  box-shadow: 2px 2px 0px var(--border-color);
+  box-shadow: 1px 1px 0px var(--border-color);
 }
 
 /* === ВКЛАДКИ КАТЕГОРИЙ === */
