@@ -39,39 +39,6 @@
   --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px rgba(0, 0, 0, 0.4);
 }
 
-/* Темная тема для вкладок */
-[data-theme="dark"] .tab-button {
-  background: #2a2a2a;
-  color: var(--hint-color);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .tab-button.active {
-  color: var(--text-color);
-}
-
-/* Темная тема для навигации */
-[data-theme="dark"] .settings-tabs {
-  background: var(--card-color);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .settings-tabs .tab-button {
-  background: var(--card-color);
-  color: var(--hint-color);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .settings-tabs .tab-button.active {
-  background: var(--accent-blue);
-  color: var(--text-color);
-}
-
-[data-theme="dark"] .settings-tabs .tab-button:hover:not(.active) {
-  background: #2a2a2a;
-  color: var(--text-color);
-}
-
 /* === БАЗОВЫЕ СТИЛИ === */
 * {
   margin: 0;
@@ -173,10 +140,6 @@ body {
   overflow: visible;
 }
 
-
-
-
-
 .settings-tabs .tab-button.active {
   top: 0;
   padding-top: 12px;
@@ -235,16 +198,6 @@ body {
   background: none;
   transition: all 0.2s ease-out;
 }
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  min-width: auto;
-  text-align: center;
-  display: block;
-  line-height: 1.2;
-  transition: all 0.2s ease-out;
-  position: relative;
-}
 
 /* Анимация при обновлении счетчика */
 .settings-tabs .tab-button .tab-count.updating {
@@ -270,103 +223,6 @@ body {
   padding: 2px 6px;
   border-radius: 4px;
   transform: scale(1.1);
-}
-
-
-
-/* === ВКЛАДКИ КАТЕГОРИЙ === */
-.category-tabs {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  background-color: transparent;
-  padding: 0 10px;
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 10;
-  border-top: none;
-}
-
-.tab-button {
-  font-family: 'Roboto Mono', monospace;
-  background: #e0e0e0;
-  color: var(--hint-color);
-  border: var(--border-width) solid var(--border-color);
-  border-bottom: none;
-  padding: 10px 12px;
-  font-weight: 700;
-  border-radius: 8px 8px 0 0;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  top: 10px;
-  box-shadow: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-  overflow: visible;
-}
-
-.tab-label { 
-  font-size: 13px; 
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.tab-count { 
-  font-family: 'Roboto Mono', monospace;
-  font-size: 11px; 
-  font-weight: 700;
-  margin-top: 2px; 
-  color: rgba(102, 102, 102, 0.7);
-  background: none;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  min-width: auto;
-  text-align: center;
-  display: block;
-  line-height: 1.2;
-  transition: all 0.2s ease-out;
-}
-
-.tab-button.active {
-  top: 0;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  color: var(--text-color);
-  box-shadow: var(--shadow-offset) 0px 0px var(--border-color);
-}
-
-.tab-button.keywords.active { 
-  background-color: var(--accent-blue); 
-  color: white;
-  font-weight: 900;
-}
-
-.tab-button.channels.active { 
-  background-color: var(--accent-green); 
-  color: white;
-  font-weight: 900;
-}
-
-.tab-button.keywords.active .tab-count { 
-  color: white;
-  opacity: 1;
-  font-weight: 700;
-}
-
-.tab-button.channels.active .tab-count { 
-  color: var(--text-color);
-  opacity: 1;
-  font-weight: 700;
 }
 
 /* === КОНТЕНТ === */
@@ -581,8 +437,6 @@ body {
   position: relative;
   overflow: hidden;
 }
-
-
 
 .tag::before {
   content: '';
@@ -1020,28 +874,6 @@ input:checked + .toggle-slider:before {
   
   .section-title {
     font-size: 14px;
-  }
-  
-  .category-tabs {
-    padding: 0 5px;
-  }
-  
-  .tab-button {
-    padding: 8px 8px;
-  }
-  
-  .tab-label {
-    font-size: 11px;
-  }
-  
-  .tab-count {
-    font-size: 10px;
-  }
-
-  /* Анимация для счетчиков во вкладках */
-  .tab-count.updating {
-    transform: scale(1.1);
-    animation: retroFlash 0.4s ease-out;
   }
   
   .actions-container {
