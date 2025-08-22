@@ -1149,23 +1149,40 @@ input:checked + .toggle-slider:before {
   align-items: center !important;
   background: var(--accent-blue) !important;
   color: white !important;
-  padding: 2px 6px !important;
-  border-radius: 12px !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
   font-family: var(--font-mono) !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  border: none !important;
-  box-shadow: none !important;
-  gap: 4px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 1px 1px 0px var(--border-color) !important;
+  gap: 6px !important;
   transition: all var(--transition-fast) !important;
   position: relative !important;
   overflow: hidden !important;
-  height: 20px !important;
+  height: 24px !important;
   line-height: 1 !important;
 }
 
+/* Глянцевый эффект для тегов */
+.keyword-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.keyword-tag:hover::before {
+  left: 100%;
+}
+
 .keyword-tag:hover {
-  transform: scale(1.05) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 2px 2px 0px var(--border-color) !important;
   filter: brightness(1.1) !important;
 }
 
@@ -1179,13 +1196,13 @@ input:checked + .toggle-slider:before {
   background: rgba(255, 255, 255, 0.2) !important;
   border: none !important;
   border-radius: 50% !important;
-  width: 14px !important;
-  height: 14px !important;
+  width: 16px !important;
+  height: 16px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  font-size: 8px !important;
+  font-size: 10px !important;
   color: white !important;
   transition: var(--transition-fast) !important;
   position: relative;
