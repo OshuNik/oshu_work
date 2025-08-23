@@ -33,23 +33,19 @@ jobs:
       with:
         node-version: '18'
 
-    - name: 🔐 Inject Environment Variables
+    - name: 📦 Install dependencies
+      run: npm install
+
+    - name: 🏗️ Build with Vite
+      run: npm run build
+
+    - name: 🔐 Create .env for Vite
       run: |
-        # Заменяем env-dev.js на production версию для всех HTML файлов
-        cat > src/js/env-dev.js << 'EOF'
-        // PRODUCTION: Переменные окружения из GitHub Secrets
-        (function() {
-          'use strict';
-          
-          // Устанавливаем production переменные
-          window.ENV = {
-            VITE_SUPABASE_URL: '${{ secrets.VITE_SUPABASE_URL }}',
-            VITE_SUPABASE_ANON_KEY: '${{ secrets.VITE_SUPABASE_ANON_KEY }}',
-            VITE_APP_ENVIRONMENT: 'production'
-          };
-          
-          console.log('✅ Production environment variables loaded');
-        })();
+        # Создаем .env файл для Vite
+        cat > .env << 'EOF'
+        VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
+        VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        VITE_APP_ENVIRONMENT=production
         EOF
         
         echo "✅ Environment variables injected successfully"
@@ -114,7 +110,7 @@ jobs:
     - name: 📦 Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: '.'
+        path: './dist'
 
     - name: 🚀 Deploy to GitHub Pages
       id: deployment
