@@ -149,11 +149,13 @@
 <!-- Критичные скрипты - загружаются синхронно -->
 <script src="src/js/config.js"></script>
 <script src="src/js/constants.js"></script>
+<script src="src/js/utils.min.js"></script>
 
-<!-- Основные модули - загружаются асинхронно -->
-<script src="src/js/utils.min.js" defer></script>
-<script src="src/js/theme-manager.js" defer></script>
-<script src="src/js/favorites.js" defer></script>
+<!-- Независимые модули - загружаются асинхронно -->
+<script src="src/js/theme-manager.js" async></script>
+
+<!-- Основной модуль страницы -->
+<script src="src/js/favorites.js"></script>
 
 <!-- Вспомогательные модули - загружаются в последнюю очередь -->
 <script src="src/js/swipe-handler.js" defer></script>

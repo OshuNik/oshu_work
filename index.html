@@ -154,14 +154,16 @@
   tryNextCdn();
 })();
 </script>
-<!-- Критичные скрипты - загружаются синхронно -->
+<!-- Критичные скрипты - загружаются синхронно (нужны всем) -->
 <script src="src/js/config.js"></script>
 <script src="src/js/constants.js"></script>
 <script src="src/js/utils.min.js"></script>
-<script src="src/js/template-loader.js"></script>
 
-<!-- Основные модули - загружаются синхронно для зависимостей -->
-<script src="src/js/theme-manager.js"></script>
+<!-- Независимые модули - можно загружать асинхронно -->
+<script src="src/js/theme-manager.js" async></script>
+<script src="src/js/template-loader.js" async></script>
+
+<!-- Цепочка зависимостей - должна быть синхронной -->
 <script src="src/js/state-manager.js"></script>
 <script src="src/js/api-service.js"></script>
 <script src="src/js/dom-manager.js"></script>
@@ -169,7 +171,7 @@
 <script src="src/js/vacancy-manager.js"></script>
 <script src="src/js/app-controller.js"></script>
 
-<!-- Вспомогательные модули - можно загружать асинхронно -->
+<!-- Вспомогательные модули - загружаются после основных -->
 <script src="src/js/swipe-handler.js" defer></script>
 </body>
 </html>
