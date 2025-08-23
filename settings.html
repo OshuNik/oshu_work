@@ -171,6 +171,7 @@
 
   <!-- Скрипты -->
   <!-- Критичные скрипты - загружаются синхронно -->
+  <script src="src/js/csp-manager.js"></script>
   <script src="src/js/env-dev.js"></script>
   <script src="src/js/env-config.js"></script>
   <script src="src/js/config.js"></script>
@@ -319,6 +320,15 @@
       }
     });
 
+  </script>
+
+  <!-- Инициализация CSP после загрузки всех скриптов -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.cspManager) {
+      window.cspManager.init();
+    }
+  });
   </script>
 </body>
 </html>
