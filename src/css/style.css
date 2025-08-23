@@ -4793,6 +4793,63 @@ body.high-contrast[data-theme="dark"] {
   box-shadow: var(--box-shadow-pressed);
 }
 
+/* === OFFLINE INDICATOR === */
+
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--accent-red);
+  color: white;
+  padding: 12px 20px;
+  transform: translateY(-100%);
+  transition: transform var(--transition-normal);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.offline-indicator.visible {
+  transform: translateY(0);
+}
+
+.offline-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.offline-icon {
+  font-size: 16px;
+}
+
+.offline-text {
+  flex: 1;
+  text-align: center;
+}
+
+.offline-retry-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.offline-retry-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 /* === SKELETON LOADERS === */
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);

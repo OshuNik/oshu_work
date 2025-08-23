@@ -102,6 +102,16 @@
             this.handleFetchAbort(key, categoryState.offset);
             return;
           }
+          
+          // Обработка специфичных ошибок
+          if (result.severity === 'warning' && result.isRetryable) {
+            // Для retryable ошибок показываем кнопку повтора
+            this.handleRetryableError(key, () => {
+              this.fetchVacanciesForCategory(key, isInitialLoad, isPullToRefresh);
+            }, result.error);
+            return;
+          }
+          
           throw new Error(result.error || 'Ошибка загрузки данных');
         }
 
@@ -612,6 +622,26 @@
       } catch (error) {
         console.error('Ошибка массового удаления:', error);
         UTIL.safeAlert?.('Не удалось удалить вакансии из этой категории. Попробуйте позже.');
+      }
+    }
+
+    // Обработать retryable ошибку
+    handleRetryableError(key, retryCallback, errorMessage) {
+      const domManager = window.domManager;
+      const container = domManager.getElement(`containers.${key}`);
+      
+      if (!container) return;
+
+      // Показываем ошибку с кнопкой повтора
+      UTIL.renderError?.(container, errorMessage, retryCallback);
+      
+      // Добавляем в очередь повтора сетевого менеджера
+      if (window.networkManager) {
+        window.networkManager.addToRetryQueue({
+          callback: retryCallback,
+          category: key,
+          type: 'fetch_vacancies'
+        });
       }
     }
 

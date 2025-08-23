@@ -109,11 +109,7 @@
           return { success: false, aborted: true };
         }
         
-        console.error(`Ошибка загрузки вакансий для ${key}:`, error);
-        return {
-          success: false,
-          error: error.message || 'Неизвестная ошибка'
-        };
+        return this.handleError(error, true);
       }
     }
 
@@ -161,10 +157,9 @@
 
         return { success: true, counts: results };
       } catch (error) {
-        console.error('Ошибка загрузки счетчиков:', error);
+        const result = this.handleError(error, false); // Не показывать toast для счетчиков
         return {
-          success: false,
-          error: error.message || 'Неизвестная ошибка',
+          ...result,
           counts: { main: 0, maybe: 0, other: 0 }
         };
       }
@@ -193,11 +188,7 @@
           return { success: false, aborted: true };
         }
         
-        console.error('Ошибка обновления статуса вакансии:', error);
-        return {
-          success: false,
-          error: error.message || 'Неизвестная ошибка'
-        };
+        return this.handleError(error, true);
       }
     }
 
@@ -223,19 +214,98 @@
           return { success: false, aborted: true };
         }
         
-        console.error('Ошибка удаления вакансии:', error);
-        return {
-          success: false,
-          error: error.message || 'Неизвестная ошибка'
-        };
+        return this.handleError(error, true);
       }
+    }
+
+    // Обработать ошибки API с пользовательским интерфейсом
+    handleError(error, showToUser = true) {
+      let userMessage = 'Произошла ошибка при загрузке данных';
+      let isRetryable = false;
+      let severity = 'error';
+      
+      // Анализ типа ошибки
+      if (error.name === 'TypeError' || error.message?.includes('NetworkError') || error.message?.includes('Failed to fetch')) {
+        userMessage = 'Проблема с подключением к интернету';
+        isRetryable = true;
+        severity = 'warning';
+      } else if (error.name === 'AbortError') {
+        userMessage = 'Запрос был отменен';
+        isRetryable = false;
+        severity = 'info';
+      } else if (error.status === 401) {
+        userMessage = 'Проблема с авторизацией. Перезагрузите страницу';
+        isRetryable = false;
+      } else if (error.status === 403) {
+        userMessage = 'Доступ запрещен';
+        isRetryable = false;
+      } else if (error.status === 404) {
+        userMessage = 'Данные не найдены';
+        isRetryable = false;
+      } else if (error.status === 429) {
+        userMessage = 'Слишком много запросов. Попробуйте через минуту';
+        isRetryable = true;
+        severity = 'warning';
+      } else if (error.status >= 500) {
+        userMessage = 'Временные проблемы сервера. Попробуйте позже';
+        isRetryable = true;
+        severity = 'warning';
+      } else if (error.status >= 400 && error.status < 500) {
+        userMessage = 'Ошибка в запросе. Обновите страницу';
+        isRetryable = false;
+      }
+
+      // Логирование с дополнительной информацией
+      console.error('API Error:', {
+        message: error.message,
+        status: error.status,
+        stack: error.stack,
+        isRetryable,
+        severity,
+        timestamp: new Date().toISOString()
+      });
+      
+      if (showToUser && UTIL.uiToast) {
+        UTIL.uiToast(userMessage, {
+          timeout: isRetryable ? 5000 : 3000
+        });
+      }
+      
+      return { 
+        success: false, 
+        error: userMessage,
+        isRetryable,
+        severity,
+        originalError: error
+      };
+    }
+
+    // Проверить статус сети
+    checkNetworkStatus() {
+      return navigator.onLine;
+    }
+
+    // Обработать offline состояние
+    handleOfflineMode() {
+      const isOnline = this.checkNetworkStatus();
+      
+      if (!isOnline) {
+        if (UTIL.uiToast) {
+          UTIL.uiToast('Нет подключения к интернету', {
+            timeout: 0 // Не скрывать автоматически
+          });
+        }
+        return false;
+      }
+      return true;
     }
 
     // Проверить доступность API
     async healthCheck() {
       try {
         const response = await fetch(`${this.baseUrl}/rest/v1/vacancies?select=id&limit=1`, {
-          headers: this.createHeaders()
+          headers: this.createHeaders(),
+          signal: AbortSignal.timeout(5000) // 5 секунд таймаут
         });
         
         return {
