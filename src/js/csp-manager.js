@@ -152,6 +152,13 @@
       });
     }
 
+    // Создать style элемент с nonce
+    createStyleElement() {
+      const style = document.createElement('style');
+      style.setAttribute('nonce', this.nonce);
+      return style;
+    }
+
     // Настроить отчетность о нарушениях
     setupViolationReporting() {
       document.addEventListener('securitypolicyviolation', (e) => {

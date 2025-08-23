@@ -1663,8 +1663,8 @@
     // Инициализация секций настроек
     initEnhancedSettings();
     
-    // Добавляем CSS анимации
-    const style = document.createElement('style');
+    // Добавляем CSS анимации с nonce для CSP
+    const style = window.cspManager?.createStyleElement() || document.createElement('style');
     style.textContent = `
       @keyframes fadeOut {
         to {

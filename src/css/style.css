@@ -1935,8 +1935,8 @@ details[open] .vacancy-text {
     background-color: var(--background-color);
     border: var(--border-width) solid var(--border-color);
     border-radius: 8px;
-    padding: 10px 12px;
     margin-top: 10px;
+    padding: 10px 12px;
 }
 .image-link-button {
     display: inline-block;
@@ -4848,6 +4848,27 @@ body.high-contrast[data-theme="dark"] {
 .offline-retry-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* === ERROR HANDLING UI === */
+
+.error-reload-btn {
+  background: white;
+  color: var(--accent-red);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all var(--transition-normal);
+}
+
+.error-reload-btn:hover {
+  background: var(--accent-red);
+  color: white;
+  transform: translateY(-1px);
 }
 
 /* === SKELETON LOADERS === */

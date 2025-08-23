@@ -520,16 +520,7 @@
       errorDiv.innerHTML = `
         <h3>Ошибка загрузки приложения</h3>
         <p>${UTIL.escapeHtml?.(error.message) || 'Неизвестная ошибка'}</p>
-        <button onclick="location.reload()" style="
-          background: white;
-          color: #ff4444;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 4px;
-          margin-top: 10px;
-          cursor: pointer;
-          font-family: inherit;
-        ">Перезагрузить</button>
+        <button onclick="location.reload()" class="error-reload-btn">Перезагрузить</button>
       `;
       
       document.body.appendChild(errorDiv);
