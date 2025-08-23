@@ -170,8 +170,11 @@
 </div>
 
   <!-- Скрипты -->
+  <!-- Критичные скрипты - загружаются синхронно -->
   <script src="src/js/config.js"></script>
-  <script src="src/js/theme-manager.js"></script>
+  
+  <!-- Основные модули - загружаются асинхронно -->
+  <script src="src/js/theme-manager.js" defer></script>
   <script type="module">
     import { SettingsMain } from './src/modules/SettingsMain.js';
     
