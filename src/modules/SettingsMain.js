@@ -223,6 +223,7 @@ export class SettingsMain {
       const count = this.keywordsManager.getKeywordsCount();
       if (this.ui) {
         const shouldAnimate = this.isInitialLoad && !this.countersAnimated.keywords;
+        console.log('Keywords counter update:', { count, isInitialLoad: this.isInitialLoad, alreadyAnimated: this.countersAnimated.keywords, shouldAnimate });
         if (shouldAnimate) {
           this.countersAnimated.keywords = true;
         }

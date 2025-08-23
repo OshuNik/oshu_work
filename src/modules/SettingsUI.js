@@ -485,9 +485,11 @@ export class SettingsUI {
    */
   updateCounter(type, count, withAnimation = false) {
     const counterElement = getElement(`${type}-count`);
+    console.log('SettingsUI.updateCounter:', { type, count, withAnimation, element: counterElement });
     if (!counterElement) return;
     
     if (withAnimation) {
+      console.log('Starting animation for counter:', type);
       // Небольшая задержка для обеспечения видимости элемента
       setTimeout(() => {
         this.animateCounterFromZero(counterElement, count);
