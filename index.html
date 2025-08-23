@@ -157,19 +157,19 @@
 <!-- Критичные скрипты - загружаются синхронно -->
 <script src="src/js/config.js"></script>
 <script src="src/js/constants.js"></script>
+<script src="src/js/utils.min.js"></script>
+<script src="src/js/template-loader.js"></script>
 
-<!-- Основные модули - загружаются асинхронно -->
-<script src="src/js/template-loader.js" defer></script>
-<script src="src/js/utils.min.js" defer></script>
-<script src="src/js/theme-manager.js" defer></script>
-<script src="src/js/state-manager.js" defer></script>
-<script src="src/js/api-service.js" defer></script>
-<script src="src/js/vacancy-manager.js" defer></script>
-<script src="src/js/app-controller.js" defer></script>
+<!-- Основные модули - загружаются синхронно для зависимостей -->
+<script src="src/js/theme-manager.js"></script>
+<script src="src/js/state-manager.js"></script>
+<script src="src/js/api-service.js"></script>
+<script src="src/js/dom-manager.js"></script>
+<script src="src/js/event-manager.js"></script>
+<script src="src/js/vacancy-manager.js"></script>
+<script src="src/js/app-controller.js"></script>
 
-<!-- Вспомогательные модули - загружаются в последнюю очередь -->
-<script src="src/js/dom-manager.js" defer></script>
-<script src="src/js/event-manager.js" defer></script>
+<!-- Вспомогательные модули - можно загружать асинхронно -->
 <script src="src/js/swipe-handler.js" defer></script>
 </body>
 </html>
