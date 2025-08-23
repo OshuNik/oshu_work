@@ -125,6 +125,58 @@
       }
     }
 
+    // Показать skeleton loader
+    showSkeleton(containerKey, count = 3) {
+      const container = this.getElement(`containers.${containerKey}`);
+      if (!container) return;
+
+      // Очищаем контейнер сначала
+      this.clearContainer(containerKey);
+
+      // Создаем skeleton карточки
+      const skeletonHTML = this.createSkeletonCard();
+      const skeletonContainer = document.createElement('div');
+      skeletonContainer.className = 'skeleton-container';
+      
+      for (let i = 0; i < count; i++) {
+        skeletonContainer.innerHTML += skeletonHTML;
+      }
+
+      container.appendChild(skeletonContainer);
+    }
+
+    // Скрыть skeleton loader
+    hideSkeleton(containerKey) {
+      const container = this.getElement(`containers.${containerKey}`);
+      if (!container) return;
+
+      const skeletonContainer = container.querySelector('.skeleton-container');
+      if (skeletonContainer) {
+        skeletonContainer.classList.add('skeleton-hidden');
+        setTimeout(() => {
+          if (skeletonContainer.parentNode) {
+            skeletonContainer.parentNode.removeChild(skeletonContainer);
+          }
+        }, 300);
+      }
+    }
+
+    // Создать HTML skeleton карточки
+    createSkeletonCard() {
+      return `
+        <div class="vacancy-card-skeleton">
+          <div class="skeleton skeleton-header"></div>
+          <div class="skeleton skeleton-text long"></div>
+          <div class="skeleton skeleton-text medium"></div>
+          <div class="skeleton skeleton-text short"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton skeleton-tag"></div>
+            <div class="skeleton skeleton-meta"></div>
+          </div>
+        </div>
+      `;
+    }
+
     // Обновить счетчик
     updateCounter(key, count) {
       const counter = this.getElement(`counts.${key}`);

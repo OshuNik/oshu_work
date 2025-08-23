@@ -379,13 +379,17 @@
       try {
         console.log('🚀 Запуск инициализации приложения');
 
-        // Показываем лоадер в самом начале
-        window.domManager?.showLoader();
+        // Показываем skeleton loaders для лучшего UX
+        window.domManager?.showSkeleton('main', 4);
+        window.domManager?.showSkeleton('maybe', 3);
+        window.domManager?.showSkeleton('other', 2);
 
-        // Устанавливаем таймаут для лоадера
-        const loaderTimeout = setTimeout(() => {
-          console.warn('⚠️ Лоадер висит слишком долго, принудительно скрываем');
-          window.domManager?.hideLoader();
+        // Устанавливаем таймаут для skeleton
+        const skeletonTimeout = setTimeout(() => {
+          console.warn('⚠️ Skeleton висит слишком долго, принудительно скрываем');
+          window.domManager?.hideSkeleton('main');
+          window.domManager?.hideSkeleton('maybe');
+          window.domManager?.hideSkeleton('other');
         }, CONST.TIMEOUTS?.LOADER || 25000);
 
         // Ждем готовности DOM
@@ -423,9 +427,11 @@
           isInitialLoad: true 
         });
 
-        // Скрываем лоадер после загрузки
-        clearTimeout(loaderTimeout);
-        window.domManager.hideLoader();
+        // Скрываем skeleton после загрузки
+        clearTimeout(skeletonTimeout);
+        window.domManager.hideSkeleton('main');
+        window.domManager.hideSkeleton('maybe');
+        window.domManager.hideSkeleton('other');
 
         // Отложенная загрузка остальных данных
         setTimeout(async () => {
@@ -463,7 +469,9 @@
 
       } catch (error) {
         console.error('❌ Критическая ошибка инициализации:', error);
-        window.domManager?.hideLoader();
+        window.domManager?.hideSkeleton('main');
+        window.domManager?.hideSkeleton('maybe');
+        window.domManager?.hideSkeleton('other');
         this.showCriticalError(error);
         throw error;
       }

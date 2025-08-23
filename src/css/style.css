@@ -4792,3 +4792,89 @@ body.high-contrast[data-theme="dark"] {
   transform: translateY(-2px);
   box-shadow: var(--box-shadow-pressed);
 }
+
+/* === SKELETON LOADERS === */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Skeleton карточка вакансии */
+.vacancy-card-skeleton {
+  background: var(--card-color);
+  border: var(--card-border) solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-margin);
+  box-shadow: var(--box-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-header {
+  width: 60%;
+  height: 18px;
+}
+
+.skeleton-text {
+  height: 14px;
+}
+
+.skeleton-text.long {
+  width: 90%;
+}
+
+.skeleton-text.medium {
+  width: 70%;
+}
+
+.skeleton-text.short {
+  width: 40%;
+}
+
+.skeleton-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.skeleton-tag {
+  width: 60px;
+  height: 20px;
+  border-radius: 10px;
+}
+
+.skeleton-meta {
+  width: 120px;
+  height: 12px;
+}
+
+/* Skeleton для счетчиков */
+.skeleton-counter {
+  width: 40px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+/* Скрытие skeleton после загрузки */
+.skeleton-hidden {
+  display: none !important;
+}
