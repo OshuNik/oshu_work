@@ -1,0 +1,85 @@
+name: 🚀 Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Права для записи в GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Только один деплой одновременно
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📁 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: 🔐 Inject Environment Variables
+      run: |
+        # Создаем временный JS файл с переменными окружения
+        cat > src/js/env-vars-generated.js << 'EOF'
+        // AUTO-GENERATED: Переменные окружения для production
+        // НЕ РЕДАКТИРОВАТЬ ВРУЧНУЮ!
+        
+        (function() {
+          'use strict';
+          
+          // Устанавливаем переменные окружения
+          window.ENV = {
+            VITE_SUPABASE_URL: '${{ secrets.VITE_SUPABASE_URL }}',
+            VITE_SUPABASE_ANON_KEY: '${{ secrets.VITE_SUPABASE_ANON_KEY }}',
+            VITE_APP_ENVIRONMENT: 'production'
+          };
+          
+          console.log('✅ Переменные окружения загружены для production');
+        })();
+        EOF
+        
+        # Добавляем скрипт в index.html перед env-config.js
+        sed -i 's|<script src="src/js/env-config.js"></script>|<script src="src/js/env-vars-generated.js"></script>\n<script src="src/js/env-config.js"></script>|' index.html
+        
+        echo "✅ Environment variables injected successfully"
+
+    - name: 🧹 Clean sensitive data
+      run: |
+        # Удаляем .env файлы если есть
+        rm -f .env .env.local .env.production
+        
+        # Убираем fallback значения из config.js для production
+        echo "⚠️ Production build: fallback values removed from config.js"
+
+    - name: 📄 Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: 📦 Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+    - name: ✅ Deployment complete
+      run: |
+        echo "🎉 Deployment successful!"
+        echo "🌐 URL: ${{ steps.deployment.outputs.page_url }}"

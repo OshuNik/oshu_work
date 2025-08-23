@@ -1,9 +1,28 @@
 // config.js — все настраиваемые параметры в одном месте
 
 window.APP_CONFIG = {
-  // 👉 Supabase конфигурация (используем переменные окружения если доступны)
-  SUPABASE_URL: window.SUPABASE_URL || 'https://lwfhtwnfqmdjwzrdznvv.supabase.co',
-  SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Zmh0d25mcW1kand6cmR6bnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDU0OTksImV4cCI6MjA2OTkyMTQ5OX0.3bvJyJ1NFn8V-bpKxApRIWB4k2_TWNbEYv-ytwhbJUE',
+  // 👉 Supabase конфигурация (из переменных окружения)
+  SUPABASE_URL: (() => {
+    const envConfig = window.ENV_CONFIG;
+    if (envConfig && envConfig.supabaseUrl) {
+      return envConfig.supabaseUrl;
+    }
+    
+    // Fallback для development режима
+    console.warn('⚠️ SUPABASE_URL не найден в переменных окружения, используется fallback');
+    return 'https://lwfhtwnfqmdjwzrdznvv.supabase.co';
+  })(),
+  
+  SUPABASE_ANON_KEY: (() => {
+    const envConfig = window.ENV_CONFIG;
+    if (envConfig && envConfig.supabaseAnonKey) {
+      return envConfig.supabaseAnonKey;
+    }
+    
+    // Fallback для development режима
+    console.warn('⚠️ SUPABASE_ANON_KEY не найден в переменных окружения, используется fallback');
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Zmh0d25mcW1kand6cmR6bnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDU0OTksImV4cCI6MjA2OTkyMTQ5OX0.3bvJyJ1NFn8V-bpKxApRIWB4k2_TWNbEYv-ytwhbJUE';
+  })(),
 
   // Порции на главной
   PAGE_SIZE_MAIN: 10,
