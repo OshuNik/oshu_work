@@ -19,10 +19,12 @@ export default defineConfig({
       
       output: {
         // Оптимальное разделение чанков
-        manualChunks: {
-          // Крупные модули выносим в отдельные чанки
-          'utils': ['src/js/utils.min.js'],
-          'settings-modules': ['src/modules/SettingsMain.js']
+        manualChunks(id) {
+          // Группируем по размеру и назначению
+          if (id.includes('src/modules/')) {
+            return 'settings-modules';
+          }
+          // Остальные модули пусть Vite сам решает
         }
       }
     },
