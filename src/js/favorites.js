@@ -3,6 +3,65 @@
 (function () {
   'use strict';
 
+  // Показать skeleton для избранного
+  function showFavoritesSkeleton() {
+    const container = document.getElementById('favorites-list');
+    if (!container) return;
+
+    const skeletonHTML = `
+      <div class="skeleton-container">
+        <div class="vacancy-card-skeleton">
+          <div class="skeleton skeleton-header"></div>
+          <div class="skeleton skeleton-text long"></div>
+          <div class="skeleton skeleton-text medium"></div>
+          <div class="skeleton skeleton-text short"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton skeleton-tag"></div>
+            <div class="skeleton skeleton-meta"></div>
+          </div>
+        </div>
+        <div class="vacancy-card-skeleton">
+          <div class="skeleton skeleton-header"></div>
+          <div class="skeleton skeleton-text long"></div>
+          <div class="skeleton skeleton-text medium"></div>
+          <div class="skeleton skeleton-text short"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton skeleton-tag"></div>
+            <div class="skeleton skeleton-meta"></div>
+          </div>
+        </div>
+        <div class="vacancy-card-skeleton">
+          <div class="skeleton skeleton-header"></div>
+          <div class="skeleton skeleton-text long"></div>
+          <div class="skeleton skeleton-text medium"></div>
+          <div class="skeleton skeleton-text short"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton skeleton-tag"></div>
+            <div class="skeleton skeleton-meta"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = skeletonHTML;
+  }
+
+  // Скрыть skeleton
+  function hideFavoritesSkeleton() {
+    const container = document.getElementById('favorites-list');
+    if (!container) return;
+
+    const skeletonContainer = container.querySelector('.skeleton-container');
+    if (skeletonContainer) {
+      skeletonContainer.classList.add('skeleton-hidden');
+      setTimeout(() => {
+        if (skeletonContainer.parentNode) {
+          skeletonContainer.remove();
+        }
+      }, 300);
+    }
+  }
+
   const CFG  = window.APP_CONFIG;
   const UTIL = window.utils;
 
@@ -167,7 +226,7 @@
   }
 
   async function loadFavorites(query = '') {
-    container.innerHTML = '<div class="loader-container" style="position: static; padding: 50px 0;"><div class="retro-spinner-inline"></div></div>';
+    showFavoritesSkeleton();
     try {
       const p = new URLSearchParams();
       p.set('select', '*');
@@ -188,7 +247,7 @@
       if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
 
       allFavorites = await resp.json();
-      container.innerHTML = '';
+      hideFavoritesSkeleton();
 
       if (!allFavorites || allFavorites.length === 0) {
         renderEmptyState(container, '-- В избранном пусто --');
@@ -230,6 +289,7 @@
       document.dispatchEvent(new CustomEvent('favorites:loaded'));
     } catch (e) {
       console.error(e);
+      hideFavoritesSkeleton();
       renderError(container, 'Ошибка загрузки избранного', () => loadFavorites());
       document.dispatchEvent(new CustomEvent('favorites:loaded'));
     }
@@ -532,6 +592,9 @@
     }
   });
 
-  ensureFavSearchUI();
-  loadFavorites();
+  // Показываем skeleton при инициализации страницы
+  document.addEventListener('DOMContentLoaded', function() {
+    ensureFavSearchUI();
+    loadFavorites();
+  });
 })();
