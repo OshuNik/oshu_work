@@ -1,0 +1,41 @@
+<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1"><title>oshu://work</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co"><script>(function() {
+      const savedTheme = localStorage.getItem('app-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.style.setProperty('--background-color', '#121212');
+        document.documentElement.style.setProperty('--card-color', '#1E1E1E');
+        document.documentElement.style.setProperty('--text-color', '#E8E8E8');
+        document.documentElement.style.setProperty('--border-color', '#333333');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();</script><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet"><script type="module" crossorigin src="/oshu_work/assets/main-CmW_J6ua.js"></script><link rel="modulepreload" crossorigin href="/oshu_work/assets/utils.min-BbBcjY2H.js"><link rel="modulepreload" crossorigin href="/oshu_work/assets/core-B_nJSvVV.js"><link rel="stylesheet" crossorigin href="/oshu_work/assets/utils-BtYAB2l6.css"><link rel="stylesheet" crossorigin href="/oshu_work/assets/critical-CBPZLhGf.css"></head><body><div class="main-wrapper"><div class="ptr-bar"><div class="ptr-text">Потяните для обновления</div></div><div id="main-header"><header class="header"><h1>oshu://work <small>v12.3</small></h1><div id="header-actions" class="header-actions"><a href="favorites.html" class="header-button">★ Избранное</a> <a href="settings.html" class="header-button">⚙︎ Настройки</a></div></header><div id="search-container" class="search-container"><div class="search-input-wrapper"><input type="search" id="search-input" class="search-input" placeholder="🔍 Поиск по названию, компании, зарплате..."> <button id="search-clear-btn" class="search-clear-btn" aria-label="Очистить поиск"></button></div></div></div><main class="content" id="vacancies-content"><div id="vacancies-list-main" class="vacancy-list active" role="tabpanel" aria-labelledby="tab-main" aria-label="Вакансии категории: Точно твоё"></div><div id="vacancies-list-maybe" class="vacancy-list" role="tabpanel" aria-labelledby="tab-maybe" aria-label="Вакансии категории: Может быть" aria-hidden="true"></div><div id="vacancies-list-other" class="vacancy-list" role="tabpanel" aria-labelledby="tab-other" aria-label="Вакансии категории: Не твоё" aria-hidden="true"></div></main></div><div id="loader" class="loader-container hidden"><div class="retro-progress-bar-outline"><div class="retro-progress-bar-fill"></div></div><div class="loader-text">Загрузка вакансий...</div></div><div id="category-tabs" class="category-tabs" role="tablist" aria-label="Категории вакансий"><button id="tab-main" class="tab-button main active" data-target="vacancies-list-main" data-category-name="ТОЧНО ТВОЁ" role="tab" aria-selected="true" aria-controls="vacancies-list-main"><span class="tab-label">ТОЧНО ТВОЁ</span> <span id="count-main" class="tab-count">0</span></button> <button id="tab-maybe" class="tab-button maybe" data-target="vacancies-list-maybe" data-category-name="МОЖЕТ БЫТЬ" role="tab" aria-selected="false" aria-controls="vacancies-list-maybe"><span class="tab-label">МОЖЕТ БЫТЬ</span> <span id="count-maybe" class="tab-count">0</span></button> <button id="tab-other" class="tab-button other" data-target="vacancies-list-other" data-category-name="НЕ ТВОЁ" role="tab" aria-selected="false" aria-controls="vacancies-list-other"><span class="tab-label">НЕ ТВОЁ</span> <span id="count-other" class="tab-count">0</span></button></div><div id="custom-confirm-overlay" class="custom-confirm-overlay hidden"><div class="custom-confirm-box"><p id="custom-confirm-text"></p><div class="custom-confirm-actions"><button id="confirm-btn-cancel" class="custom-confirm-button" aria-label="Отменить действие">Отмена</button> <button id="confirm-btn-ok" class="custom-confirm-button ok" aria-label="Подтвердить действие">OK</button></div></div></div><div id="toast-container" class="toast-container"></div><script src="https://telegram.org/js/telegram-web-app.js"></script><script>window.SUPABASE_URL = 'https://lwfhtwnfqmdjwzrdznvv.supabase.co';
+  window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Zmh0d25mcW1kand6cmR6bnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNDU0OTksImV4cCI6MjA2OTkyMTQ5OX0.3bvJyJ1NFn8V-bpKxApRIWB4k2_TWNbEYv-ytwhbJUE';</script><script>// Fallback загрузка interact.js
+(function() {
+  function loadScript(url, callback) {
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = () => {
+      window.dispatchEvent(new CustomEvent('interactLoaded'));
+      callback(true);
+    };
+    script.onerror = () => callback(false);
+    document.head.appendChild(script);
+  }
+
+  // Пробуем разные CDN (начинаем с самого стабильного)
+  const cdnUrls = [
+    'https://unpkg.com/interactjs@1.10.11/dist/interact.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js',
+    'https://cdn.interactjs.io/v1.10.11/interact.min.js'
+  ];
+
+  function tryNextCdn(index = 0) {
+    if (index >= cdnUrls.length) return;
+    loadScript(cdnUrls[index], (success) => {
+      if (!success) tryNextCdn(index + 1);
+    });
+  }
+
+  tryNextCdn();
+})();</script><script nomodule>document.body.innerHTML = '<div style="text-align:center;padding:50px;font-family:sans-serif;"><h2>Обновите браузер</h2><p>Этот сайт требует современный браузер с поддержкой ES modules</p></div>';</script></body></html>
