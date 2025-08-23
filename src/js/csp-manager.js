@@ -28,18 +28,22 @@
     enforceStrictCSP() {
       const cspPolicy = this.buildCSPPolicy();
       
-      // Устанавливаем через meta tag если возможно
+      // CSP через meta tag имеет ограничения, поэтому создаем упрощенную версию
+      const metaCSPPolicy = this.buildMetaCSPPolicy();
+      
+      // Устанавливаем через meta tag (без frame-ancestors и других server-only директив)
       const existingCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
       if (existingCSP) {
-        existingCSP.content = cspPolicy;
+        existingCSP.content = metaCSPPolicy;
       } else {
         const meta = document.createElement('meta');
         meta.setAttribute('http-equiv', 'Content-Security-Policy');
-        meta.content = cspPolicy;
+        meta.content = metaCSPPolicy;
         document.head.insertBefore(meta, document.head.firstChild);
       }
 
-      console.log('🛡️ Strict CSP enforced:', cspPolicy);
+      console.log('🛡️ CSP enforced via meta tag:', metaCSPPolicy);
+      console.log('⚠️ Note: Some directives (frame-ancestors, block-all-mixed-content) require HTTP headers');
     }
 
     // Построить CSP политику
@@ -83,6 +87,46 @@
         
         // Блокировка mixed content
         `block-all-mixed-content`
+      ];
+
+      return policy.join('; ');
+    }
+
+    // Построить CSP политику для meta tag (без server-only директив)
+    buildMetaCSPPolicy() {
+      const policy = [
+        // Базовая политика - только собственные ресурсы
+        `default-src 'self'`,
+        
+        // Скрипты: только с nonce + разрешенные CDN
+        `script-src 'self' 'nonce-${this.nonce}' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
+        
+        // Стили: только собственные + Google Fonts
+        `style-src 'self' 'nonce-${this.nonce}' https://fonts.googleapis.com`,
+        
+        // Шрифты: Google Fonts
+        `font-src 'self' https://fonts.gstatic.com`,
+        
+        // Изображения: собственные + GitHub + data URLs для base64
+        `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
+        
+        // Сетевые запросы: Supabase API
+        `connect-src 'self' https://*.supabase.co wss://*.supabase.co`,
+        
+        // Медиа: только собственные
+        `media-src 'self'`,
+        
+        // Объекты: запрещены (предотвращение Flash, etc.)
+        `object-src 'none'`,
+        
+        // Базовые ресурсы: только собственные
+        `base-uri 'self'`,
+        
+        // Формы: только на собственный домен  
+        `form-action 'self'`
+        
+        // НЕ включаем frame-ancestors, upgrade-insecure-requests, block-all-mixed-content
+        // так как они не поддерживаются в meta tags
       ];
 
       return policy.join('; ');

@@ -68,6 +68,46 @@ jobs:
         # Убираем fallback значения из config.js для production
         echo "⚠️ Production build: fallback values removed from config.js"
 
+    - name: 🔐 Create Security Headers Script
+      run: |
+        # Создаем JavaScript для установки заголовков безопасности
+        cat > security-headers.js << 'EOF'
+        // security-headers.js - устанавливает дополнительные заголовки безопасности
+        (function() {
+          'use strict';
+          
+          // Проверяем что мы на production
+          if (window.location.hostname.includes('github.io')) {
+            console.log('🔐 Production security headers applied');
+            
+            // Устанавливаем дополнительные мета-теги для безопасности
+            const securityMeta = [
+              { name: 'referrer', content: 'strict-origin-when-cross-origin' },
+              { name: 'format-detection', content: 'telephone=no' },
+              { name: 'msapplication-config', content: 'none' },
+            ];
+            
+            securityMeta.forEach(meta => {
+              if (!document.querySelector(`meta[name="${meta.name}"]`)) {
+                const metaEl = document.createElement('meta');
+                metaEl.name = meta.name;
+                metaEl.content = meta.content;
+                document.head.appendChild(metaEl);
+              }
+            });
+          }
+        })();
+        EOF
+        
+        # Добавляем скрипт в начало всех HTML файлов
+        for file in *.html; do
+          if [ -f "$file" ]; then
+            sed -i '/<script src="src\/js\/csp-manager.js"><\/script>/a <script src="security-headers.js"></script>' "$file"
+          fi
+        done
+        
+        echo "✅ Security headers script added to all HTML files"
+
     - name: 📄 Setup Pages
       uses: actions/configure-pages@v4
 
