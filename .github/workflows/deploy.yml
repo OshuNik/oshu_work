@@ -36,12 +36,9 @@ jobs:
     - name: 📦 Install dependencies
       run: npm install
 
-    - name: 🏗️ Build with Vite
-      run: npm run build
-
     - name: 🔐 Create .env for Vite
       run: |
-        # Создаем .env файл для Vite
+        # Создаем .env файл для Vite ПЕРЕД сборкой
         cat > .env << 'EOF'
         VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
         VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
@@ -56,18 +53,20 @@ jobs:
         VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
         VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
+    - name: 🏗️ Build with Vite
+      run: npm run build
+
     - name: 🧹 Clean sensitive data
       run: |
         # Удаляем .env файлы если есть
         rm -f .env .env.local .env.production
         
-        # Убираем fallback значения из config.js для production
-        echo "⚠️ Production build: fallback values removed from config.js"
+        echo "⚠️ Production build: fallback values removed from source"
 
     - name: 🔐 Create Security Headers Script
       run: |
         # Создаем JavaScript для установки заголовков безопасности
-        cat > security-headers.js << 'EOF'
+        cat > ./dist/security-headers.js << 'EOF'
         // security-headers.js - устанавливает дополнительные заголовки безопасности
         (function() {
           'use strict';
@@ -95,14 +94,16 @@ jobs:
         })();
         EOF
         
-        # Добавляем скрипт в начало всех HTML файлов
+        # Добавляем скрипт в HTML файлы в dist папке
+        cd dist
         for file in *.html; do
           if [ -f "$file" ]; then
             sed -i '/<script src="src\/js\/csp-manager.js"><\/script>/a <script src="security-headers.js"></script>' "$file"
           fi
         done
+        cd ..
         
-        echo "✅ Security headers script added to all HTML files"
+        echo "✅ Security headers script added to all HTML files in dist"
 
     - name: 📄 Setup Pages
       uses: actions/configure-pages@v4
