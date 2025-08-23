@@ -18,11 +18,6 @@ export class SettingsMain {
     this.channelsManager = null;
     this.ui = null;
     this.initialized = false;
-    this.isInitialLoad = true;
-    this.countersAnimated = {
-      keywords: false,
-      channels: false
-    };
     
     this.init();
   }
@@ -174,9 +169,6 @@ export class SettingsMain {
         await this.channelsManager.loadChannels();
       }
       
-      // После первой загрузки отключаем анимацию для последующих обновлений
-      this.isInitialLoad = false;
-      
       log('log', 'Все данные загружены');
     } catch (error) {
       log('error', 'Ошибка загрузки данных:', error);
@@ -222,12 +214,7 @@ export class SettingsMain {
     if (this.keywordsManager) {
       const count = this.keywordsManager.getKeywordsCount();
       if (this.ui) {
-        const shouldAnimate = this.isInitialLoad && !this.countersAnimated.keywords;
-        console.log('Keywords counter update:', { count, isInitialLoad: this.isInitialLoad, alreadyAnimated: this.countersAnimated.keywords, shouldAnimate });
-        if (shouldAnimate) {
-          this.countersAnimated.keywords = true;
-        }
-        this.ui.updateCounter('keywords', count, shouldAnimate);
+        this.ui.updateCounter('keywords', count);
       }
     }
   }
@@ -239,11 +226,7 @@ export class SettingsMain {
     if (this.channelsManager) {
       const count = this.channelsManager.getChannels().length;
       if (this.ui) {
-        const shouldAnimate = this.isInitialLoad && !this.countersAnimated.channels;
-        if (shouldAnimate) {
-          this.countersAnimated.channels = true;
-        }
-        this.ui.updateCounter('channels', count, shouldAnimate);
+        this.ui.updateCounter('channels', count);
       }
     }
   }

@@ -483,61 +483,13 @@ export class SettingsUI {
    * @param {number} count - Количество элементов
    * @param {boolean} withAnimation - Показывать анимацию от 0
    */
-  updateCounter(type, count, withAnimation = false) {
+  updateCounter(type, count) {
     const counterElement = getElement(`${type}-count`);
-    console.log('SettingsUI.updateCounter:', { type, count, withAnimation, element: counterElement });
     if (!counterElement) return;
     
-    if (withAnimation) {
-      console.log('Starting animation for counter:', type);
-      // Небольшая задержка для обеспечения видимости элемента
-      setTimeout(() => {
-        this.animateCounterFromZero(counterElement, count);
-      }, 100);
-    } else {
-      counterElement.textContent = count.toString();
-      counterElement.classList.add('updating');
-      setTimeout(() => counterElement.classList.remove('updating'), 200);
-    }
-  }
-
-  /**
-   * Анимация счетчика от 0 до целевого значения
-   * @param {HTMLElement} countEl - Элемент счетчика
-   * @param {number} targetCount - Целевое значение
-   */
-  animateCounterFromZero(countEl, targetCount) {
-    if (!countEl || targetCount === 0) {
-      countEl.textContent = targetCount;
-      return;
-    }
-    
-    // Принудительно устанавливаем 0 в начале
-    countEl.textContent = '0';
-    
-    let currentCount = 0;
-    const duration = 800; // Длительность анимации в мс
-    const steps = Math.min(targetCount, 20); // Максимум 20 шагов для плавности
-    const stepTime = duration / steps;
-    const increment = targetCount / steps;
-    
-    // Начинаем с желтого и плавно переходим к зеленому
-    countEl.classList.add('counting-up');
-    
-    const counter = setInterval(() => {
-      currentCount += increment;
-      if (currentCount >= targetCount) {
-        currentCount = targetCount;
-        countEl.textContent = targetCount;
-        countEl.classList.remove('counting-up');
-        // Переход от зеленого к желтому
-        countEl.classList.add('counting-complete');
-        setTimeout(() => countEl.classList.remove('counting-complete'), 400);
-        clearInterval(counter);
-      } else {
-        countEl.textContent = Math.floor(currentCount);
-      }
-    }, stepTime);
+    counterElement.textContent = count.toString();
+    counterElement.classList.add('updating');
+    setTimeout(() => counterElement.classList.remove('updating'), 200);
   }
 
   /**
