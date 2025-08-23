@@ -5,19 +5,14 @@
 
   // Функция для безопасного получения переменных окружения
   function getEnvVar(key, fallback = '') {
-    // Vite-стиль переменных (для будущей интеграции с Vite)
-    if (typeof import !== 'undefined' && import.meta && import.meta.env) {
-      return import.meta.env[key] || fallback;
-    }
-    
-    // Переменные из window (для текущего подхода)
+    // Переменные из window.ENV (инжектируются в production)
     if (window.ENV && window.ENV[key]) {
       return window.ENV[key];
     }
     
-    // Process.env для Node.js сред (если доступно)
-    if (typeof process !== 'undefined' && process.env && process.env[key]) {
-      return process.env[key];
+    // Проверяем глобальные переменные (для dev режима)
+    if (window[key]) {
+      return window[key];
     }
     
     return fallback;

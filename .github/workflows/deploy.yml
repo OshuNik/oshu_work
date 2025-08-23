@@ -35,29 +35,30 @@ jobs:
 
     - name: 🔐 Inject Environment Variables
       run: |
-        # Создаем временный JS файл с переменными окружения
-        cat > src/js/env-vars-generated.js << 'EOF'
-        // AUTO-GENERATED: Переменные окружения для production
-        // НЕ РЕДАКТИРОВАТЬ ВРУЧНУЮ!
-        
+        # Заменяем env-dev.js на production версию для всех HTML файлов
+        cat > src/js/env-dev.js << 'EOF'
+        // PRODUCTION: Переменные окружения из GitHub Secrets
         (function() {
           'use strict';
           
-          // Устанавливаем переменные окружения
+          // Устанавливаем production переменные
           window.ENV = {
             VITE_SUPABASE_URL: '${{ secrets.VITE_SUPABASE_URL }}',
             VITE_SUPABASE_ANON_KEY: '${{ secrets.VITE_SUPABASE_ANON_KEY }}',
             VITE_APP_ENVIRONMENT: 'production'
           };
           
-          console.log('✅ Переменные окружения загружены для production');
+          console.log('✅ Production environment variables loaded');
         })();
         EOF
         
-        # Добавляем скрипт в index.html перед env-config.js
-        sed -i 's|<script src="src/js/env-config.js"></script>|<script src="src/js/env-vars-generated.js"></script>\n<script src="src/js/env-config.js"></script>|' index.html
-        
         echo "✅ Environment variables injected successfully"
+        echo "🔍 Checking secrets are not empty:"
+        echo "SUPABASE_URL length: ${#VITE_SUPABASE_URL}"
+        echo "SUPABASE_KEY length: ${#VITE_SUPABASE_ANON_KEY}"
+      env:
+        VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
     - name: 🧹 Clean sensitive data
       run: |
