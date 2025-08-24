@@ -1,6 +1,11 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  // Копируем статические файлы в dist
+  publicDir: false, // Отключаем автокопирование из public/
+  
+  // Копируем нужные статические ресурсы
+  assetsInclude: ['**/*.js', '**/*.css', '**/*.html'],
   // GitHub Pages конфигурация
   base: '/oshu_work/',
   
