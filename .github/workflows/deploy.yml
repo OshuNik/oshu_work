@@ -69,12 +69,15 @@ jobs:
     - name: 🏗️ Build with Vite
       run: npm run build
 
-    - name: 📁 Copy static JS files to dist
+    - name: 📁 Copy static files to dist
       run: |
-        # Копируем src/ файлы в dist/ после Vite сборки
+        # Копируем HTML файлы напрямую в dist/ (не в assets/)
+        cp *.html dist/
+        
+        # Копируем src/ файлы в dist/
         cp -r src dist/
         
-        echo "✅ Static JS files copied to dist/"
+        echo "✅ HTML and static files copied to dist/"
 
     - name: 🔐 Inject environment variables into built files
       run: |

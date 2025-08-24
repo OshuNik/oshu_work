@@ -1,41 +1,34 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  // Копируем статические файлы в dist
-  publicDir: false, // Отключаем автокопирование из public/
-  
-  // Копируем нужные статические ресурсы
-  assetsInclude: ['**/*.js', '**/*.css', '**/*.html'],
   // GitHub Pages конфигурация
   base: '/oshu_work/',
+  
+  // Отключаем обработку HTML как модулей
+  publicDir: false,
   
   build: {
     // Современная сборка для быстрых браузеров
     target: 'es2022',
     
-    // Настройки сборки
+    // Копируем HTML файлы как есть, не как модули
     rollupOptions: {
-      // Мульти-страничное приложение
-      input: {
-        main: 'index.html',
-        favorites: 'favorites.html', 
-        settings: 'settings.html'
-      },
+      // Исключаем HTML из bundling
+      external: ['*.html'],
       
-      output: {
-        // Оптимальное разделение чанков
-        manualChunks(id) {
-          // Группируем по размеру и назначению
-          if (id.includes('src/modules/')) {
-            return 'settings-modules';
-          }
-          // Остальные модули пусть Vite сам решает
-        }
+      // Мульти-страничное приложение - только JS entry points
+      input: {
+        main: 'main.js',
+        favorites: 'favorites.js',
+        settings: 'settings.js'
       }
     },
     
-    // Минификация - упрощенная для избежания проблем
-    minify: 'esbuild'
+    // Минификация
+    minify: 'esbuild',
+    
+    // Не генерировать manifest
+    manifest: false
   },
   
   // Настройки dev сервера
