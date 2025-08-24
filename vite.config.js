@@ -29,15 +29,8 @@ export default defineConfig({
       }
     },
     
-    // Минификация
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        // Сохраняем console.log для отладки в Telegram
-        drop_console: false,
-        drop_debugger: true
-      }
-    }
+    // Минификация - упрощенная для избежания проблем
+    minify: 'esbuild'
   },
   
   // Настройки dev сервера
