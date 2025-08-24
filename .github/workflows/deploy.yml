@@ -69,6 +69,31 @@ jobs:
     - name: 🏗️ Build with Vite
       run: npm run build
 
+    - name: 🔐 Inject environment variables into built files
+      run: |
+        # Инжектируем переменные окружения в собранные HTML файлы
+        cd dist
+        
+        # Создаем script с переменными окружения
+        cat > env-injection.js << EOF
+        window.ENV = {
+          VITE_SUPABASE_URL: '${{ secrets.VITE_SUPABASE_URL }}',
+          VITE_SUPABASE_ANON_KEY: '${{ secrets.VITE_SUPABASE_ANON_KEY }}',
+          VITE_APP_ENVIRONMENT: 'production'
+        };
+        console.log('🔐 Production environment variables injected');
+        EOF
+        
+        # Добавляем script в каждый HTML файл ПЕРЕД другими скриптами
+        for file in *.html; do
+          if [ -f "$file" ]; then
+            sed -i '/<script src="src\/js\/csp-manager.js"><\/script>/i <script src="env-injection.js"></script>' "$file"
+            echo "✅ Environment variables injected into $file"
+          fi
+        done
+        
+        echo "🎯 Environment injection completed"
+
     - name: 🧹 Clean sensitive data
       run: |
         # Удаляем .env файлы если есть
