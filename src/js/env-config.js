@@ -56,11 +56,11 @@
     
     // Shorthand для часто используемых переменных
     get supabaseUrl() {
-      return getEnvVar('VITE_SUPABASE_URL');
+      return getEnvVar('VITE_SUPABASE_URL') || getEnvVar('SUPABASE_URL');
     },
     
     get supabaseAnonKey() {
-      return getEnvVar('VITE_SUPABASE_ANON_KEY');
+      return getEnvVar('VITE_SUPABASE_ANON_KEY') || getEnvVar('SUPABASE_ANON_KEY');
     },
     
     get isProduction() {
