@@ -11,7 +11,6 @@
   <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
   
   <!-- Preload критических файлов -->
-  <link rel="preload" href="src/css/style.css" as="style">
   <link rel="preload" href="src/js/config.js" as="script">
   <link rel="preload" href="src/js/constants.js" as="script">
   <link rel="preload" href="src/js/utils.min.js" as="script">
@@ -43,7 +42,7 @@
   </script>
   
   <!-- Async CSS Loading for non-critical styles -->
-  <link rel="preload" href="src/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="src/css/style.css">
   
   <!-- Fonts loaded asynchronously -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -55,7 +54,7 @@
   
   <div id="main-header">
     <header class="header">
-      <h1>oshu://work <small>v12.3</small></h1>
+      <h1>oshu://work <small>v13.3.0</small></h1>
       <div id="header-actions" class="header-actions">
         <a href="favorites.html" class="header-button">★ Избранное</a>
         <a href="settings.html" class="header-button">⚙︎ Настройки</a>
@@ -178,8 +177,8 @@
 <!-- Вспомогательные модули - загружаются после основных -->
 <script src="src/js/swipe-handler.js" defer></script>
 
-<!-- Vite entry point -->
-<script type="module" src="./main.js"></script>
+<!-- Vite entry point - УБРАНО дублирование -->
+<!-- <script type="module" src="./main.js"></script> -->
 
 <!-- Инициализация CSP после загрузки всех скриптов -->
 <script>

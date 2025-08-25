@@ -217,16 +217,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Загружаем шаблон немедленно если страница уже готова
-if (document.readyState !== 'loading') {
-  // Страница уже загружена, загружаем сразу
-  (async () => {
-    if (document.querySelector('.vacancy-list') || document.querySelector('#favorites-list')) {
-      await TemplateLoader.loadVacancyCardTemplate();
-      window.TEMPLATE_READY = true;
-      window.dispatchEvent(new CustomEvent('templateReady'));
-    }
-  })();
-}
+// УБРАНО - дублирование вызывало рекурсию
+// if (document.readyState !== 'loading') {
+//   // Страница уже загружена, загружаем сразу
+//   (async () => {
+//     if (document.querySelector('.vacancy-list') || document.querySelector('#favorites-list')) {
+//       await TemplateLoader.loadVacancyCardTemplate();
+//       window.TEMPLATE_READY = true;
+//       window.dispatchEvent(new CustomEvent('templateReady'));
+//     }
+//   })();
+// }
 
 // Экспорт для использования в других модулях
 window.TemplateLoader = TemplateLoader;

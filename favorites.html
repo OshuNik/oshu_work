@@ -4,14 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <!-- CSP будет установлен динамически через csp-manager.js с nonce-based security -->
-  <title>Избранное - oshu://work v12.3</title>
+  <title>Избранное - oshu://work v13.3.0</title>
   <!-- Preload критических ресурсов для быстрого First Paint -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
   
   <!-- Preload критических файлов -->
-  <link rel="preload" href="src/css/style.css" as="style">
   <link rel="preload" href="src/js/favorites.js" as="script">
   <link rel="preload" href="src/js/utils.min.js" as="script">
   <link rel="preload" href="src/js/config.js" as="script">
@@ -37,7 +36,7 @@
   </script>
   
   <!-- Async CSS Loading for non-critical styles -->
-  <link rel="preload" href="src/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="src/css/style.css">
   
   <!-- Fonts loaded asynchronously -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -163,8 +162,8 @@
 <!-- Вспомогательные модули - загружаются в последнюю очередь -->
 <script src="src/js/swipe-handler.js" defer></script>
 
-<!-- Vite entry point -->
-<script type="module" src="./favorites.js"></script>
+<!-- Vite entry point - УБРАНО дублирование -->
+<!-- <script type="module" src="./favorites.js"></script> -->
 
 <!-- Инициализация CSP после загрузки всех скриптов -->
 <script>

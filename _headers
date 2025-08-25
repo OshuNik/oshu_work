@@ -2,7 +2,7 @@
 
 /*
   # Content Security Policy с полной поддержкой всех директив
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self' https://web.telegram.org https://telegram.org; upgrade-insecure-requests; block-all-mixed-content
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-oa9qZ9ZMUg2W5sgbuxe8Fw==' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io; style-src 'self' 'nonce-oa9qZ9ZMUg2W5sgbuxe8Fw==' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self' https://web.telegram.org https://telegram.org; upgrade-insecure-requests; block-all-mixed-content
 
   # Дополнительные заголовки безопасности
   X-Frame-Options: SAMEORIGIN
