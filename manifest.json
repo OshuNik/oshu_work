@@ -1,0 +1,122 @@
+{
+  "name": "oshu://work - Поиск вакансий",
+  "short_name": "oshu://work",
+  "description": "Telegram мини-приложение для поиска и управления вакансиями с ретро-дизайном",
+  "version": "1.0.0",
+  "start_url": "/oshu_work/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#FF5C5C",
+  "background_color": "#000000",
+  "lang": "ru-RU",
+  "scope": "/oshu_work/",
+  "categories": ["productivity", "business"],
+  "icons": [
+    {
+      "src": "/oshu_work/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-96.png", 
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-128.png",
+      "sizes": "128x128", 
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png", 
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/oshu_work/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/oshu_work/screenshot-mobile.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Главная страница с категориями вакансий"
+    },
+    {
+      "src": "/oshu_work/screenshot-tablet.png", 
+      "sizes": "768x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Расширенный вид для планшетов"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Избранное",
+      "short_name": "Избранное",
+      "description": "Быстрый доступ к избранным вакансиям",
+      "url": "/oshu_work/favorites.html",
+      "icons": [
+        {
+          "src": "/oshu_work/icon-star-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Настройки", 
+      "short_name": "Настройки",
+      "description": "Управление ключевыми словами и каналами",
+      "url": "/oshu_work/settings.html",
+      "icons": [
+        {
+          "src": "/oshu_work/icon-settings-96.png",
+          "sizes": "96x96", 
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://t.me/oshu_work_bot"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": "preferred"
+}
