@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Настройки - oshu://work v13</title>
+  
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+  
+  <!-- Стили -->
+  <link rel="stylesheet" href="src/css/retro-settings.css">
+</head>
+<body>
+
+  <div class="mini-app-settings">
+    <!-- Заголовок -->
+    <header class="settings-header">
+      <div class="header-left">
+        <h1>НАСТРОЙКИ</h1>
+      </div>
+      <div class="header-controls">
+        <a href="index.html" class="back-button" title="Назад">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <button class="theme-toggle" id="theme-toggle" title="Сменить тему">
+          <i class="bi bi-sun-fill"></i>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Контент -->
+    <div class="settings-content">
+      
+      <!-- Секция ключевых слов -->
+      <div class="settings-section active" id="keywords-section">
+        <div class="section-header">
+          <span class="section-title">КЛЮЧЕВЫЕ СЛОВА</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="keywords-count" class="favorites-count">0</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+        
+        <!-- Добавление -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Одно слово или несколько через запятую:</p>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
+              <button class="input-clear-btn" aria-label="Очистить поле"></button>
+            </div>
+            <button id="add-keyword-btn" class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button id="load-presets-btn" class="action-button success">Загрузить пресет</button>
+          </div>
+        </div>
+        
+        <!-- Активные ключевые слова -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА</h3>
+          
+          <div class="tags-container" id="current-keywords-tags">
+            <div class="loading-indicator">Загрузка...</div>
+          </div>
+          
+          <div class="actions-container">
+            <button id="save-as-preset-btn" class="action-button success">Сохранить как пресет</button>
+            <button id="clear-all-keywords-btn" class="action-button danger">Удалить все</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Секция каналов -->
+      <div class="settings-section" id="channels-section">
+        <div class="section-header">
+          <span class="section-title">КАНАЛЫ</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="channels-count" class="favorites-count">0</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+        
+        <!-- Добавление канала -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Кликабельные примеры:</p>
+          
+          <div class="tags-container" style="margin-bottom: 15px;">
+            <div class="tag example-tag" style="cursor: pointer;">@username</div>
+            <div class="tag example-tag" style="cursor: pointer;">t.me/channel</div>
+          </div>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите @username или ссылку на канал..." id="channel-input">
+              <button class="input-clear-btn" aria-label="Очистить поле"></button>
+            </div>
+            <button id="add-channel-btn" class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button id="load-defaults-channels-btn" class="action-button info">Загрузить стандартные каналы</button>
+          </div>
+        </div>
+        
+        <!-- Активные каналы -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КАНАЛЫ</h3>
+          
+          <div class="channels-list" id="channels-list">
+            <div class="loading-indicator">Загрузка каналов...</div>
+          </div>
+          
+          <div class="actions-container">
+            <button id="save-channels-preset-btn" class="action-button success">Сохранить как пресет</button>
+            <button id="clear-all-channels-btn" class="action-button danger">Удалить все</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно пресетов -->
+  <div class="modal" id="presets-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>ВЫБРАТЬ ПРЕСЕТ</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="preset-item" data-preset="default">
+          <span class="preset-name">Стандартный</span>
+          <span class="preset-description">Базовые настройки для начала работы</span>
+        </div>
+        <div class="preset-item" data-preset="developer">
+          <span class="preset-name">Разработчик</span>
+          <span class="preset-description">Настройки для IT-специалистов</span>
+        </div>
+        <div class="preset-item" data-preset="designer">
+          <span class="preset-name">Дизайнер</span>
+          <span class="preset-description">Настройки для творческих профессий</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Навигация по вкладкам (внизу как на главной странице) -->
+<div id="category-tabs" class="category-tabs" role="tablist" aria-label="Разделы настроек">
+  <button id="tab-keywords" class="tab-button keywords active" data-target="keywords-section" data-category-name="КЛЮЧЕВЫЕ СЛОВА" 
+        role="tab" aria-selected="true" aria-controls="keywords-section">
+    <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
+  </button>
+  <button id="tab-channels" class="tab-button channels" data-target="channels-section" data-category-name="КАНАЛЫ"
+        role="tab" aria-selected="false" aria-controls="channels-section">
+    <span class="tab-label">КАНАЛЫ</span>
+  </button>
+</div>
+
+  <!-- Скрипты -->
+  <!-- Критичные скрипты - загружаются синхронно -->
+  <script src="src/js/csp-manager.js"></script>
+  <script src="src/js/env-dev.js"></script>
+  <script src="src/js/env-config.js"></script>
+  <script src="src/js/config.js"></script>
+  
+  <!-- Основные модули - загружаются асинхронно -->
+  <script src="src/js/theme-manager.js" defer></script>
+  <script type="module">
+    import { SettingsMain } from './src/modules/SettingsMain.js';
+    
+    let settingsApp = null;
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Инициализируем главный модуль настроек
+        settingsApp = new SettingsMain();
+        
+        // Ждем инициализации
+        while (!settingsApp.initialized) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        console.log('Настройки инициализированы:', settingsApp.getStats());
+        
+      } catch (error) {
+        console.error('Ошибка инициализации настроек:', error);
+      }
+    });
+
+    // Инициализация новых вкладок
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      
+      tabButtons.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const target = this.dataset.target;
+          
+          // Убираем активность со всех вкладок
+          tabButtons.forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.remove('active');
+          });
+          
+          // Активируем выбранную вкладку
+          this.classList.add('active');
+          const targetSection = document.getElementById(target);
+          if (targetSection) {
+            targetSection.classList.add('active');
+          }
+        });
+      });
+
+      // Инициализация переключения темы
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          
+          // Используем ThemeManager для правильного применения темы
+          if (window.ThemeManager) {
+            window.ThemeManager.setTheme(newTheme);
+          } else {
+            // Fallback если ThemeManager не загружен
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('app-theme', newTheme);
+          }
+          
+          // Обновляем иконку
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.className = newTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+          }
+        });
+
+        // Загружаем сохраненную тему (унифицированный ключ)
+        const savedTheme = localStorage.getItem('app-theme');
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+          }
+        }
+      }
+    });
+
+    // Обработка кликабельных примеров
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('example-tag')) {
+        const input = e.target.closest('.settings-card').querySelector('.input-field');
+        input.value = e.target.textContent;
+        input.focus();
+        // Показываем крестик
+        updateClearButtonVisibility(input);
+      }
+    });
+
+    // Функция для обновления видимости кнопки очистки
+    function updateClearButtonVisibility(input) {
+      const wrapper = input.closest('.input-wrapper');
+      if (input.value.trim()) {
+        wrapper.classList.add('has-text');
+      } else {
+        wrapper.classList.remove('has-text');
+      }
+    }
+
+    // Обработка ввода в поля для показа/скрытия крестика
+    document.addEventListener('input', (e) => {
+      if (e.target.classList.contains('input-field')) {
+        updateClearButtonVisibility(e.target);
+      }
+    });
+
+    // Обработка кликов по крестикам
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('input-clear-btn')) {
+        const input = e.target.closest('.input-wrapper').querySelector('.input-field');
+        input.value = '';
+        input.focus();
+        updateClearButtonVisibility(input);
+      }
+    });
+
+    // Обработка модального окна пресетов
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-close')) {
+        const modal = e.target.closest('.modal');
+        modal.classList.remove('active');
+      }
+      
+      if (e.target.classList.contains('preset-item')) {
+        const preset = e.target.dataset.preset;
+        console.log('Выбран пресет:', preset);
+        // Здесь будет логика загрузки пресета
+        const modal = e.target.closest('.modal');
+        modal.classList.remove('active');
+      }
+    });
+
+    // Показать модальное окно пресетов
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'load-presets-btn') {
+        const modal = document.getElementById('presets-modal');
+        modal.classList.add('active');
+      }
+    });
+
+  </script>
+
+  <!-- Инициализация CSP после загрузки всех скриптов -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.cspManager) {
+      window.cspManager.init();
+    }
+  });
+  </script>
+</body>
+</html>
