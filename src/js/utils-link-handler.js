@@ -42,6 +42,15 @@
     }
   }
 
+  // Определение платформы
+  function detectPlatform() {
+    const isInTelegramApp = !!(tg && tg.platform !== 'unknown');
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isDesktop = !isMobile;
+    
+    return { isInTelegramApp, isMobile, isDesktop };
+  }
+
   // Основная функция обработки ссылок
   function handleLink(url) {
     let safeUrl = sanitizeLink(url);
@@ -53,23 +62,36 @@
       safeUrl = `https://t.me/${username}`;
     }
 
-    // Правильная логика для разных случаев
-    const isInTelegramApp = !!(tg && tg.platform !== 'unknown');
+    const { isInTelegramApp, isDesktop } = detectPlatform();
     
-    if (safeUrl.startsWith('https://t.me')) {
-      // Telegram ссылки
-      if (isInTelegramApp && typeof tg.openTelegramLink === 'function') {
-        tg.openTelegramLink(safeUrl);
+    // ПРАВИЛЬНАЯ ЛОГИКА:
+    // 1. ПК - ВСЕГДА новое окно (_blank)
+    // 2. Телефон в Telegram Mini App - через TG API
+    // 3. Телефон в браузере - новое окно
+    
+    if (isDesktop) {
+      // ПК: всегда открываем в новой вкладке
+      openInNewTab(safeUrl);
+    } else if (isInTelegramApp) {
+      // Мобильный Telegram Mini App
+      if (safeUrl.startsWith('https://t.me')) {
+        // Telegram ссылки через TG API
+        if (typeof tg.openTelegramLink === 'function') {
+          tg.openTelegramLink(safeUrl);
+        } else {
+          openInNewTab(safeUrl);
+        }
       } else {
-        openInNewTab(safeUrl);
+        // Внешние ссылки через TG API (откроется в браузере/внутри TG)
+        if (typeof tg.openLink === 'function') {
+          tg.openLink(safeUrl);
+        } else {
+          openInNewTab(safeUrl);
+        }
       }
     } else {
-      // Внешние ссылки
-      if (isInTelegramApp && typeof tg.openLink === 'function') {
-        tg.openLink(safeUrl);
-      } else {
-        openInNewTab(safeUrl);
-      }
+      // Мобильный браузер: новое окно
+      openInNewTab(safeUrl);
     }
     
     // НЕ вызываем appController.destroy()!
