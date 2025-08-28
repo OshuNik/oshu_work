@@ -46,8 +46,8 @@ dist-ssr/
 build/
 out/
 
-# Package managers
-package-lock.json
+# Package managers (keep package-lock.json for reproducible deployments)
+# package-lock.json  # NEEDED for GitHub Actions
 yarn.lock
 pnpm-lock.yaml
 
