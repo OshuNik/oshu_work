@@ -169,15 +169,8 @@
   </button>
 </div>
 
-  <!-- Скрипты -->
-  <!-- Критичные скрипты - загружаются синхронно -->
-  <script src="src/js/csp-manager.js"></script>
-  <script src="src/js/env-dev.js"></script>
-  <script src="src/js/env-config.js"></script>
-  <script src="src/js/config.js"></script>
-  
-  <!-- Основные модули - загружаются асинхронно -->
-  <script src="src/js/theme-manager.js" defer></script>
+  <!-- Entry point - ES модуль -->
+  <script type="module" src="/src/js/settings-main.js"></script>
   <script type="module">
     import { SettingsMain } from './src/modules/SettingsMain.js';
     

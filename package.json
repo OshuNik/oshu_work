@@ -1,0 +1,30 @@
+{
+  "name": "oshu-work-telegram-mini-app",
+  "version": "13.0.0",
+  "type": "module",
+  "description": "Telegram Mini App парсер вакансий",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
+    "serve": "vite preview --port 4173",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "vite": "^5.4.3",
+    "terser": "^5.31.6"
+  },
+  "dependencies": {},
+  "keywords": ["telegram", "mini-app", "job-parser", "vite"],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "your-repo-url"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

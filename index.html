@@ -186,31 +186,9 @@
   tryNextCdn();
 })();
 </script>
-<!-- Критичные скрипты - загружаются синхронно (нужны всем) -->
-<script src="src/js/csp-manager.js"></script>
-<script src="src/js/env-dev.js"></script>
-<script src="src/js/env-config.js"></script>
-<script src="src/js/config.js"></script>
-<script src="src/js/constants.js"></script>
-<script src="src/js/utils.min.js"></script>
+<!-- Entry point - ES модуль -->
+<script type="module" src="/src/js/main.js"></script>
 
-<!-- Независимые модули - можно загружать асинхронно -->
-<script src="src/js/theme-manager.js" async></script>
-<script src="src/js/template-loader.js" async></script>
-<script src="src/js/utils-empty-state.js"></script>
-<script src="src/js/utils-link-handler.js"></script>
-
-<!-- Цепочка зависимостей - должна быть синхронной -->
-<script src="src/js/state-manager.js"></script>
-<script src="src/js/api-service.js"></script>
-<script src="src/js/network-manager.js"></script>
-<script src="src/js/dom-manager.js"></script>
-<script src="src/js/event-manager.js"></script>
-<script src="src/js/vacancy-manager.js"></script>
-<script src="src/js/app-controller.js"></script>
-
-<!-- Вспомогательные модули - загружаются после основных -->
-<script src="src/js/swipe-handler.js" defer></script>
 
 <!-- Инициализация CSP после загрузки всех скриптов -->
 <script>

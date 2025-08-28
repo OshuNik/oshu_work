@@ -32,3 +32,25 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+
+# Vite build output
+dist/
+dist-ssr/
+*.local
+
+# Vite cache
+.cache/
+.parcel-cache/
+
+# Build outputs
+build/
+out/
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage
+coverage/
+*.lcov

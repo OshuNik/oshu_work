@@ -9,7 +9,16 @@
       "Read(E:\\ОшуВорк\\КЛОД\\Документы/**)",
       "Read(E:\\ОшуВорк\\КЛОД\\Документы/**)",
       "Read(E:\\ОшуВорк\\КЛОД/**)",
-      "Read(E:\\ОшуВорк\\КЛОД/**)"
+      "Read(E:\\ОшуВорк\\КЛОД/**)",
+      "Read(E:\\ОшуВорк\\КЛОД/**)",
+      "Read(E:\\ОшуВорк\\КЛОД/**)",
+      "Bash(npm install:*)",
+      "Bash(claude mcp add memory npx:*)",
+      "Bash(npm search:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp:*)",
+      "WebFetch(domain:vite.dev)",
+      "WebFetch(domain:docs.telegram-mini-apps.com)"
     ],
     "deny": [],
     "ask": []
