@@ -33,7 +33,7 @@
     buildCategoryUrl(key, limit, offset, query) {
       const params = new URLSearchParams();
       params.set('select', '*');
-      params.set('status', `eq.${CFG.STATUSES.NEW}`);
+      params.set('status', `eq.${CFG.STATUSES?.NEW || 'NEW'}`);
       params.set('order', 'timestamp.desc');
       params.set('limit', String(limit));
       params.set('offset', String(offset));
@@ -61,7 +61,7 @@
     buildCountUrl(key, query) {
       const params = new URLSearchParams();
       params.set('select', 'id');
-      params.set('status', `eq.${CFG.STATUSES.NEW}`);
+      params.set('status', `eq.${CFG.STATUSES?.NEW || 'NEW'}`);
       params.set('limit', '1');
       
       // Установка категории
