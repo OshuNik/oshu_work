@@ -40,11 +40,11 @@
 
       // Установка категории
       if (key === 'main') {
-        params.set('category', `eq.${CFG.CATEGORIES.MAIN}`);
+        params.set('category', `eq.${CFG.CATEGORIES?.MAIN || 'ТОЧНО ТВОЁ'}`);
       } else if (key === 'maybe') {
-        params.set('category', `eq.${CFG.CATEGORIES.MAYBE}`);
+        params.set('category', `eq.${CFG.CATEGORIES?.MAYBE || 'МОЖЕТ БЫТЬ'}`);
       } else {
-        params.set('category', `not.in.("${CFG.CATEGORIES.MAIN}","${CFG.CATEGORIES.MAYBE}")`);
+        params.set('category', `not.in.("${CFG.CATEGORIES?.MAIN || 'ТОЧНО ТВОЁ'}","${CFG.CATEGORIES?.MAYBE || 'МОЖЕТ БЫТЬ'}")`);
       }
 
       // Добавление поискового запроса
@@ -66,11 +66,11 @@
       
       // Установка категории
       if (key === 'main') {
-        params.set('category', `eq.${CFG.CATEGORIES.MAIN}`);
+        params.set('category', `eq.${CFG.CATEGORIES?.MAIN || 'ТОЧНО ТВОЁ'}`);
       } else if (key === 'maybe') {
-        params.set('category', `eq.${CFG.CATEGORIES.MAYBE}`);
+        params.set('category', `eq.${CFG.CATEGORIES?.MAYBE || 'МОЖЕТ БЫТЬ'}`);
       } else {
-        params.set('category', `not.in.("${CFG.CATEGORIES.MAIN}","${CFG.CATEGORIES.MAYBE}")`);
+        params.set('category', `not.in.("${CFG.CATEGORIES?.MAIN || 'ТОЧНО ТВОЁ'}","${CFG.CATEGORIES?.MAYBE || 'МОЖЕТ БЫТЬ'}")`);
       }
 
       // Добавление поискового запроса
