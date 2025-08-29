@@ -61,8 +61,8 @@
         // Базовая политика - только собственные ресурсы
         `default-src 'self'`,
         
-        // Скрипты: только с nonce + разрешенные CDN + поддержка inline handlers
-        `script-src 'self' 'nonce-${this.nonce}' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
+        // Скрипты: только с nonce + разрешенные CDN + полная поддержка inline handlers
+        `script-src 'self' 'nonce-${this.nonce}' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
         
         // Стили: только собственные + Google Fonts
         `style-src 'self' 'nonce-${this.nonce}' https://fonts.googleapis.com`,
@@ -107,8 +107,8 @@
         // Базовая политика - только собственные ресурсы
         `default-src 'self'`,
         
-        // Скрипты: только с nonce + разрешенные CDN + поддержка inline handlers
-        `script-src 'self' 'nonce-${this.nonce}' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
+        // Скрипты: только с nonce + разрешенные CDN + полная поддержка inline handlers
+        `script-src 'self' 'nonce-${this.nonce}' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
         
         // Стили: только собственные + Google Fonts
         `style-src 'self' 'nonce-${this.nonce}' https://fonts.googleapis.com`,

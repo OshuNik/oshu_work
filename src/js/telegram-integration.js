@@ -63,16 +63,16 @@ class TelegramIntegration {
       // Настраиваем обработчики событий
       this.setupEventHandlers();
       
-      // Включаем закрытие через жесты (если поддерживается)
-      if (typeof this.tg.enableClosingConfirmation === 'function') {
+      // Включаем closing confirmation только для поддерживаемых версий (6.2+)
+      if (this.isClosingConfirmationSupported()) {
         try {
           this.tg.enableClosingConfirmation();
           console.log('✅ Closing confirmation активирован');
         } catch (error) {
-          console.warn('⚠️ Closing confirmation не поддерживается в этой версии:', error.message);
+          console.warn('⚠️ Closing confirmation не поддерживается:', error.message);
         }
       } else {
-        console.warn('⚠️ enableClosingConfirmation недоступен в текущей версии Telegram WebApp API');
+        console.log('ℹ️ Closing confirmation требует более новую версию Telegram WebApp API');
       }
       
       // Уведомляем о готовности
@@ -156,20 +156,37 @@ class TelegramIntegration {
       return; // Не показываем на странице настроек
     }
 
-    // Проверяем поддержку SettingsButton в текущей версии
-    if (this.tg.SettingsButton && typeof this.tg.SettingsButton.show === 'function') {
-      try {
-        this.tg.SettingsButton.show();
-        this.tg.SettingsButton.onClick(() => {
-          this.hapticFeedback('light');
-          this.navigateTo('settings.html');
-        });
-        console.log('✅ SettingsButton активирован');
-      } catch (error) {
-        console.warn('⚠️ SettingsButton не поддерживается в этой версии Telegram:', error.message);
+    // Строгая проверка версии API - только для 6.1+
+    if (!this.tg.SettingsButton) {
+      console.log('ℹ️ SettingsButton не поддерживается в Telegram WebApp API версии ' + (this.apiVersion || 'неизвестной'));
+      return;
+    }
+
+    // Дополнительная проверка версии через парсинг
+    if (this.apiVersion && this.apiVersion !== '6.1+') {
+      const version = parseFloat(this.apiVersion);
+      if (version && version < 6.1) {
+        console.log('ℹ️ SettingsButton требует Telegram WebApp API версии 6.1 или выше');
+        return;
       }
-    } else {
-      console.warn('⚠️ SettingsButton недоступен в текущей версии Telegram WebApp API');
+    }
+
+    // Только если все проверки пройдены
+    try {
+      if (typeof this.tg.SettingsButton.show === 'function') {
+        this.tg.SettingsButton.show();
+        
+        if (typeof this.tg.SettingsButton.onClick === 'function') {
+          this.tg.SettingsButton.onClick(() => {
+            this.hapticFeedback('light');
+            this.navigateTo('settings.html');
+          });
+        }
+        
+        console.log('✅ SettingsButton активирован');
+      }
+    } catch (error) {
+      console.warn('⚠️ Ошибка при настройке SettingsButton:', error.message);
     }
   }
 
@@ -208,6 +225,23 @@ class TelegramIntegration {
     } else {
       window.history.back();
     }
+  }
+
+  // Проверка поддержки closing confirmation
+  isClosingConfirmationSupported() {
+    if (!this.tg || typeof this.tg.enableClosingConfirmation !== 'function') {
+      return false;
+    }
+
+    // Проверяем версию API
+    if (this.apiVersion) {
+      const version = parseFloat(this.apiVersion);
+      if (version && version < 6.2) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   // Haptic Feedback
