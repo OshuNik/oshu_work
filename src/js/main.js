@@ -6,10 +6,15 @@ import './config.js';
 import './constants.js';
 import './csp-manager.js';
 
+// Utils модули (КРИТИЧЕСКИ ВАЖНО - содержит createVacancyCard, renderEmptyState)
+import './utils.min.js';
+import './utils-empty-state.js';
+
 // Core модули  
 import './state-manager.js';
 import './api-service.js';
 import './dom-manager.js';
+import './event-manager.js';
 import './vacancy-manager.js';
 import './app-controller.js';
 
