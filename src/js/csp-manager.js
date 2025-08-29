@@ -61,11 +61,11 @@
         // Базовая политика - только собственные ресурсы
         `default-src 'self'`,
         
-        // Скрипты: только с nonce + разрешенные CDN + полная поддержка inline handlers
-        `script-src 'self' 'nonce-${this.nonce}' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
+        // Скрипты: разрешаем inline handlers + CDN (без nonce чтобы не блокировать unsafe-inline)
+        `script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
         
-        // Стили: только собственные + Google Fonts
-        `style-src 'self' 'nonce-${this.nonce}' https://fonts.googleapis.com`,
+        // Стили: собственные + Google Fonts + inline стили
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
         
         // Шрифты: Google Fonts
         `font-src 'self' https://fonts.gstatic.com`,
@@ -107,11 +107,11 @@
         // Базовая политика - только собственные ресурсы
         `default-src 'self'`,
         
-        // Скрипты: только с nonce + разрешенные CDN + полная поддержка inline handlers
-        `script-src 'self' 'nonce-${this.nonce}' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
+        // Скрипты: разрешаем inline handlers + CDN (без nonce чтобы не блокировать unsafe-inline)
+        `script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
         
-        // Стили: только собственные + Google Fonts
-        `style-src 'self' 'nonce-${this.nonce}' https://fonts.googleapis.com`,
+        // Стили: собственные + Google Fonts + inline стили
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
         
         // Шрифты: Google Fonts
         `font-src 'self' https://fonts.gstatic.com`,
