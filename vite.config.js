@@ -29,11 +29,11 @@ export default defineConfig(({ command, mode }) => {
       outDir: 'dist',
       assetsDir: 'assets',
       
-      // Multi-page configuration
+      // Multi-page configuration - правильные входные точки
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),
-          favorites: resolve(__dirname, 'favorites.html'),
+          favorites: resolve(__dirname, 'favorites.html'),  
           settings: resolve(__dirname, 'settings.html')
         },
         
@@ -44,40 +44,7 @@ export default defineConfig(({ command, mode }) => {
           assetFileNames: isProd ? 'assets/[hash:8].[ext]' : 'assets/[name]-[hash:8].[ext]',
           entryFileNames: isProd ? 'js/[hash:8].js' : 'js/[name]-[hash:8].js',
           
-          // Smart chunking для Telegram performance
-          manualChunks: {
-            // Critical path - только необходимое для первого экрана
-            'critical': [
-              './src/js/config.js',
-              './src/js/constants.js',
-              './src/js/csp-manager.js'
-            ],
-            
-            // Telegram-specific utilities
-            'telegram-utils': [
-              './src/js/telegram-integration.js',
-              './src/js/smart-cache.js'
-            ],
-            
-            // Core job functionality
-            'job-core': [
-              './src/js/vacancy-manager.js',
-              './src/js/state-manager.js'
-            ],
-            
-            // UI libraries - загружаются по требованию
-            'ui-libs': [
-              './src/js/dom-manager.js',
-              './src/js/template-loader.js',
-              './src/js/swipe-handler.js'
-            ],
-            
-            // Network & API - defer loading
-            'network': [
-              './src/js/api-service.js',
-              './src/js/network-manager.js'
-            ]
-          },
+          // Упрощенное разделение чанков - пусть Vite сам оптимизирует
           
           // Экстремальная оптимизация размера
           compact: true,
@@ -89,48 +56,23 @@ export default defineConfig(({ command, mode }) => {
         // Внешние зависимости (если есть CDN версии)
         external: isProd ? [] : [],
         
-        // Tree-shaking конфигурация
+        // Умный tree-shaking (не агрессивный)
         treeshake: {
-          moduleSideEffects: false,
-          propertyReadSideEffects: false,
-          unknownGlobalSideEffects: false
+          moduleSideEffects: true, // Сохраняем side effects
+          propertyReadSideEffects: true,
+          unknownGlobalSideEffects: true
         }
       },
       
-      // Экстремальная минификация для Telegram
+      // Минификация для продакшна (менее агрессивная)
       minify: 'terser',
       terserOptions: {
         compress: {
-          // Агрессивное удаление кода
           drop_console: isProd,
-          drop_debugger: isProd,
-          pure_funcs: isProd ? ['console.log', 'console.info', 'console.debug', 'console.warn'] : [],
-          
-          // Экстремальные optimizations
-          passes: 3, // Больше проходов для лучшего сжатия
-          unsafe_arrows: true,
-          unsafe_methods: true,
-          unsafe_proto: true,
-          
-          // Mobile-specific optimizations
-          collapse_vars: true,
-          reduce_vars: true,
-          hoist_funs: true,
-          hoist_props: true,
-          hoist_vars: false, // Лучше для mobile memory
-          
-          // Remove unused
-          dead_code: true,
-          unused: true
+          drop_debugger: isProd
         },
         mangle: {
-          safari10: true,
-          toplevel: true, // Mangle top-level names
-          properties: false // Не manglе properties для стабильности
-        },
-        format: {
-          comments: false, // Убираем все комментарии
-          ecma: 2020
+          safari10: true
         }
       },
       
