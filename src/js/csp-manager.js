@@ -14,8 +14,17 @@
     generateNonce() {
       const array = new Uint8Array(16);
       if (window.crypto && window.crypto.getRandomValues) {
-        window.crypto.getRandomValues(array);
+        try {
+          window.crypto.getRandomValues(array);
+        } catch (error) {
+          console.warn('⚠️ CSP: Crypto API недоступен, используем fallback:', error.message);
+          // Fallback для старых браузеров
+          for (let i = 0; i < array.length; i++) {
+            array[i] = Math.floor(Math.random() * 256);
+          }
+        }
       } else {
+        console.warn('⚠️ CSP: Limited CSP support in this browser - crypto API недоступен');
         // Fallback для старых браузеров
         for (let i = 0; i < array.length; i++) {
           array[i] = Math.floor(Math.random() * 256);

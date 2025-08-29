@@ -24,7 +24,7 @@ export default defineConfig(({ command, mode }) => {
       host: true
     },
     
-    // Конфигурация сборки
+    // EXTREME Performance конфигурация для Telegram Mini App
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
@@ -37,69 +37,136 @@ export default defineConfig(({ command, mode }) => {
           settings: resolve(__dirname, 'settings.html')
         },
         
-        // Оптимизация для production
+        // Экстремальная оптимизация для Telegram Mini App
         output: {
-          // Chunking стратегия для better caching
+          // Ultra-compact filenames для кэширования
+          chunkFileNames: isProd ? 'js/[hash:8].js' : 'js/[name]-[hash:8].js',
+          assetFileNames: isProd ? 'assets/[hash:8].[ext]' : 'assets/[name]-[hash:8].[ext]',
+          entryFileNames: isProd ? 'js/[hash:8].js' : 'js/[name]-[hash:8].js',
+          
+          // Smart chunking для Telegram performance
           manualChunks: {
-            // Общие утилиты
-            utils: [
-              './src/js/utils.min.js',
+            // Critical path - только необходимое для первого экрана
+            'critical': [
+              './src/js/config.js',
               './src/js/constants.js',
-              './src/js/config.js'
+              './src/js/csp-manager.js'
             ],
-            // API и сеть
-            api: [
+            
+            // Telegram-specific utilities
+            'telegram-utils': [
+              './src/js/telegram-integration.js',
+              './src/js/smart-cache.js'
+            ],
+            
+            // Core job functionality
+            'job-core': [
+              './src/js/vacancy-manager.js',
+              './src/js/state-manager.js'
+            ],
+            
+            // UI libraries - загружаются по требованию
+            'ui-libs': [
+              './src/js/dom-manager.js',
+              './src/js/template-loader.js',
+              './src/js/swipe-handler.js'
+            ],
+            
+            // Network & API - defer loading
+            'network': [
               './src/js/api-service.js',
               './src/js/network-manager.js'
-            ],
-            // UI менеджеры
-            ui: [
-              './src/js/dom-manager.js',
-              './src/js/theme-manager.js',
-              './src/js/template-loader.js'
-            ],
-            // Бизнес логика
-            core: [
-              './src/js/state-manager.js',
-              './src/js/vacancy-manager.js',
-              './src/js/app-controller.js'
             ]
-          }
+          },
+          
+          // Экстремальная оптимизация размера
+          compact: true,
+          
+          // Минимальные import statements
+          hoistTransitiveImports: false
+        },
+        
+        // Внешние зависимости (если есть CDN версии)
+        external: isProd ? [] : [],
+        
+        // Tree-shaking конфигурация
+        treeshake: {
+          moduleSideEffects: false,
+          propertyReadSideEffects: false,
+          unknownGlobalSideEffects: false
         }
       },
       
-      // Минификация
+      // Экстремальная минификация для Telegram
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: isProd, // Убираем console.log в production
+          // Агрессивное удаление кода
+          drop_console: isProd,
           drop_debugger: isProd,
-          pure_funcs: isProd ? ['console.log', 'console.info', 'console.debug'] : [],
-          passes: 2 // Дополнительные проходы для лучшего сжатия
+          pure_funcs: isProd ? ['console.log', 'console.info', 'console.debug', 'console.warn'] : [],
+          
+          // Экстремальные optimizations
+          passes: 3, // Больше проходов для лучшего сжатия
+          unsafe_arrows: true,
+          unsafe_methods: true,
+          unsafe_proto: true,
+          
+          // Mobile-specific optimizations
+          collapse_vars: true,
+          reduce_vars: true,
+          hoist_funs: true,
+          hoist_props: true,
+          hoist_vars: false, // Лучше для mobile memory
+          
+          // Remove unused
+          dead_code: true,
+          unused: true
         },
         mangle: {
-          safari10: true // Совместимость с мобильными браузерами
+          safari10: true,
+          toplevel: true, // Mangle top-level names
+          properties: false // Не manglе properties для стабильности
+        },
+        format: {
+          comments: false, // Убираем все комментарии
+          ecma: 2020
         }
       },
       
-      // CSS минификация
+      // Максимальная CSS оптимизация
       cssMinify: 'esbuild',
       
-      // Мониторинг размера бандла
+      // Отчетность
       reportCompressedSize: true,
       
-      // Лимит предупреждения для мобильных
-      chunkSizeWarningLimit: 300,
+      // Mobile-first размеры
+      chunkSizeWarningLimit: 200, // Еще строже для Telegram
       
-      // Source maps для debugging
-      sourcemap: isDev,
+      // Source maps только для dev
+      sourcemap: isDev ? 'inline' : false,
       
-      // Оптимизация размера для мобильных
-      target: 'es2020',
+      // Target для современных мобильных браузеров
+      target: ['es2015', 'chrome64', 'firefox67', 'safari12'],
+      
+      // CSS оптимизации
       cssCodeSplit: true,
       
-      // Inline ассеты меньше 4KB для уменьшения HTTP запросов
-      assetsInlineLimit: 4096
+      // Inline small assets для уменьшения запросов
+      assetsInlineLimit: 2048, // Уменьшили для mobile
+      
+      // Оптимизация для мобильных устройств
+      modulePreload: {
+        polyfill: false // Убираем polyfill для размера
+      },
+      
+      // Experimental optimizations
+      experimental: {
+        renderBuiltUrl: (filename) => {
+          // Custom asset URL handling если нужно
+          return filename;
+        }
+      }
     },
     
     // CSS настройки

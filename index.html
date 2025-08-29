@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <!-- CSP будет установлен динамически через csp-manager.js с nonce-based security -->
-  <title>oshu://work</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
+  
+  <title>oshu://work v14 - Telegram Mini App</title>
   <!-- Preload критических ресурсов для быстрого First Paint -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,10 +50,10 @@
   
   <div id="main-header">
     <header class="header">
-      <h1>oshu://work <small>v13</small></h1>
+      <h1>oshu://work <small>v14</small></h1>
       <div id="header-actions" class="header-actions">
-        <a href="favorites.html" class="header-button">★ Избранное</a>
-        <a href="settings.html" class="header-button">⚙︎ Настройки</a>
+        <a href="favorites.html" class="header-button telegram-haptic">★ Избранное</a>
+        <a href="settings.html" class="header-button telegram-haptic">⚙︎ Настройки</a>
       </div>
     </header>
     <div id="search-container" class="search-container">
@@ -142,7 +147,24 @@
   </div>
 </template>
 
+<!-- Telegram WebApp API - загружаем первым для Phase 3 -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Phase 3: Telegram Mini App optimizations -->
+<script>
+// Preload optimizations для Telegram Mini App
+if (window.Telegram?.WebApp) {
+  // Расширяем на весь экран сразу
+  window.Telegram.WebApp.expand();
+  
+  // Применяем тему быстро чтобы избежать flash
+  const tg = window.Telegram.WebApp;
+  if (tg.themeParams.bg_color) {
+    document.documentElement.style.setProperty('--tg-bg-color', tg.themeParams.bg_color);
+    document.body.style.backgroundColor = tg.themeParams.bg_color;
+  }
+}
+</script>
 
 <!-- Supabase конфигурация загружается через env-dev.js -->
 
