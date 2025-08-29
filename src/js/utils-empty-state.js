@@ -16,7 +16,7 @@
     const img = document.createElement('img');
     img.className = 'empty-state-gif';
     img.alt = 'Анимация собачки';
-    img.src = 'src/img/doggie.gif'; // Используем локальный файл
+    img.src = 'https://oshu-vacancies.github.io/oshuwork-mini-app/doggie.gif'; // Используем CDN
     img.loading = 'lazy'; // Оптимизация загрузки
 
     const p = document.createElement('p');

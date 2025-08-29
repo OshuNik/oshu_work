@@ -41,12 +41,10 @@ class SmartCacheManager {
   // ===================
 
   async preloadCriticalAssets() {
+    // Только статические ресурсы (JS/CSS загружаются автоматически)
     const criticalAssets = [
-      '/oshu_work/src/css/critical.css',
-      '/oshu_work/src/css/style.css',
-      '/oshu_work/src/js/config.js',
-      '/oshu_work/src/js/constants.js',
-      '/oshu_work/favicon.ico'
+      '/oshu_work/favicon.ico',
+      '/oshu_work/favicon.svg'
     ];
 
     try {
