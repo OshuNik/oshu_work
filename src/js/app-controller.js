@@ -188,7 +188,7 @@
 
       try {
         const query = window.stateManager.getState().query;
-        const limit = CONST.PAGE_SIZES?.MAIN || CFG.PAGE_SIZE_MAIN || 10;
+        const limit = CONST?.PAGE_SIZES?.MAIN || CFG.PAGE_SIZE_MAIN || 10;
         
         const result = await window.apiService.fetchVacancies(key, limit, 0, query);
         
@@ -390,7 +390,7 @@
           window.domManager?.hideSkeleton('main');
           window.domManager?.hideSkeleton('maybe');
           window.domManager?.hideSkeleton('other');
-        }, CONST.TIMEOUTS?.LOADER || 25000);
+        }, CONST?.TIMEOUTS?.LOADER || 25000);
 
         // Ждем готовности DOM
         await this.waitForDOM();

@@ -89,7 +89,7 @@
           throw new Error('API сервис не инициализирован');
         }
 
-        const limit = CONST.PAGE_SIZES?.MAIN || CFG.PAGE_SIZE_MAIN || 10;
+        const limit = CONST?.PAGE_SIZES?.MAIN || CFG.PAGE_SIZE_MAIN || 10;
         const query = stateManager.getState().query;
         
         const result = await apiService.fetchVacancies(

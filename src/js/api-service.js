@@ -125,7 +125,7 @@
           
           // Увеличиваем таймаут для мобильных устройств
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), CONST.TIMEOUTS.MOBILE);
+          const timeoutId = setTimeout(() => controller.abort(), CONST?.TIMEOUTS?.MOBILE || 15000);
           
           try {
             const response = await UTIL.fetchWithRetry(url, {
