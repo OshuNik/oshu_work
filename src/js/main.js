@@ -53,7 +53,17 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('✅ WebSocket Manager готов к работе');
       
       // Подписываемся на активную категорию при запуске
-      const activeCategory = window.stateManager?.getCurrentCategory() || 'ТОЧНО ТВОЁ';
+      let activeCategory = 'ТОЧНО ТВОЁ'; // По умолчанию
+      
+      // Безопасная попытка получить текущую категорию
+      try {
+        if (window.stateManager && typeof window.stateManager.getCurrentCategory === 'function') {
+          activeCategory = window.stateManager.getCurrentCategory() || 'ТОЧНО ТВОЁ';
+        }
+      } catch (error) {
+        console.warn('[Phase 3.2] Не удалось получить текущую категорию:', error);
+      }
+      
       window.wsManager.subscribeToCategory(activeCategory);
       
       // Добавляем обработчики WebSocket событий
