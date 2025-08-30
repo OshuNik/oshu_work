@@ -93,6 +93,13 @@ class WebSocketManager {
     // Определяем WebSocket сервер (для разработки используем mock)
     const wsUrl = this.getWebSocketUrl();
     
+    // Если URL не определен (production без WebSocket сервера), переходим в fallback
+    if (!wsUrl) {
+      console.warn('[WebSocket] WebSocket сервер недоступен, переходим в fallback режим');
+      this.dispatchEvent('ws:fallback', { reason: 'no_server_configured' });
+      return;
+    }
+    
     console.log(`[WebSocket] Подключение к: ${wsUrl}`);
     
     this.socket = window.io(wsUrl, {
@@ -117,8 +124,9 @@ class WebSocketManager {
       return 'http://localhost:3001'; // Mock server для разработки
     }
     
-    // Для production - реальный WebSocket server
-    return 'wss://api.oshuwork.ru/socket'; // Placeholder URL
+    // Для production - пока WebSocket сервер не развернут, возвращаем null для fallback
+    // TODO: После развертывания WebSocket сервера заменить на реальный URL
+    return null; // Временно отключаем WebSocket в production
   }
 
   /**
