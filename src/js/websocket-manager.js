@@ -124,9 +124,68 @@ class WebSocketManager {
       return 'http://localhost:3001'; // Mock server для разработки
     }
     
-    // Для production - пока WebSocket сервер не развернут, возвращаем null для fallback
-    // TODO: После развертывания WebSocket сервера заменить на реальный URL
-    return null; // Временно отключаем WebSocket в production
+    // Для production используем Supabase Realtime как WebSocket альтернативу
+    // Это позволит получать live обновления через database subscriptions
+    if (window.location.hostname.includes('github.io') || window.location.hostname.includes('oshunik.github.io')) {
+      // Вместо отдельного WebSocket сервера используем Supabase Realtime
+      this.setupSupabaseRealtime();
+      return null; // Используем Supabase вместо Socket.IO
+    }
+    
+    // Fallback для других доменов
+    return null;
+  }
+
+  /**
+   * Настройка Supabase Realtime для production
+   */
+  setupSupabaseRealtime() {
+    // Проверяем, что Supabase доступен
+    if (typeof window.supabaseClient === 'undefined') {
+      console.warn('[WebSocket] Supabase client недоступен для realtime');
+      this.dispatchEvent('ws:fallback', { reason: 'supabase_unavailable' });
+      return;
+    }
+    
+    console.log('[WebSocket] Используем Supabase Realtime вместо Socket.IO');
+    
+    try {
+      // Подписываемся на изменения в таблице вакансий (если она есть)
+      const subscription = window.supabaseClient
+        .channel('vacancy-updates')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'vacancies' }, 
+          (payload) => {
+            console.log('[Supabase] Database change:', payload);
+            
+            if (payload.eventType === 'INSERT') {
+              this.dispatchEvent(this.events.vacancyNew, payload.new);
+            } else if (payload.eventType === 'UPDATE') {
+              this.dispatchEvent(this.events.vacancyUpdated, payload.new);
+            } else if (payload.eventType === 'DELETE') {
+              this.dispatchEvent(this.events.vacancyDeleted, payload.old);
+            }
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('✅ [Supabase] Realtime подписка активна');
+            this.connected = true;
+            this.dispatchEvent(this.events.connected);
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('❌ [Supabase] Ошибка realtime подписки');
+            this.connected = false;
+            this.dispatchEvent(this.events.disconnected, { reason: 'supabase_error' });
+          }
+        });
+        
+      // Сохраняем подписку для возможности отписки
+      this.supabaseSubscription = subscription;
+      
+    } catch (error) {
+      console.error('[WebSocket] Ошибка настройки Supabase Realtime:', error);
+      this.dispatchEvent('ws:fallback', { reason: 'supabase_setup_error' });
+    }
   }
 
   /**
@@ -372,6 +431,12 @@ class WebSocketManager {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
+    }
+    
+    // Очистка Supabase подписки
+    if (this.supabaseSubscription) {
+      window.supabaseClient?.removeChannel(this.supabaseSubscription);
+      this.supabaseSubscription = null;
     }
     
     this.listeners.forEach((handlers, eventName) => {
