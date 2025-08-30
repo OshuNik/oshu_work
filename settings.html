@@ -130,6 +130,165 @@
           </div>
         </div>
       </div>
+
+      <!-- Секция уведомлений -->
+      <div class="settings-section" id="notifications-section">
+        <div class="section-header">
+          <span class="section-title">УВЕДОМЛЕНИЯ</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="notification-status" class="favorites-count">OFF</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+
+        <!-- Основные настройки уведомлений -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ОСНОВНЫЕ НАСТРОЙКИ</h3>
+          <p class="card-description">Управление уведомлениями через Telegram бота:</p>
+          
+          <div class="settings-controls">
+            <!-- Главный переключатель -->
+            <div class="control-row">
+              <label class="control-label" for="notifications-enabled">
+                <i class="bi bi-bell"></i>
+                Включить уведомления
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notifications-enabled" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+
+            <!-- Новые вакансии -->
+            <div class="control-row">
+              <label class="control-label" for="notify-new-vacancies">
+                <i class="bi bi-plus-circle"></i>
+                Новые вакансии
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notify-new-vacancies" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+
+            <!-- Обновления избранного -->
+            <div class="control-row">
+              <label class="control-label" for="notify-favorites">
+                <i class="bi bi-star"></i>
+                Изменения в избранном
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notify-favorites" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions-container">
+            <button id="test-notification-btn" class="action-button info">
+              <i class="bi bi-send"></i>
+              Тест уведомления
+            </button>
+          </div>
+        </div>
+
+        <!-- Фильтры уведомлений -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ФИЛЬТРЫ</h3>
+          <p class="card-description">Настройте для каких категорий получать уведомления:</p>
+
+          <div class="filter-options">
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" id="filter-all" name="category-filter" value="all">
+                <label for="filter-all">
+                  <i class="bi bi-collection"></i>
+                  Все категории
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="filter-main" name="category-filter" value="main">
+                <label for="filter-main">
+                  <i class="bi bi-bullseye"></i>
+                  Только "Точно твоё"
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="filter-maybe" name="category-filter" value="maybe">
+                <label for="filter-maybe">
+                  <i class="bi bi-question-circle"></i>
+                  Только "Может быть"
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="filter-other" name="category-filter" value="other">
+                <label for="filter-other">
+                  <i class="bi bi-x-circle"></i>
+                  Только "Не твоё"
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Тихие часы -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ТИХИЕ ЧАСЫ</h3>
+          <p class="card-description">Отключение уведомлений в определенное время:</p>
+
+          <div class="settings-controls">
+            <div class="control-row">
+              <label class="control-label" for="quiet-hours-enabled">
+                <i class="bi bi-moon"></i>
+                Включить тихие часы
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="quiet-hours-enabled" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+
+            <div class="time-range-controls" id="time-range-controls" style="display: none;">
+              <div class="time-input-group">
+                <label for="quiet-start">С:</label>
+                <input type="time" id="quiet-start" value="22:00" class="time-input">
+              </div>
+              <div class="time-input-group">
+                <label for="quiet-end">До:</label>
+                <input type="time" id="quiet-end" value="08:00" class="time-input">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Статус подключения -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">СТАТУС</h3>
+          
+          <div class="status-info">
+            <div class="status-row">
+              <span class="status-label">Telegram Bot:</span>
+              <span id="bot-status" class="status-value">Проверка...</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">Real-time обновления:</span>
+              <span id="websocket-status" class="status-value">Проверка...</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">Пользователь:</span>
+              <span id="user-status" class="status-value">Загрузка...</span>
+            </div>
+          </div>
+
+          <div class="actions-container">
+            <button id="refresh-status-btn" class="action-button secondary">
+              <i class="bi bi-arrow-clockwise"></i>
+              Обновить статус
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -167,10 +326,16 @@
         role="tab" aria-selected="false" aria-controls="channels-section">
     <span class="tab-label">КАНАЛЫ</span>
   </button>
+  <button id="tab-notifications" class="tab-button notifications" data-target="notifications-section" data-category-name="УВЕДОМЛЕНИЯ"
+        role="tab" aria-selected="false" aria-controls="notifications-section">
+    <span class="tab-label">УВЕДОМЛЕНИЯ</span>
+  </button>
 </div>
 
   <!-- Entry point - ES модуль -->
   <script type="module" src="/src/js/settings-main.js"></script>
+  <!-- Phase 3.2: Notification Settings -->
+  <script type="module" src="/src/js/notification-settings.js"></script>
   <script type="module">
     import { SettingsMain } from './src/modules/SettingsMain.js';
     

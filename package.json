@@ -1,20 +1,26 @@
 {
   "name": "oshu-work-telegram-mini-app",
-  "version": "13.0.0",
+  "version": "14.0.1",
   "type": "module",
-  "description": "Telegram Mini App парсер вакансий",
+  "description": "oshu://work - Telegram Mini App для поиска вакансий с real-time функциями",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 4176 --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 4176 --host 0.0.0.0",
     "build:dev": "vite build --mode development",
     "build:prod": "vite build --mode production",
     "serve": "vite preview --port 4173",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "mock-ws": "node mock-websocket-server.js",
+    "dev:full": "concurrently \"npm run mock-ws\" \"npm run dev\""
   },
   "devDependencies": {
     "vite": "^5.4.3",
-    "terser": "^5.31.6"
+    "terser": "^5.31.6",
+    "concurrently": "^8.2.2",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "cors": "^2.8.5"
   },
   "dependencies": {},
   "keywords": ["telegram", "mini-app", "job-parser", "vite"],

@@ -194,7 +194,7 @@ body {
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr); /* Изменено на 3 колонки для 3-х вкладок */
   background-color: transparent;
   padding: 0 10px;
   padding-bottom: env(safe-area-inset-bottom);
@@ -266,6 +266,10 @@ body {
   background-color: var(--accent-green); 
 }
 
+.tab-button.notifications.active { 
+  background-color: var(--accent-yellow); 
+}
+
 .tab-button.keywords.active .tab-count { 
   color: var(--text-color);
   opacity: 1;
@@ -278,10 +282,16 @@ body {
   font-weight: 700;
 }
 
+.tab-button.notifications.active .tab-count { 
+  color: var(--text-color);
+  opacity: 1;
+  font-weight: 700;
+}
+
 /* === КОНТЕНТ === */
 .settings-content {
   padding: var(--card-padding);
-  padding-bottom: 100px; /* Место для фиксированных вкладок */
+  padding-bottom: 120px; /* Увеличенное место для 3-х вкладок */
   min-height: calc(100vh - 200px);
   max-width: 100%;
   overflow-x: hidden;
@@ -1024,11 +1034,15 @@ input:checked + .toggle-slider:before {
   }
   
   .tab-button {
-    padding: 8px 8px;
+    padding: 8px 6px; /* Уменьшено для 3-х вкладок */
+    min-width: 0; /* Позволяет сжиматься */
   }
   
   .tab-label {
-    font-size: 11px;
+    font-size: 10px; /* Уменьшено для 3-х вкладок */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .tab-count {
