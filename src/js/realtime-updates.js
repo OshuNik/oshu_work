@@ -298,7 +298,101 @@ class RealtimeUpdates {
     rightIcon.textContent = '★';
     card.appendChild(rightIcon);
     
+    // ВАЖНО: Добавляем все event listeners для полного функционала
+    this.addCardEventListeners(card, vacancyData);
+    
     return card;
+  }
+
+  /**
+   * Добавление всех event listeners для полного функционала карточки
+   */
+  addCardEventListeners(card, vacancyData) {
+    console.log('[Realtime Updates] ➕ Добавляем event listeners для карточки:', vacancyData.id);
+    
+    // Кнопки действий
+    const favoriteBtn = card.querySelector('[data-element="favorite-btn"]');
+    const deleteBtn = card.querySelector('[data-element="delete-btn"]');
+    const applyBtn = card.querySelector('[data-element="apply-btn"]');
+    
+    // Добавляем обработчики кнопок
+    if (favoriteBtn) {
+      favoriteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('[Realtime Updates] 🌟 Клик по favorite для:', vacancyData.id);
+        if (window.vacancyManager && window.vacancyManager.updateVacancyStatus) {
+          window.vacancyManager.updateVacancyStatus(vacancyData.id, 'favorite', false);
+        }
+      });
+    }
+    
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('[Realtime Updates] 🗑️ Клик по delete для:', vacancyData.id);
+        if (window.vacancyManager && window.vacancyManager.updateVacancyStatus) {
+          window.vacancyManager.updateVacancyStatus(vacancyData.id, 'deleted', false);
+        }
+      });
+    }
+    
+    if (applyBtn) {
+      applyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const url = applyBtn.dataset.url;
+        console.log('[Realtime Updates] ✈️ Клик по apply, URL:', url);
+        if (url && window.openLink) {
+          window.openLink(url);
+        }
+      });
+    }
+    
+    // Swipe функционал - используем Interact.js если доступен
+    if (window.interact) {
+      console.log('[Realtime Updates] 👆 Добавляем swipe handlers');
+      
+      window.interact(card)
+        .draggable({
+          axis: 'x',
+          listeners: {
+            move: (event) => {
+              const x = (parseFloat(card.style.transform.replace(/translateX\((.*)px\)/, '$1')) || 0) + event.dx;
+              card.style.transform = `translateX(${x}px)`;
+              
+              // Показываем индикаторы
+              const leftIcon = card.querySelector('.swipe-icon.left');
+              const rightIcon = card.querySelector('.swipe-icon.right');
+              
+              if (x < -50 && leftIcon) leftIcon.style.opacity = Math.min(1, Math.abs(x) / 100);
+              if (x > 50 && rightIcon) rightIcon.style.opacity = Math.min(1, x / 100);
+            },
+            end: (event) => {
+              const x = parseFloat(card.style.transform.replace(/translateX\((.*)px\)/, '$1')) || 0;
+              
+              if (x < -100) {
+                // Swipe left - delete
+                console.log('[Realtime Updates] 🗑️ Swipe delete для:', vacancyData.id);
+                if (window.vacancyManager && window.vacancyManager.updateVacancyStatus) {
+                  window.vacancyManager.updateVacancyStatus(vacancyData.id, 'deleted', true);
+                }
+              } else if (x > 100) {
+                // Swipe right - favorite
+                console.log('[Realtime Updates] 🌟 Swipe favorite для:', vacancyData.id);
+                if (window.vacancyManager && window.vacancyManager.updateVacancyStatus) {
+                  window.vacancyManager.updateVacancyStatus(vacancyData.id, 'favorite', true);
+                }
+              } else {
+                // Reset position
+                card.style.transform = 'translateX(0px)';
+                card.querySelector('.swipe-icon.left').style.opacity = '0';
+                card.querySelector('.swipe-icon.right').style.opacity = '0';
+              }
+            }
+          }
+        });
+    } else {
+      console.warn('[Realtime Updates] ⚠️ Interact.js недоступен - swipe не работает');
+    }
   }
 
   /**
