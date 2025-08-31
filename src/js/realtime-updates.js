@@ -187,10 +187,15 @@ class RealtimeUpdates {
    * Создание карточки вакансии
    */
   async createVacancyCard(vacancyData) {
+    console.log('[Realtime Updates] Создаем карточку для вакансии:', vacancyData);
+    
     // Используем существующую функцию createVacancyCard если она доступна
     if (window.createVacancyCard && typeof window.createVacancyCard === 'function') {
+      console.log('[Realtime Updates] Используем window.createVacancyCard');
       return window.createVacancyCard(vacancyData);
     }
+    
+    console.log('[Realtime Updates] Используем fallback метод создания карточки');
     
     // Fallback - создаем базовую карточку
     const template = document.getElementById('vacancy-card-template');
@@ -209,9 +214,9 @@ class RealtimeUpdates {
     const timestampEl = card.querySelector('[data-element="timestamp"]');
     
     if (categoryEl) categoryEl.textContent = vacancyData.category || 'Без категории';
-    if (summaryEl) summaryEl.textContent = vacancyData.title || vacancyData.description || '';
-    if (channelEl) channelEl.textContent = vacancyData.company || 'Неизвестная компания';
-    if (timestampEl) timestampEl.textContent = this.formatTimestamp(vacancyData.timestamp);
+    if (summaryEl) summaryEl.textContent = vacancyData.reason || vacancyData.title || vacancyData.description || 'Описание отсутствует';
+    if (channelEl) channelEl.textContent = vacancyData.channel || vacancyData.company_name || 'Неизвестный канал';
+    if (timestampEl) timestampEl.textContent = this.formatTimestamp(vacancyData.created_at || vacancyData.timestamp);
     
     // Добавляем ID для поиска
     card.dataset.vacancyId = vacancyData.id;
