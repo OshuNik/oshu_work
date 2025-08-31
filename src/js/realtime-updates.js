@@ -324,14 +324,35 @@ class RealtimeUpdates {
       badge.remove();
     });
     
-    // Дополнительно - удаляем все элементы с текстом "NEW" не в footer
-    const allElements = card.querySelectorAll('*');
-    allElements.forEach(el => {
-      if (el.textContent?.trim() === 'NEW' && !el.closest('.card-footer')) {
-        console.log('[Realtime Updates] 🔥 Удаляем NEW элемент:', el.className);
-        el.remove();
-      }
-    });
+    // ЭКСТРЕМАЛЬНАЯ очистка - проверяем всю карточку на наличие синих элементов
+    setTimeout(() => {
+      console.log('[Realtime Updates] 🔍 ЭКСТРЕМАЛЬНАЯ проверка через 100мс...');
+      const allElements = card.querySelectorAll('*');
+      let found = 0;
+      
+      allElements.forEach(el => {
+        const text = el.textContent?.trim();
+        const className = el.className || '';
+        const style = el.getAttribute('style') || '';
+        const tagName = el.tagName.toLowerCase();
+        
+        // Удаляем любой элемент с "NEW" не в card-footer
+        if (text === 'NEW' && !el.closest('.card-footer')) {
+          console.log('[Realtime Updates] 🔥 ПОЗДНЯЯ ОЧИСТКА - удаляем NEW:', tagName, className);
+          el.remove();
+          found++;
+        }
+        
+        // Удаляем элементы с синими стилями
+        if (style.includes('blue') || style.includes('#') || className.includes('blue')) {
+          console.log('[Realtime Updates] 🔥 ПОЗДНЯЯ ОЧИСТКА - удаляем синий:', tagName, className);
+          el.remove();
+          found++;
+        }
+      });
+      
+      console.log(`[Realtime Updates] ✅ ЭКСТРЕМАЛЬНАЯ очистка завершена, удалено: ${found} элементов`);
+    }, 100);
     
     // ПРАВИЛЬНАЯ структура: НЕ меняем footer-meta, а добавляем NEW в card-footer
     const footerMeta = card.querySelector('.footer-meta');
@@ -704,9 +725,6 @@ class RealtimeUpdates {
    * Показ уведомления о подключении
    */
   showConnectionNotification(status) {
-    // ОТКЛЮЧЕНО: убираем лишние уведомления при тестировании
-    return;
-    
     const messages = {
       connected: { text: '🟢 Real-time обновления активны', type: 'success' },
       disconnected: { text: '🔴 Подключение потеряно', type: 'warning' }
@@ -722,10 +740,6 @@ class RealtimeUpdates {
    * Показ toast уведомления
    */
   showToast(message, type = 'info', duration = 3000) {
-    // ОТКЛЮЧЕНО: не показываем toast при тестировании  
-    console.log(`[Toast ОТКЛЮЧЕН] ${type}: ${message}`);
-    return;
-    
     // Используем существующую систему toast если она есть
     if (window.showToast && typeof window.showToast === 'function') {
       window.showToast(message, type);
