@@ -191,21 +191,22 @@ class WebSocketManager {
             console.log('[WebSocket] 🔍 Payload данные:', payload);
             
             if (payload.eventType === 'INSERT') {
-              // Для INSERT используем payload.new, но проверяем полноту данных
+              // Всегда запрашиваем полные данные для INSERT, так как Realtime может передавать неполные данные
               if (payload.new && payload.new.id) {
                 console.log('[WebSocket] ✅ Новая вакансия с ID:', payload.new.id);
-                this.dispatchEvent(this.events.vacancyNew, payload.new);
+                console.log('[WebSocket] 🔄 Запрашиваем полные данные для корректного отображения...');
+                this.fetchFullVacancyData(payload.new.id, 'new');
               } else {
-                console.warn('[WebSocket] ⚠️ INSERT payload неполный, запрашиваем полные данные');
-                this.fetchFullVacancyData(payload.new?.id, 'new');
+                console.warn('[WebSocket] ⚠️ INSERT payload без ID:', payload.new);
               }
             } else if (payload.eventType === 'UPDATE') {
+              // Также всегда запрашиваем полные данные для UPDATE
               if (payload.new && payload.new.id) {
                 console.log('[WebSocket] ✅ Обновлена вакансия с ID:', payload.new.id);
-                this.dispatchEvent(this.events.vacancyUpdated, payload.new);
+                console.log('[WebSocket] 🔄 Запрашиваем полные данные обновленной вакансии...');
+                this.fetchFullVacancyData(payload.new.id, 'updated');
               } else {
-                console.warn('[WebSocket] ⚠️ UPDATE payload неполный, запрашиваем полные данные');
-                this.fetchFullVacancyData(payload.new?.id, 'updated');
+                console.warn('[WebSocket] ⚠️ UPDATE payload без ID:', payload.new);
               }
             } else if (payload.eventType === 'DELETE') {
               console.log('[WebSocket] ✅ Удалена вакансия с ID:', payload.old?.id);
