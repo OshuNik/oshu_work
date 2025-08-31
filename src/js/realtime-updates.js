@@ -267,6 +267,42 @@ class RealtimeUpdates {
     
     if (categoryEl) categoryEl.textContent = vacancyData.category || 'Без категории';
     if (summaryEl) summaryEl.textContent = vacancyData.reason || vacancyData.title || vacancyData.description || 'Описание отсутствует';
+    
+    // ВАЖНО: Обрабатываем skills для правильного layout .card-footer с justify-content: space-between
+    const skillsEl = card.querySelector('[data-element="skills"]');
+    if (skillsEl) {
+      // ВСЕГДА очищаем существующие skills
+      skillsEl.innerHTML = '';
+      
+      // Добавляем skills если они есть, иначе оставляем пустым
+      if (vacancyData.skills) {
+        if (Array.isArray(vacancyData.skills) && vacancyData.skills.length > 0) {
+          vacancyData.skills.slice(0, 3).forEach(skill => {
+            const skillTag = document.createElement('span');
+            skillTag.className = 'footer-skill-tag';
+            skillTag.textContent = skill;
+            skillsEl.appendChild(skillTag);
+          });
+          console.log('[Realtime Updates] 🏷️ Skills массив добавлен:', vacancyData.skills);
+        } else if (typeof vacancyData.skills === 'string' && vacancyData.skills.trim()) {
+          // Если skills строка, разбиваем по запятым
+          vacancyData.skills.split(',').slice(0, 3).forEach(skill => {
+            const trimmedSkill = skill.trim();
+            if (trimmedSkill) {
+              const skillTag = document.createElement('span');
+              skillTag.className = 'footer-skill-tag';
+              skillTag.textContent = trimmedSkill;
+              skillsEl.appendChild(skillTag);
+            }
+          });
+          console.log('[Realtime Updates] 🏷️ Skills строка добавлена:', vacancyData.skills);
+        }
+      }
+      
+      // НЕ удаляем skillsEl даже если пустой - нужен для layout justify-content: space-between
+      console.log('[Realtime Updates] 📦 Footer-skills контейнер сохранен для layout');
+    }
+    
     // НЕ заполняем channelEl и timestampEl здесь - они будут заполнены в footer-meta
     
     // Добавляем полный текст если есть
