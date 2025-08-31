@@ -1,5 +1,5 @@
 // Main entry point для Vite - Phase 3.2 Real-time Features
-// oshu://work v14.0.1 Phase 3.2 loading
+console.log('🚀 [MAIN] oshu://work v14.0.1 Phase 3.2 loading...');
 
 // Импортируем основные модули
 import './config.js';
@@ -38,7 +38,7 @@ import './swipe-handler.js';
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
-  // oshu://work v14.0.1 Phase 3.2 ready
+  console.log('✅ [MAIN] DOMContentLoaded - приложение готово к инициализации');
   
   // Инициализация CSP
   if (window.cspManager) {

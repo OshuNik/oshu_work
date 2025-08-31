@@ -110,8 +110,9 @@
   }
   
   // Глобальная инициализация
+  console.log('🔧 [Supabase] Начинаем инициализацию Supabase Manager...');
   window.supabaseManager = new SupabaseClientManager();
   
-  console.log('[Supabase] Manager инициализирован');
+  console.log('✅ [Supabase] Manager инициализирован');
   
 })();
