@@ -1,5 +1,5 @@
 // Main entry point для Vite - Phase 3.2 Real-time Features
-console.log('🚀 [MAIN] oshu://work v14.0.1 Phase 3.2 loading...');
+console.log('🚀 [MAIN] oshu://work v15.0.0 Phase 3.2 loading...');
 
 // Импортируем основные модули
 import './config.js';
