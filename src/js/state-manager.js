@@ -169,6 +169,16 @@
       return stats;
     }
 
+    // Получить название текущей активной категории
+    getCurrentCategory() {
+      const categoryMap = {
+        'main': 'ТОЧНО ТВОЁ',
+        'maybe': 'МОЖЕТ БЫТЬ',
+        'other': 'НЕ ТВОЁ'
+      };
+      return categoryMap[this.state.activeKey] || 'ТОЧНО ТВОЁ';
+    }
+
     // Очистить все подписки
     destroy() {
       this.listeners.clear();

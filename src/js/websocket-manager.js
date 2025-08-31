@@ -35,8 +35,9 @@ class WebSocketManager {
       await this.loadSocketIO();
       this.connect();
     } catch (error) {
-      // Socket.IO недоступен
-      this.dispatchEvent('ws:fallback', { reason: 'socket.io_unavailable' });
+      // Socket.IO недоступен, но все равно пробуем connect() для настройки Supabase Realtime
+      console.log('[WebSocket] Socket.IO недоступен, пробуем альтернативные методы подключения');
+      this.connect();
     }
   }
 
@@ -58,22 +59,24 @@ class WebSocketManager {
    * Установка WebSocket соединения
    */
   connect() {
-    if (!window.io) {
-      throw new Error('Socket.IO не загружен');
-    }
-
     // Определяем WebSocket сервер (для разработки используем mock)
     const wsUrl = this.getWebSocketUrl();
     
-    // Если URL не определен (production без WebSocket сервера), переходим в fallback
+    // Если URL не определен (production без WebSocket сервера), используем альтернативы
     if (!wsUrl) {
-      // WebSocket сервер недоступен
-      this.dispatchEvent('ws:fallback', { reason: 'no_server_configured' });
+      // Нет WebSocket сервера, возможно Supabase Realtime уже настроен в getWebSocketUrl()
+      console.log('[WebSocket] WebSocket URL не определен, альтернативные методы должны быть активны');
+      return;
+    }
+    
+    // Проверяем доступность Socket.IO для WebSocket подключения
+    if (!window.io) {
+      console.warn('[WebSocket] Socket.IO недоступен для WebSocket подключения к:', wsUrl);
+      this.dispatchEvent('ws:fallback', { reason: 'socket.io_unavailable' });
       return;
     }
     
     // Подключение к WebSocket
-    
     this.socket = window.io(wsUrl, {
       transports: ['websocket', 'polling'],
       timeout: 10000,
