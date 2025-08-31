@@ -1,5 +1,5 @@
-// Main entry point для Vite - Phase 3.2 Real-time Features
-console.log('🚀 [MAIN] oshu://work v15.0.0 Phase 3.2 loading...');
+// Main entry point для Vite - Phase 3.2 Simplified
+console.log('🚀 [MAIN] oshu://work v15.1.0 loading...');
 
 // Импортируем основные модули
 import './config.js';
@@ -25,11 +25,11 @@ import './app-controller.js';
 import './telegram-integration.js';
 import './smart-cache.js';
 
-// Phase 3.2: Real-time Features
-import './websocket-manager.js';
-import './realtime-updates.js';
-import './realtime-search.js';
-import './bot-integration.js';
+// Phase 3.2: Simplified Features (только уведомления и real-time поиск)
+// import './websocket-manager.js';  // ОТКЛЮЧЕНО - проблемы с обновлениями карточек
+// import './realtime-updates.js';   // ОТКЛЮЧЕНО - проблемы с синими бейджами  
+import './realtime-search.js';       // ОСТАВЛЕНО - real-time поиск работает
+import './bot-integration.js';       // ОСТАВЛЕНО - уведомления работают
 
 // Дополнительные модули
 import './theme-manager.js';
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if (missing.length === 0) {
     // Core modules loaded successfully
     
-    // Phase 3.2: Real-time функции включены
-    console.log('✅ [Phase 3.2] Real-time функции включены - тестируем Supabase интеграцию');
+    // Phase 3.2: Упрощенные функции (только уведомления и поиск)
+    console.log('✅ [Phase 3.2] Упрощенная версия - только уведомления и real-time поиск');
   } else {
     // Ошибка: не все модули загружены
   }
