@@ -125,12 +125,52 @@ class WebSocketManager {
     
     // Проверяем, что Supabase доступен
     if (typeof window.supabaseClient === 'undefined') {
-      console.warn('[WebSocket] Supabase client недоступен во время настройки Realtime');
-      this.dispatchEvent('ws:fallback', { reason: 'supabase_unavailable' });
+      console.log('[WebSocket] Supabase client еще не готов, ожидаем инициализацию...');
+      // Ждем готовность Supabase client
+      this.waitForSupabaseClient();
       return;
     }
     
-    // Используем Supabase Realtime
+    // Если Supabase client уже готов, сразу настраиваем Realtime
+    this.setupSupabaseRealtimeActual();
+  }
+
+  /**
+   * Ожидание готовности Supabase client
+   */
+  waitForSupabaseClient() {
+    let attempts = 0;
+    const maxAttempts = 50; // 5 секунд максимум
+    const checkInterval = 100; // каждые 100мс
+    
+    const checkSupabase = () => {
+      attempts++;
+      
+      if (typeof window.supabaseClient !== 'undefined') {
+        console.log('[WebSocket] ✅ Supabase client готов после', attempts * checkInterval, 'мс');
+        // Теперь можем настроить Realtime
+        this.setupSupabaseRealtimeActual();
+        return;
+      }
+      
+      if (attempts >= maxAttempts) {
+        console.warn('[WebSocket] ⏰ Timeout ожидания Supabase client (5 сек)');
+        this.dispatchEvent('ws:fallback', { reason: 'supabase_timeout' });
+        return;
+      }
+      
+      // Продолжаем ждать
+      setTimeout(checkSupabase, checkInterval);
+    };
+    
+    setTimeout(checkSupabase, checkInterval);
+  }
+
+  /**
+   * Фактическая настройка Supabase Realtime (после ожидания готовности)
+   */
+  setupSupabaseRealtimeActual() {
+    console.log('[WebSocket] 🚀 Начинаем настройку Supabase Realtime...');
     
     try {
       // Подписываемся на изменения в таблице вакансий (если она есть)
@@ -140,6 +180,7 @@ class WebSocketManager {
           { event: '*', schema: 'public', table: 'vacancies' }, 
           (payload) => {
             // Database change
+            console.log('[WebSocket] 📡 Получено обновление базы данных:', payload.eventType);
             
             if (payload.eventType === 'INSERT') {
               this.dispatchEvent(this.events.vacancyNew, payload.new);
@@ -151,14 +192,22 @@ class WebSocketManager {
           }
         )
         .subscribe((status) => {
+          console.log('[WebSocket] 📊 Статус Supabase подписки:', status);
+          
           if (status === 'SUBSCRIBED') {
             // Realtime подписка активна
             this.connected = true;
+            console.log('[WebSocket] ✅ Supabase Realtime активен');
             this.dispatchEvent(this.events.connected);
           } else if (status === 'CHANNEL_ERROR') {
             // Ошибка realtime подписки
             this.connected = false;
+            console.warn('[WebSocket] ❌ Ошибка Supabase Realtime');
             this.dispatchEvent(this.events.disconnected, { reason: 'supabase_error' });
+          } else if (status === 'CLOSED') {
+            // Подписка закрыта
+            this.connected = false;
+            console.log('[WebSocket] 🔌 Supabase Realtime подписка закрыта');
           }
         });
         
@@ -166,6 +215,7 @@ class WebSocketManager {
       this.supabaseSubscription = subscription;
       
     } catch (error) {
+      console.error('[WebSocket] ❌ Ошибка настройки Supabase Realtime:', error);
       // Ошибка настройки Supabase Realtime
       this.dispatchEvent('ws:fallback', { reason: 'supabase_setup_error' });
     }
