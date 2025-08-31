@@ -704,6 +704,9 @@ class RealtimeUpdates {
    * Показ уведомления о подключении
    */
   showConnectionNotification(status) {
+    // ОТКЛЮЧЕНО: убираем лишние уведомления при тестировании
+    return;
+    
     const messages = {
       connected: { text: '🟢 Real-time обновления активны', type: 'success' },
       disconnected: { text: '🔴 Подключение потеряно', type: 'warning' }
@@ -719,6 +722,10 @@ class RealtimeUpdates {
    * Показ toast уведомления
    */
   showToast(message, type = 'info', duration = 3000) {
+    // ОТКЛЮЧЕНО: не показываем toast при тестировании  
+    console.log(`[Toast ОТКЛЮЧЕН] ${type}: ${message}`);
+    return;
+    
     // Используем существующую систему toast если она есть
     if (window.showToast && typeof window.showToast === 'function') {
       window.showToast(message, type);
