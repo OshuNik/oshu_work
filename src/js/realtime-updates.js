@@ -237,14 +237,7 @@ class RealtimeUpdates {
       card.classList.add('category-other');
     }
     
-    // Добавляем NEW бейдж для новых вакансий
-    const isNew = this.isVacancyNew(vacancyData.created_at || vacancyData.timestamp);
-    if (isNew) {
-      const newBadge = document.createElement('div');
-      newBadge.className = 'new-badge';
-      newBadge.textContent = 'NEW';
-      card.appendChild(newBadge);
-    }
+    // НЕ добавляем синий NEW бейдж - он будет зеленым в footer
     
     // Заполняем основные данные  
     const categoryEl = card.querySelector('[data-element="category"]');
@@ -333,11 +326,15 @@ class RealtimeUpdates {
       }
     });
     
-    // Убеждаемся что footer-meta правильно структурирован как в оригинальном template
+    // Правильная структура footer: skills слева, meta слева, NEW справа
     const footerMeta = card.querySelector('.footer-meta');
     if (footerMeta) {
-      // Сбрасываем содержимое и создаем точную структуру из template
+      // Сбрасываем содержимое и создаем правильную структуру
       footerMeta.innerHTML = '';
+      
+      // Контейнер для канала и времени (слева)
+      const metaInfo = document.createElement('div');
+      metaInfo.className = 'meta-info';
       
       const channelSpan = document.createElement('span');
       channelSpan.className = 'channel-name';
@@ -354,11 +351,23 @@ class RealtimeUpdates {
       const isVeryNew = this.isVacancyVeryNew(vacancyData.created_at || vacancyData.timestamp);
       timestampSpan.textContent = isVeryNew ? 'только что' : this.formatTimestamp(vacancyData.created_at || vacancyData.timestamp);
       
-      footerMeta.appendChild(channelSpan);
-      footerMeta.appendChild(separator);
-      footerMeta.appendChild(timestampSpan);
+      metaInfo.appendChild(channelSpan);
+      metaInfo.appendChild(separator);
+      metaInfo.appendChild(timestampSpan);
       
-      console.log('[Realtime Updates] 📍 Структура footer-meta восстановлена:', footerMeta.innerHTML);
+      // Зеленый NEW бейдж (справа)
+      const isNew = this.isVacancyNew(vacancyData.created_at || vacancyData.timestamp);
+      if (isNew) {
+        const newBadge = document.createElement('div');
+        newBadge.className = 'new-badge';
+        newBadge.textContent = 'NEW';
+        footerMeta.appendChild(metaInfo);
+        footerMeta.appendChild(newBadge);
+      } else {
+        footerMeta.appendChild(metaInfo);
+      }
+      
+      console.log('[Realtime Updates] 📍 Структура footer восстановлена с NEW справа:', footerMeta.innerHTML);
     }
     
     // Создаем правильные swipe индикаторы

@@ -1867,17 +1867,13 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
 .card-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: flex-end;
     margin-top: 15px;
     padding-top: 10px;
     border-top: 1px dashed var(--hint-color);
     flex-wrap: wrap;
     gap: 10px;
-}
-
-.footer-skill-tags {
-    margin-right: auto; /* Прижимаем skills влево, если есть */
 }
 .footer-skill-tags {
     display: flex;
@@ -1901,10 +1897,17 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .footer-meta {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 6px;
     color: var(--hint-color);
     white-space: nowrap;
     font-size: 12px;
+}
+
+.meta-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 .channel-name {
     font-weight: 700;
