@@ -278,7 +278,8 @@ class RealtimeUpdates {
       detailsEl.style.display = 'none';
     }
     
-    // Добавляем ID для поиска
+    // Добавляем правильные ID для поиска VacancyManager
+    card.id = `card-${vacancyData.id}`;  // Основной ID для поиска
     card.dataset.vacancyId = vacancyData.id;
     
     // Убираем лишние swipe индикаторы которые могут создаваться
