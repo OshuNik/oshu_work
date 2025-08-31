@@ -1868,11 +1868,11 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .card-footer {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center; /* Изменено с flex-end на center для NEW бейджа */
     margin-top: 15px;
     padding-top: 10px;
     border-top: 1px dashed var(--hint-color);
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Запрещаем перенос для правильного отображения NEW */
     gap: 10px;
 }
 .footer-skill-tags {
@@ -1905,15 +1905,18 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
 /* NEW бейдж в card-footer (справа от всего) */
 .card-footer .new-badge {
-    background: var(--accent-green);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border: 1px solid var(--border-color);
-    margin-left: auto;
+    background: var(--accent-green) !important;
+    color: white !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    border: 1px solid var(--border-color) !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    line-height: 1 !important;
 }
 .channel-name {
     font-weight: 700;

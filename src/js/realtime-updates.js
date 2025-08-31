@@ -318,11 +318,18 @@ class RealtimeUpdates {
     if (existingLeftIcon) existingLeftIcon.remove();
     if (existingRightIcon) existingRightIcon.remove();
     
-    // Удаляем все синие/лишние бейджи которые могли создаться
+    // АГРЕССИВНО удаляем ВСЕ синие бейджи
     existingBadges.forEach(badge => {
-      if (!badge.classList.contains('new-badge')) { // Оставляем только NEW бейдж
-        console.log('[Realtime Updates] 🗑️ Удаляем лишний элемент:', badge.className, badge.style.cssText);
-        badge.remove();
+      console.log('[Realtime Updates] 🔥 УБИРАЕМ СИНИЙ БЕЙДЖ:', badge.textContent, badge.className);
+      badge.remove();
+    });
+    
+    // Дополнительно - удаляем все элементы с текстом "NEW" не в footer
+    const allElements = card.querySelectorAll('*');
+    allElements.forEach(el => {
+      if (el.textContent?.trim() === 'NEW' && !el.closest('.card-footer')) {
+        console.log('[Realtime Updates] 🔥 Удаляем NEW элемент:', el.className);
+        el.remove();
       }
     });
     
