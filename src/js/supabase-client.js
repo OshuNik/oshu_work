@@ -24,11 +24,16 @@
           return;
         }
         
-        // Загружаем Supabase SDK
-        await this.loadSupabaseSDK();
+        // Проверяем доступность Supabase UMD (должен быть загружен через script tag)
+        if (!window.supabase) {
+          console.error('[Supabase] UMD библиотека не найдена в window.supabase');
+          this.dispatchFallback('sdk_missing');
+          return;
+        }
         
-        // Создаем клиент
-        this.client = window.supabase.createClient(
+        // Создаем клиент используя UMD версию
+        const { createClient } = window.supabase;
+        this.client = createClient(
           CFG.SUPABASE_URL,
           CFG.SUPABASE_ANON_KEY,
           {
@@ -55,41 +60,6 @@
         console.error('[Supabase] Ошибка инициализации:', error);
         this.dispatchFallback('init_error');
       }
-    }
-    
-    async loadSupabaseSDK() {
-      if (window.supabase) {
-        return; // Уже загружен
-      }
-      
-      const cdnUrls = [
-        'https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js',
-        'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js'
-      ];
-      
-      for (const url of cdnUrls) {
-        try {
-          await this.loadScript(url);
-          if (window.supabase) {
-            console.log('[Supabase] SDK загружен с:', url);
-            return;
-          }
-        } catch (error) {
-          console.warn('[Supabase] Не удалось загрузить SDK с', url);
-        }
-      }
-      
-      throw new Error('Все CDN Supabase SDK недоступны');
-    }
-    
-    loadScript(url) {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = url;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
     }
     
     dispatchFallback(reason) {

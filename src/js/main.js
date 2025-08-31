@@ -6,8 +6,8 @@ import './config.js';
 import './constants.js';
 import './csp-manager.js';
 
-// Supabase клиент для Realtime - ВРЕМЕННО ОТКЛЮЧЕН
-// import './supabase-client.js';
+// Supabase клиент для Realtime
+import './supabase-client.js';
 
 // Utils модули (КРИТИЧЕСКИ ВАЖНО - содержит createVacancyCard, renderEmptyState)
 import './utils.min.js';
@@ -25,12 +25,11 @@ import './app-controller.js';
 import './telegram-integration.js';
 import './smart-cache.js';
 
-// Phase 3.2: Real-time Features - ВРЕМЕННО ОТКЛЮЧЕНЫ
-// import './websocket-manager.js';
-// import './realtime-updates.js';
-// import './realtime-search.js';
-// import './bot-integration.js';
-// import './vacancy-simulator.js';
+// Phase 3.2: Real-time Features
+import './websocket-manager.js';
+import './realtime-updates.js';
+import './realtime-search.js';
+import './bot-integration.js';
 
 // Дополнительные модули
 import './theme-manager.js';
@@ -52,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if (missing.length === 0) {
     // Core modules loaded successfully
     
-    // Phase 3.2: Real-time функции ВРЕМЕННО ОТКЛЮЧЕНЫ
-    console.log('⚠️ [Phase 3.2] Real-time функции отключены - работаем в обычном режиме');
+    // Phase 3.2: Real-time функции включены
+    console.log('✅ [Phase 3.2] Real-time функции включены - тестируем Supabase интеграцию');
   } else {
     // Ошибка: не все модули загружены
   }

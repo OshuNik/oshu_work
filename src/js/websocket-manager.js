@@ -41,46 +41,18 @@ class WebSocketManager {
   }
 
   /**
-   * Загрузка Socket.IO библиотеки с fallback CDN
+   * Проверка доступности Socket.IO библиотеки (должна быть загружена через script tag)
    */
   async loadSocketIO() {
     if (window.io) {
       return Promise.resolve();
     }
-
-    const cdnUrls = [
-      'https://cdn.socket.io/4.7.0/socket.io.min.js',
-      'https://unpkg.com/socket.io@4.7.0/dist/socket.io.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.0/socket.io.min.js'
-    ];
-
-    for (const url of cdnUrls) {
-      try {
-        await this.loadScript(url);
-        if (window.io) {
-          // Socket.IO загружен
-          return;
-        }
-      } catch (error) {
-        // Ошибка загрузки Socket.IO
-      }
-    }
     
-    throw new Error('Все CDN Socket.IO недоступны');
+    // В новой архитектуре Socket.IO должен быть загружен статически
+    console.warn('[WebSocket] Socket.IO не найден в window.io. Переходим на Supabase Realtime.');
+    throw new Error('Socket.IO недоступен, используется Supabase Realtime fallback');
   }
 
-  /**
-   * Загрузка скрипта с Promise
-   */
-  loadScript(url) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = url;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
 
   /**
    * Установка WebSocket соединения
