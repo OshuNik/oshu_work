@@ -264,12 +264,20 @@
 
     // Инициализация CSP менеджера
     init() {
-      console.log('🔧 [CSP] CSP Manager временно отключен для диагностики');
+      const support = this.checkBrowserSupport();
       
-      // Временно отключаем CSP для диагностики
-      // this.enforceStrictCSP();
-      
-      console.log('⚠️ [CSP] CSP отключен - включить после исправления проблем');
+      if (!support.supported) {
+        console.warn('⚠️ Limited CSP support in this browser:', support.features);
+      }
+
+      // Применяем nonce к существующим элементам
+      this.applyNonceToScripts();
+      this.applyNonceToStyles();
+
+      // Устанавливаем строгую политику
+      this.enforceStrictCSP();
+
+      console.log('✅ CSP Manager initialized with nonce:', this.nonce);
     }
   }
 
