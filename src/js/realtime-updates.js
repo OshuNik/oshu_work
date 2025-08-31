@@ -267,8 +267,7 @@ class RealtimeUpdates {
     
     if (categoryEl) categoryEl.textContent = vacancyData.category || 'Без категории';
     if (summaryEl) summaryEl.textContent = vacancyData.reason || vacancyData.title || vacancyData.description || 'Описание отсутствует';
-    if (channelEl) channelEl.textContent = vacancyData.channel || vacancyData.company_name || 'Неизвестный канал';
-    if (timestampEl) timestampEl.textContent = this.formatTimestamp(vacancyData.created_at || vacancyData.timestamp);
+    // НЕ заполняем channelEl и timestampEl здесь - они будут заполнены в footer-meta
     
     // Добавляем полный текст если есть
     if (fullTextEl && (vacancyData.text_highlighted || vacancyData.text)) {
@@ -282,11 +281,49 @@ class RealtimeUpdates {
     card.id = `card-${vacancyData.id}`;  // Основной ID для поиска
     card.dataset.vacancyId = vacancyData.id;
     
-    // Убираем лишние swipe индикаторы которые могут создаваться
+    // Убираем ВСЕ лишние элементы которые могут создаваться
     const existingLeftIcon = card.querySelector('.swipe-icon.left');
-    const existingRightIcon = card.querySelector('.swipe-icon.right');
+    const existingRightIcon = card.querySelector('.swipe-icon.right');  
+    const existingBadges = card.querySelectorAll('.badge, .blue-badge, div[style*="blue"], div[style*="#"], .indicator');
+    
     if (existingLeftIcon) existingLeftIcon.remove();
     if (existingRightIcon) existingRightIcon.remove();
+    
+    // Удаляем все синие/лишние бейджи которые могли создаться
+    existingBadges.forEach(badge => {
+      if (!badge.classList.contains('new-badge')) { // Оставляем только NEW бейдж
+        console.log('[Realtime Updates] 🗑️ Удаляем лишний элемент:', badge.className, badge.style.cssText);
+        badge.remove();
+      }
+    });
+    
+    // Убеждаемся что footer-meta правильно структурирован как в оригинальном template
+    const footerMeta = card.querySelector('.footer-meta');
+    if (footerMeta) {
+      // Сбрасываем содержимое и создаем точную структуру из template
+      footerMeta.innerHTML = '';
+      
+      const channelSpan = document.createElement('span');
+      channelSpan.className = 'channel-name';
+      channelSpan.setAttribute('data-element', 'channel');
+      channelSpan.textContent = vacancyData.channel || vacancyData.company_name || 'Неизвестный канал';
+      
+      const separator = document.createElement('span');
+      separator.className = 'meta-separator';
+      separator.textContent = ' • ';
+      
+      const timestampSpan = document.createElement('span');
+      timestampSpan.className = 'timestamp-footer';
+      timestampSpan.setAttribute('data-element', 'timestamp');
+      const isVeryNew = this.isVacancyVeryNew(vacancyData.created_at || vacancyData.timestamp);
+      timestampSpan.textContent = isVeryNew ? 'только что' : this.formatTimestamp(vacancyData.created_at || vacancyData.timestamp);
+      
+      footerMeta.appendChild(channelSpan);
+      footerMeta.appendChild(separator);
+      footerMeta.appendChild(timestampSpan);
+      
+      console.log('[Realtime Updates] 📍 Структура footer-meta восстановлена:', footerMeta.innerHTML);
+    }
     
     // Создаем правильные swipe индикаторы
     const leftIcon = document.createElement('div');
@@ -408,6 +445,24 @@ class RealtimeUpdates {
       const diffMs = now - vacancyDate;
       const diffHours = diffMs / (1000 * 60 * 60);
       return diffHours <= 3;
+    } catch (error) {
+      console.warn('[Realtime Updates] Ошибка проверки даты вакансии:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Проверка является ли вакансия очень новой (создана в последние 5 минут)
+   */
+  isVacancyVeryNew(dateString) {
+    if (!dateString) return false;
+    
+    try {
+      const vacancyDate = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - vacancyDate;
+      const diffMinutes = diffMs / (1000 * 60);
+      return diffMinutes <= 5;
     } catch (error) {
       console.warn('[Realtime Updates] Ошибка проверки даты вакансии:', error);
       return false;
