@@ -42,6 +42,22 @@ class VacancySimulator {
           ['Flutter', 'Dart', 'React Native'],
           ['Docker', 'Kubernetes', 'AWS']
         ]
+      },
+      {
+        category: 'НЕ ТВОЁ',
+        summaries: [
+          '📊 Data Analyst с опытом SQL и Excel',
+          '💰 Менеджер по продажам (B2B сегмент)',
+          '🎨 UI/UX дизайнер для мобильных приложений',
+          '📝 Контент-менеджер для социальных сетей'
+        ],
+        channels: ['DataJobs', 'Sales Pro', 'Design Team', 'Content Hub'],
+        skills: [
+          ['SQL', 'Excel', 'PowerBI'],
+          ['CRM', 'Переговоры', 'B2B'],
+          ['Figma', 'Sketch', 'Principle'],
+          ['SMM', 'Копирайтинг', 'Аналитика']
+        ]
       }
     ];
   }
@@ -54,7 +70,7 @@ class VacancySimulator {
       return;
     }
     
-    console.log('🎭 [Simulator] Запущен симулятор новых вакансий');
+    // Симулятор запущен
     this.isActive = true;
     
     // Генерируем новые вакансии каждые 45 секунд
@@ -76,7 +92,7 @@ class VacancySimulator {
       return;
     }
     
-    console.log('🛑 [Simulator] Остановлен симулятор новых вакансий');
+    // Симулятор остановлен
     this.isActive = false;
     
     if (this.intervalId) {
@@ -106,7 +122,7 @@ class VacancySimulator {
       isSimulated: true // Помечаем как симулированную
     };
     
-    console.log('🎭 [Simulator] Генерируем новую вакансию:', newVacancy.summary);
+    // Генерация новой вакансии
     
     // Отправляем событие как будто пришло от WebSocket
     const event = new CustomEvent('vacancy:new', {
@@ -118,16 +134,18 @@ class VacancySimulator {
   }
   
   /**
-   * Выбор случайной категории (больше шансов для "ТОЧНО ТВОЁ")
+   * Выбор случайной категории с распределением по важности
    */
   getRandomCategory() {
     const chance = Math.random();
     
-    // 60% - ТОЧНО ТВОЁ, 40% - МОЖЕТ БЫТЬ  
-    if (chance < 0.6) {
+    // 50% - ТОЧНО ТВОЁ, 30% - МОЖЕТ БЫТЬ, 20% - НЕ ТВОЁ
+    if (chance < 0.5) {
       return this.mockVacancies[0]; // ТОЧНО ТВОЁ
-    } else {
+    } else if (chance < 0.8) {
       return this.mockVacancies[1]; // МОЖЕТ БЫТЬ
+    } else {
+      return this.mockVacancies[2]; // НЕ ТВОЁ
     }
   }
   
@@ -159,4 +177,4 @@ window.VacancySimulator = VacancySimulator;
 // Создаем глобальный экземпляр
 window.vacancySimulator = new VacancySimulator();
 
-console.log('[Phase 3.2] Vacancy Simulator готов к работе');
+// Vacancy Simulator инициализирован

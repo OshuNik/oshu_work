@@ -35,7 +35,7 @@ class WebSocketManager {
       await this.loadSocketIO();
       this.connect();
     } catch (error) {
-      console.warn('[WebSocket] Socket.IO недоступен, работаем без real-time функций:', error);
+      // Socket.IO недоступен
       this.dispatchEvent('ws:fallback', { reason: 'socket.io_unavailable' });
     }
   }
@@ -58,11 +58,11 @@ class WebSocketManager {
       try {
         await this.loadScript(url);
         if (window.io) {
-          console.log(`[WebSocket] Socket.IO загружен с: ${url}`);
+          // Socket.IO загружен
           return;
         }
       } catch (error) {
-        console.warn(`[WebSocket] Не удалось загрузить Socket.IO с ${url}:`, error);
+        // Ошибка загрузки Socket.IO
       }
     }
     
@@ -95,12 +95,12 @@ class WebSocketManager {
     
     // Если URL не определен (production без WebSocket сервера), переходим в fallback
     if (!wsUrl) {
-      console.warn('[WebSocket] WebSocket сервер недоступен, переходим в fallback режим');
+      // WebSocket сервер недоступен
       this.dispatchEvent('ws:fallback', { reason: 'no_server_configured' });
       return;
     }
     
-    console.log(`[WebSocket] Подключение к: ${wsUrl}`);
+    // Подключение к WebSocket
     
     this.socket = window.io(wsUrl, {
       transports: ['websocket', 'polling'],
@@ -142,12 +142,12 @@ class WebSocketManager {
   setupSupabaseRealtime() {
     // Проверяем, что Supabase доступен
     if (typeof window.supabaseClient === 'undefined') {
-      console.warn('[WebSocket] Supabase client недоступен для realtime');
+      // Supabase client недоступен
       this.dispatchEvent('ws:fallback', { reason: 'supabase_unavailable' });
       return;
     }
     
-    console.log('[WebSocket] Используем Supabase Realtime вместо Socket.IO');
+    // Используем Supabase Realtime
     
     try {
       // Подписываемся на изменения в таблице вакансий (если она есть)
@@ -156,7 +156,7 @@ class WebSocketManager {
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'vacancies' }, 
           (payload) => {
-            console.log('[Supabase] Database change:', payload);
+            // Database change
             
             if (payload.eventType === 'INSERT') {
               this.dispatchEvent(this.events.vacancyNew, payload.new);
@@ -169,11 +169,11 @@ class WebSocketManager {
         )
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
-            console.log('✅ [Supabase] Realtime подписка активна');
+            // Realtime подписка активна
             this.connected = true;
             this.dispatchEvent(this.events.connected);
           } else if (status === 'CHANNEL_ERROR') {
-            console.error('❌ [Supabase] Ошибка realtime подписки');
+            // Ошибка realtime подписки
             this.connected = false;
             this.dispatchEvent(this.events.disconnected, { reason: 'supabase_error' });
           }
@@ -183,7 +183,7 @@ class WebSocketManager {
       this.supabaseSubscription = subscription;
       
     } catch (error) {
-      console.error('[WebSocket] Ошибка настройки Supabase Realtime:', error);
+      // Ошибка настройки Supabase Realtime
       this.dispatchEvent('ws:fallback', { reason: 'supabase_setup_error' });
     }
   }
@@ -193,7 +193,7 @@ class WebSocketManager {
    */
   setupEventHandlers() {
     this.socket.on('connect', () => {
-      console.log('[WebSocket] ✅ Соединение установлено');
+      // Соединение установлено
       this.connected = true;
       this.reconnectAttempts = 0;
       
@@ -207,40 +207,40 @@ class WebSocketManager {
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.warn('[WebSocket] ❌ Соединение потеряно:', reason);
+      // Соединение потеряно
       this.connected = false;
       this.dispatchEvent(this.events.disconnected, { reason });
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('[WebSocket] Ошибка подключения:', error);
+      // Ошибка подключения
       this.reconnectAttempts++;
       
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.warn('[WebSocket] Максимум попыток переподключения достигнут');
+        // Максимум попыток переподключения
         this.dispatchEvent('ws:max_reconnects_reached');
       }
     });
 
     // Обработка событий вакансий
     this.socket.on('vacancy:new', (data) => {
-      console.log('[WebSocket] Новая вакансия:', data);
+      // Новая вакансия
       this.dispatchEvent(this.events.vacancyNew, data);
     });
 
     this.socket.on('vacancy:updated', (data) => {
-      console.log('[WebSocket] Обновление вакансии:', data);
+      // Обновление вакансии
       this.dispatchEvent(this.events.vacancyUpdated, data);
     });
 
     this.socket.on('vacancy:deleted', (data) => {
-      console.log('[WebSocket] Удаление вакансии:', data);
+      // Удаление вакансии
       this.dispatchEvent(this.events.vacancyDeleted, data);
     });
 
     // Обработка результатов поиска
     this.socket.on('search:results', (data) => {
-      console.log('[WebSocket] Результаты поиска:', data);
+      // Результаты поиска
       this.dispatchEvent(this.events.searchResults, data);
     });
   }
@@ -258,7 +258,7 @@ class WebSocketManager {
     if (this.connected && this.socket) {
       this.socket.emit('join_room', roomName);
       this.currentRooms.add(roomName);
-      console.log(`[WebSocket] Подписка на room: ${roomName}`);
+      // Подписка на room
     } else {
       // Добавляем в очередь для выполнения после подключения
       this.queueMessage('join_room', roomName);
@@ -278,7 +278,7 @@ class WebSocketManager {
     if (this.connected && this.socket) {
       this.socket.emit('leave_room', roomName);
       this.currentRooms.delete(roomName);
-      console.log(`[WebSocket] Отписка от room: ${roomName}`);
+      // Отписка от room
     }
   }
 
@@ -312,7 +312,7 @@ class WebSocketManager {
     if (this.connected && this.socket) {
       this.socket.emit('search:query', searchData);
     } else {
-      console.warn('[WebSocket] Поиск недоступен - нет соединения');
+      // Поиск недоступен
       // Fallback к локальному поиску через существующую логику
       this.dispatchEvent('search:fallback', searchData);
     }
@@ -357,7 +357,7 @@ class WebSocketManager {
     
     this.messageQueue = this.messageQueue.filter(msg => {
       if (now - msg.timestamp > maxAge) {
-        console.warn('[WebSocket] Сообщение устарело, пропускаем:', msg);
+        // Сообщение устарело
         return false;
       }
       
@@ -458,4 +458,4 @@ window.WebSocketManager = WebSocketManager;
 // Создаем глобальный экземпляр для использования в приложении
 window.wsManager = new WebSocketManager();
 
-console.log('[Phase 3.2] WebSocket Manager инициализирован');
+// WebSocket Manager инициализирован
