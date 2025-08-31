@@ -216,6 +216,15 @@ class RealtimeUpdates {
       card.classList.add('category-other');
     }
     
+    // Добавляем NEW бейдж для новых вакансий
+    const isNew = this.isVacancyNew(vacancyData.created_at || vacancyData.timestamp);
+    if (isNew) {
+      const newBadge = document.createElement('div');
+      newBadge.className = 'new-badge';
+      newBadge.textContent = 'NEW';
+      card.appendChild(newBadge);
+    }
+    
     // Заполняем основные данные
     const categoryEl = card.querySelector('[data-element="category"]');
     const summaryEl = card.querySelector('[data-element="summary"]');
@@ -240,7 +249,42 @@ class RealtimeUpdates {
     // Добавляем ID для поиска
     card.dataset.vacancyId = vacancyData.id;
     
+    // Убираем лишние swipe индикаторы которые могут создаваться
+    const existingLeftIcon = card.querySelector('.swipe-icon.left');
+    const existingRightIcon = card.querySelector('.swipe-icon.right');
+    if (existingLeftIcon) existingLeftIcon.remove();
+    if (existingRightIcon) existingRightIcon.remove();
+    
+    // Создаем правильные swipe индикаторы
+    const leftIcon = document.createElement('div');
+    leftIcon.className = 'swipe-icon left';
+    leftIcon.textContent = '✕';
+    card.appendChild(leftIcon);
+
+    const rightIcon = document.createElement('div');
+    rightIcon.className = 'swipe-icon right';
+    rightIcon.textContent = '★';
+    card.appendChild(rightIcon);
+    
     return card;
+  }
+
+  /**
+   * Проверка является ли вакансия новой (создана в последние 3 часа)
+   */
+  isVacancyNew(dateString) {
+    if (!dateString) return false;
+    
+    try {
+      const vacancyDate = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - vacancyDate;
+      const diffHours = diffMs / (1000 * 60 * 60);
+      return diffHours <= 3;
+    } catch (error) {
+      console.warn('[Realtime Updates] Ошибка проверки даты вакансии:', error);
+      return false;
+    }
   }
 
   /**
