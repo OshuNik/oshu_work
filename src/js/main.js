@@ -27,7 +27,7 @@ import './websocket-manager.js';
 import './realtime-updates.js';
 import './realtime-search.js';
 import './bot-integration.js';
-import './vacancy-simulator.js';
+// import './vacancy-simulator.js'; // Убрано - используем только реальные вакансии
 
 // Дополнительные модули
 import './theme-manager.js';
@@ -101,13 +101,8 @@ function setupWebSocketHandlers() {
   
   // Fallback когда WebSocket недоступен
   document.addEventListener('ws:fallback', (event) => {
-    console.log('📱 [WebSocket] Manual режим активен, причина:', event.detail?.reason);
-    
-    // Запускаем симулятор для демонстрации live функций
-    if (window.vacancySimulator && !window.vacancySimulator.isActive) {
-      console.log('🎭 [Simulator] Запущен demo режим для тестирования live функций');
-      window.vacancySimulator.start();
-    }
+    console.log('📱 [WebSocket] Fallback режим - только pull-to-refresh обновления');
+    console.log('🔧 [Setup] Для live обновлений нужен WebSocket сервер:', event.detail?.reason);
   });
 }
 
