@@ -200,7 +200,12 @@ if (window.Telegram?.WebApp) {
 })();
 </script>
 <!-- Entry point - ES модуль -->
-<script type="module" src="./src/js/main.js"></script>
+<script>
+console.log('🔧 [HTML] Пытаемся загрузить ES модуль main.js...');
+</script>
+<script type="module" src="./src/js/main.js" 
+        onload="console.log('✅ [HTML] ES модуль загружен!')" 
+        onerror="console.error('❌ [HTML] Ошибка загрузки ES модуля!')"></script>
 
 
 <!-- Инициализация CSP после загрузки всех скриптов -->
