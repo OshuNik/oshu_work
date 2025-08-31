@@ -177,16 +177,37 @@ class WebSocketManager {
       const subscription = window.supabaseClient
         .channel('vacancy-updates')
         .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'vacancies' }, 
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'vacancies',
+            // Запрашиваем все столбцы для получения полных данных
+            filter: '' 
+          }, 
           (payload) => {
             // Database change
             console.log('[WebSocket] 📡 Получено обновление базы данных:', payload.eventType);
+            console.log('[WebSocket] 🔍 Payload данные:', payload);
             
             if (payload.eventType === 'INSERT') {
-              this.dispatchEvent(this.events.vacancyNew, payload.new);
+              // Для INSERT используем payload.new, но проверяем полноту данных
+              if (payload.new && payload.new.id) {
+                console.log('[WebSocket] ✅ Новая вакансия с ID:', payload.new.id);
+                this.dispatchEvent(this.events.vacancyNew, payload.new);
+              } else {
+                console.warn('[WebSocket] ⚠️ INSERT payload неполный, запрашиваем полные данные');
+                this.fetchFullVacancyData(payload.new?.id, 'new');
+              }
             } else if (payload.eventType === 'UPDATE') {
-              this.dispatchEvent(this.events.vacancyUpdated, payload.new);
+              if (payload.new && payload.new.id) {
+                console.log('[WebSocket] ✅ Обновлена вакансия с ID:', payload.new.id);
+                this.dispatchEvent(this.events.vacancyUpdated, payload.new);
+              } else {
+                console.warn('[WebSocket] ⚠️ UPDATE payload неполный, запрашиваем полные данные');
+                this.fetchFullVacancyData(payload.new?.id, 'updated');
+              }
             } else if (payload.eventType === 'DELETE') {
+              console.log('[WebSocket] ✅ Удалена вакансия с ID:', payload.old?.id);
               this.dispatchEvent(this.events.vacancyDeleted, payload.old);
             }
           }
@@ -218,6 +239,45 @@ class WebSocketManager {
       console.error('[WebSocket] ❌ Ошибка настройки Supabase Realtime:', error);
       // Ошибка настройки Supabase Realtime
       this.dispatchEvent('ws:fallback', { reason: 'supabase_setup_error' });
+    }
+  }
+
+  /**
+   * Получение полных данных вакансии из Supabase
+   */
+  async fetchFullVacancyData(vacancyId, eventType) {
+    if (!vacancyId) {
+      console.error('[WebSocket] ❌ Не указан ID вакансии для fetchFullVacancyData');
+      return;
+    }
+
+    try {
+      console.log('[WebSocket] 🔄 Запрашиваем полные данные вакансии ID:', vacancyId);
+      
+      const { data, error } = await window.supabaseClient
+        .from('vacancies')
+        .select('*')
+        .eq('id', vacancyId)
+        .single();
+
+      if (error) {
+        console.error('[WebSocket] ❌ Ошибка получения полных данных вакансии:', error);
+        return;
+      }
+
+      if (data) {
+        console.log('[WebSocket] ✅ Получены полные данные вакансии:', data);
+        
+        if (eventType === 'new') {
+          this.dispatchEvent(this.events.vacancyNew, data);
+        } else if (eventType === 'updated') {
+          this.dispatchEvent(this.events.vacancyUpdated, data);
+        }
+      } else {
+        console.warn('[WebSocket] ⚠️ Вакансия не найдена в базе:', vacancyId);
+      }
+    } catch (error) {
+      console.error('[WebSocket] ❌ Критическая ошибка fetchFullVacancyData:', error);
     }
   }
 
