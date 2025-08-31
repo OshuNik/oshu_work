@@ -68,7 +68,7 @@ export default defineConfig(({ command, mode }) => {
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: isProd,
+          drop_console: false, // Оставляем консоль для отладки Phase 3.2
           drop_debugger: isProd
         },
         mangle: {
