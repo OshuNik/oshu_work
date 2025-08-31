@@ -169,8 +169,11 @@ class WebSocketManager {
   /**
    * Фактическая настройка Supabase Realtime (после ожидания готовности)
    */
-  setupSupabaseRealtimeActual() {
+  async setupSupabaseRealtimeActual() {
     console.log('[WebSocket] 🚀 Начинаем настройку Supabase Realtime...');
+    
+    // Проверяем доступ к таблице vacancies
+    await this.testTableAccess();
     
     try {
       // Подписываемся на изменения в таблице вакансий (если она есть)
@@ -180,9 +183,7 @@ class WebSocketManager {
           { 
             event: '*', 
             schema: 'public', 
-            table: 'vacancies',
-            // Запрашиваем все столбцы для получения полных данных
-            filter: '' 
+            table: 'vacancies'
           }, 
           (payload) => {
             // Database change
@@ -239,6 +240,46 @@ class WebSocketManager {
       console.error('[WebSocket] ❌ Ошибка настройки Supabase Realtime:', error);
       // Ошибка настройки Supabase Realtime
       this.dispatchEvent('ws:fallback', { reason: 'supabase_setup_error' });
+    }
+  }
+
+  /**
+   * Тестирование доступа к таблице vacancies
+   */
+  async testTableAccess() {
+    try {
+      console.log('[WebSocket] 🔍 Тестируем доступ к таблице vacancies...');
+      
+      // Пробуем простой count запрос
+      const { data, error, count } = await window.supabaseClient
+        .from('vacancies')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) {
+        console.error('[WebSocket] ❌ Ошибка доступа к таблице vacancies:', error);
+        if (error.code === 'PGRST116') {
+          console.error('[WebSocket] 💡 Таблица vacancies не существует!');
+        } else if (error.code === '42501') {
+          console.error('[WebSocket] 💡 RLS блокирует доступ к таблице vacancies');
+        }
+      } else {
+        console.log('[WebSocket] ✅ Доступ к таблице vacancies OK, записей:', count);
+      }
+
+      // Тестируем самую простую подписку
+      console.log('[WebSocket] 🧪 Тестируем простую подписку...');
+      const testChannel = window.supabaseClient
+        .channel('test-connection')
+        .subscribe((status) => {
+          console.log('[WebSocket] 🧪 Статус тестовой подписки:', status);
+          if (status === 'SUBSCRIBED') {
+            // Отписываемся от теста
+            testChannel.unsubscribe();
+          }
+        });
+
+    } catch (error) {
+      console.error('[WebSocket] ❌ Критическая ошибка тестирования доступа:', error);
     }
   }
 
