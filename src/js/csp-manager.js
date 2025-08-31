@@ -67,8 +67,8 @@
         // Стили: собственные + Google Fonts + inline стили
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
         
-        // Шрифты: Google Fonts
-        `font-src 'self' https://fonts.gstatic.com`,
+        // Шрифты: Google Fonts + Bootstrap Icons
+        `font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net`,
         
         // Изображения: собственные + GitHub + data URLs для base64
         `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
@@ -113,8 +113,8 @@
         // Стили: собственные + Google Fonts + inline стили
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
         
-        // Шрифты: Google Fonts
-        `font-src 'self' https://fonts.gstatic.com`,
+        // Шрифты: Google Fonts + Bootstrap Icons
+        `font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net`,
         
         // Изображения: собственные + GitHub + data URLs для base64
         `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
