@@ -85,13 +85,21 @@ class RealtimeUpdates {
         return;
       }
 
-      // Создаем карточку вакансии
+      // Создаем карточку вакансии с полным функционалом
       const vacancyCard = await this.createVacancyCard(vacancyData);
       if (!vacancyCard) {
         console.error('[Realtime Updates] Не удалось создать карточку вакансии');
         return;
       }
 
+      console.log('[Realtime Updates] ✅ Карточка создана, проверяем функционал...');
+      
+      // Проверяем что карточка создана правильно
+      const applyBtn = vacancyCard.querySelector('[data-element="apply-btn"]');
+      const hasApplyUrl = vacancyData.apply_url && vacancyData.apply_url.trim() !== '';
+      
+      console.log('[Realtime Updates] Apply URL:', vacancyData.apply_url, 'Кнопка найдена:', !!applyBtn);
+      
       // Помечаем как новую для анимации
       vacancyCard.classList.add('vacancy-new', 'vacancy-realtime');
       
@@ -189,13 +197,17 @@ class RealtimeUpdates {
   async createVacancyCard(vacancyData) {
     console.log('[Realtime Updates] Создаем карточку для вакансии:', vacancyData);
     
-    // Используем существующую функцию createVacancyCard если она доступна
+    // Всегда используем основную функцию createVacancyCard если она доступна
     if (window.createVacancyCard && typeof window.createVacancyCard === 'function') {
-      console.log('[Realtime Updates] Используем window.createVacancyCard');
-      return window.createVacancyCard(vacancyData);
+      console.log('[Realtime Updates] Используем window.createVacancyCard с полным функционалом');
+      // Используем с правильными опциями для main страницы
+      return window.createVacancyCard(vacancyData, {
+        pageType: 'main',
+        searchQuery: ''
+      });
     }
     
-    console.log('[Realtime Updates] Используем fallback метод создания карточки');
+    console.log('[Realtime Updates] ⚠️ FALLBACK: window.createVacancyCard недоступен');
     
     // Fallback - создаем базовую карточку
     const template = document.getElementById('vacancy-card-template');
