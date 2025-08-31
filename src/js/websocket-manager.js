@@ -98,10 +98,15 @@ class WebSocketManager {
     
     // Для production используем Supabase Realtime как WebSocket альтернативу
     // Это позволит получать live обновления через database subscriptions
+    console.log('[WebSocket] Текущий домен:', window.location.hostname);
+    
     if (window.location.hostname.includes('github.io') || window.location.hostname.includes('oshunik.github.io')) {
+      console.log('[WebSocket] GitHub Pages домен обнаружен - настраиваем Supabase Realtime');
       // Вместо отдельного WebSocket сервера используем Supabase Realtime
       this.setupSupabaseRealtime();
       return null; // Используем Supabase вместо Socket.IO
+    } else {
+      console.log('[WebSocket] Домен не GitHub Pages - Supabase Realtime недоступен');
     }
     
     // Fallback для других доменов
@@ -112,9 +117,12 @@ class WebSocketManager {
    * Настройка Supabase Realtime для production
    */
   setupSupabaseRealtime() {
+    console.log('[WebSocket] Настраиваем Supabase Realtime...');
+    console.log('[WebSocket] window.supabaseClient доступен:', typeof window.supabaseClient !== 'undefined');
+    
     // Проверяем, что Supabase доступен
     if (typeof window.supabaseClient === 'undefined') {
-      // Supabase client недоступен
+      console.warn('[WebSocket] Supabase client недоступен во время настройки Realtime');
       this.dispatchEvent('ws:fallback', { reason: 'supabase_unavailable' });
       return;
     }
