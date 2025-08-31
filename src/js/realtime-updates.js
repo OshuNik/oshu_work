@@ -207,16 +207,35 @@ class RealtimeUpdates {
     const cardClone = template.content.cloneNode(true);
     const card = cardClone.querySelector('.vacancy-card');
     
+    // Добавляем правильные CSS классы для категории
+    if (vacancyData.category === 'ТОЧНО ТВОЁ') {
+      card.classList.add('category-main');
+    } else if (vacancyData.category === 'МОЖЕТ БЫТЬ') {
+      card.classList.add('category-maybe');
+    } else {
+      card.classList.add('category-other');
+    }
+    
     // Заполняем основные данные
     const categoryEl = card.querySelector('[data-element="category"]');
     const summaryEl = card.querySelector('[data-element="summary"]');
     const channelEl = card.querySelector('[data-element="channel"]');
     const timestampEl = card.querySelector('[data-element="timestamp"]');
+    const fullTextEl = card.querySelector('[data-element="full-text"]');
+    const detailsEl = card.querySelector('[data-element="details"]');
     
     if (categoryEl) categoryEl.textContent = vacancyData.category || 'Без категории';
     if (summaryEl) summaryEl.textContent = vacancyData.reason || vacancyData.title || vacancyData.description || 'Описание отсутствует';
     if (channelEl) channelEl.textContent = vacancyData.channel || vacancyData.company_name || 'Неизвестный канал';
     if (timestampEl) timestampEl.textContent = this.formatTimestamp(vacancyData.created_at || vacancyData.timestamp);
+    
+    // Добавляем полный текст если есть
+    if (fullTextEl && (vacancyData.text_highlighted || vacancyData.text)) {
+      fullTextEl.innerHTML = vacancyData.text_highlighted || vacancyData.text;
+    } else if (detailsEl && !vacancyData.text_highlighted && !vacancyData.text) {
+      // Скрываем details если нет полного текста
+      detailsEl.style.display = 'none';
+    }
     
     // Добавляем ID для поиска
     card.dataset.vacancyId = vacancyData.id;
