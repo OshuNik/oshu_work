@@ -1897,17 +1897,23 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .footer-meta {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 6px;
     color: var(--hint-color);
     white-space: nowrap;
     font-size: 12px;
 }
 
-.meta-info {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+/* NEW бейдж в card-footer (справа от всего) */
+.card-footer .new-badge {
+    background: var(--accent-green);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 1px solid var(--border-color);
+    margin-left: auto;
 }
 .channel-name {
     font-weight: 700;
