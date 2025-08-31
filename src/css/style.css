@@ -1897,6 +1897,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 .footer-meta {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 6px;
     color: var(--hint-color);
     text-align: right;
