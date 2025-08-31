@@ -6,6 +6,9 @@ import './config.js';
 import './constants.js';
 import './csp-manager.js';
 
+// Supabase клиент для Realtime (загружается первым)
+import './supabase-client.js';
+
 // Utils модули (КРИТИЧЕСКИ ВАЖНО - содержит createVacancyCard, renderEmptyState)
 import './utils.min.js';
 import './utils-empty-state.js';
