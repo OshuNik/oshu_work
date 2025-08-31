@@ -197,14 +197,23 @@ class RealtimeUpdates {
   async createVacancyCard(vacancyData) {
     console.log('[Realtime Updates] Создаем карточку для вакансии:', vacancyData);
     
+    // Проверяем доступность основной функции createVacancyCard 
+    console.log('[Realtime Updates] 🔍 Доступные window функции:', {
+      createVacancyCard: typeof window.createVacancyCard,
+      utils_loaded: typeof window.uiToast,
+      stateManager: typeof window.stateManager
+    });
+    
     // Всегда используем основную функцию createVacancyCard если она доступна
     if (window.createVacancyCard && typeof window.createVacancyCard === 'function') {
-      console.log('[Realtime Updates] Используем window.createVacancyCard с полным функционалом');
+      console.log('[Realtime Updates] ✅ Используем window.createVacancyCard с полным функционалом');
       // Используем с правильными опциями для main страницы
-      return window.createVacancyCard(vacancyData, {
+      const card = window.createVacancyCard(vacancyData, {
         pageType: 'main',
         searchQuery: ''
       });
+      console.log('[Realtime Updates] ✅ Карточка создана через основную функцию');
+      return card;
     }
     
     console.log('[Realtime Updates] ⚠️ FALLBACK: window.createVacancyCard недоступен');
@@ -237,13 +246,24 @@ class RealtimeUpdates {
       card.appendChild(newBadge);
     }
     
-    // Заполняем основные данные
+    // Заполняем основные данные  
     const categoryEl = card.querySelector('[data-element="category"]');
     const summaryEl = card.querySelector('[data-element="summary"]');
     const channelEl = card.querySelector('[data-element="channel"]');
     const timestampEl = card.querySelector('[data-element="timestamp"]');
     const fullTextEl = card.querySelector('[data-element="full-text"]');
     const detailsEl = card.querySelector('[data-element="details"]');
+    const applyBtn = card.querySelector('[data-element="apply-btn"]');
+    
+    // Правильно обрабатываем apply_url - убираем кнопку если нет URL
+    const hasValidApplyUrl = vacancyData.apply_url && vacancyData.apply_url.trim() !== '';
+    if (!hasValidApplyUrl && applyBtn) {
+      console.log('[Realtime Updates] Убираем кнопку apply - нет URL');
+      applyBtn.remove();
+    } else if (hasValidApplyUrl && applyBtn) {
+      applyBtn.dataset.action = 'apply';
+      applyBtn.dataset.url = vacancyData.apply_url;
+    }
     
     if (categoryEl) categoryEl.textContent = vacancyData.category || 'Без категории';
     if (summaryEl) summaryEl.textContent = vacancyData.reason || vacancyData.title || vacancyData.description || 'Описание отсутствует';
