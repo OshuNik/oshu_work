@@ -19,6 +19,16 @@
     --font-pixel: 'Press Start 2P', 'Courier New', monospace;
 }
 
+/* КРИТИЧЕСКИ ВАЖНО - Контейнер тегов навыков в строку */
+.footer-skill-tags {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    justify-content: flex-start !important;
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+}
+
 /* КРИТИЧЕСКИ ВАЖНО - Теги навыков в карточках */
 .footer-skill-tag {
     font-family: 'Press Start 2P', monospace !important;
