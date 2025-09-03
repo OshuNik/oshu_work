@@ -22,13 +22,30 @@
 /* КРИТИЧЕСКИ ВАЖНО - Footer карточки для горизонтальной разметки */
 .card-footer {
     display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-end !important;
+    align-items: center !important;
     margin-top: 15px !important;
     padding-top: 10px !important;
     border-top: 1px dashed var(--hint-color) !important;
-    flex-wrap: wrap !important;
     gap: 10px !important;
+}
+
+/* КРИТИЧЕСКИ ВАЖНО - Порядок элементов в footer */
+.card-footer .channel-name {
+    flex: 0 0 auto !important;
+    order: 1 !important;
+    margin-right: 10px !important;
+}
+
+.card-footer .footer-skill-tags {
+    flex: 1 1 auto !important;
+    order: 2 !important;
+    justify-content: center !important;
+}
+
+.card-footer .timestamp-footer {
+    flex: 0 0 auto !important;
+    order: 3 !important;
+    margin-left: 10px !important;
 }
 
 /* КРИТИЧЕСКИ ВАЖНО - Контейнер тегов навыков в строку */
