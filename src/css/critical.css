@@ -19,6 +19,21 @@
     --font-pixel: 'Press Start 2P', 'Courier New', monospace;
 }
 
+/* КРИТИЧЕСКИ ВАЖНО - Теги навыков в карточках */
+.footer-skill-tag {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    background-color: var(--background-color) !important;
+    color: var(--text-color) !important;
+    padding: 5px 8px !important;
+    border: var(--border-width) solid var(--border-color) !important;
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    display: inline-block !important;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color) !important;
+}
+
 /* Базовые утилиты */
 .hidden { display: none !important; }
 
