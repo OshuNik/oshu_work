@@ -398,7 +398,7 @@ class RealtimeSearch {
     if (!text || !query) return text;
     
     const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+    return text.replace(regex, '<mark class="highlight">$1</mark>');
   }
 
   /**
@@ -421,7 +421,7 @@ class RealtimeSearch {
       card.style.display = 'block';
       
       // Убираем подсветку
-      const highlighted = card.querySelectorAll('.search-highlight');
+      const highlighted = card.querySelectorAll('.highlight');
       highlighted.forEach(el => {
         el.outerHTML = el.textContent;
       });
@@ -708,12 +708,7 @@ const searchStyles = `
   100% { transform: translateY(-50%) rotate(360deg); }
 }
 
-.search-highlight {
-  background-color: #ffeb3b;
-  padding: 1px 2px;
-  border-radius: 2px;
-  font-weight: bold;
-}
+/* Подсветка поиска использует существующий стиль .highlight из style.css */
 
 .search-result-card {
   cursor: pointer;
