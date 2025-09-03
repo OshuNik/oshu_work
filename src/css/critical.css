@@ -19,6 +19,18 @@
     --font-pixel: 'Press Start 2P', 'Courier New', monospace;
 }
 
+/* КРИТИЧЕСКИ ВАЖНО - Footer карточки для горизонтальной разметки */
+.card-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    margin-top: 15px !important;
+    padding-top: 10px !important;
+    border-top: 1px dashed var(--hint-color) !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+}
+
 /* КРИТИЧЕСКИ ВАЖНО - Контейнер тегов навыков в строку */
 .footer-skill-tags {
     display: flex !important;
