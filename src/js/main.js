@@ -26,10 +26,8 @@ import './telegram-integration.js';
 import './smart-cache.js';
 
 // Phase 3.2: Simplified Features (только уведомления и real-time поиск)
-// import './websocket-manager.js';  // ОТКЛЮЧЕНО - проблемы с обновлениями карточек
-// import './realtime-updates.js';   // ОТКЛЮЧЕНО - проблемы с синими бейджами  
-import './realtime-search.js';       // ОСТАВЛЕНО - real-time поиск работает
-import './bot-integration.js';       // ОСТАВЛЕНО - уведомления работают
+import './realtime-search.js';       // Real-time поиск работает
+import './bot-integration.js';       // Уведомления работают
 
 // Дополнительные модули
 import './theme-manager.js';
@@ -58,8 +56,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// WebSocket обработчики ВРЕМЕННО ОТКЛЮЧЕНЫ
-
-// UI уведомления убраны - используется console.log для тестирования
-
-// Toast уведомления убраны - используется console.log для тестирования
+// Приложение готово к работе

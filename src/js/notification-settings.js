@@ -71,7 +71,6 @@ class NotificationSettings {
       // Элементы статуса
       notificationStatus: document.getElementById('notification-status'),
       botStatus: document.getElementById('bot-status'),
-      websocketStatus: document.getElementById('websocket-status'),
       userStatus: document.getElementById('user-status')
     };
 
@@ -313,16 +312,7 @@ class NotificationSettings {
       this.elements.botStatus.className = 'status-value status-warning';
     }
 
-    // Статус WebSocket
-    if (this.elements.websocketStatus && window.wsManager) {
-      const wsStatus = window.wsManager.getConnectionStatus();
-      const statusText = wsStatus.connected ? '✅ Подключен' : '❌ Отключен';
-      this.elements.websocketStatus.textContent = statusText;
-      this.elements.websocketStatus.className = `status-value ${wsStatus.connected ? 'status-success' : 'status-error'}`;
-    } else if (this.elements.websocketStatus) {
-      this.elements.websocketStatus.textContent = '❓ Недоступен';
-      this.elements.websocketStatus.className = 'status-value status-warning';
-    }
+    // WebSocket статус удален - функция больше не используется
 
     // Статус пользователя
     if (this.elements.userStatus && window.botIntegration) {
