@@ -189,9 +189,12 @@ class TemplateLoader {
       </details>
     </div>
     <div class="card-footer">
-      <span class="channel-name" data-element="channel"></span>
       <div class="footer-skill-tags" data-element="skills"></div>
-      <span class="timestamp-footer" data-element="timestamp"></span>
+      <div class="footer-meta">
+        <span class="channel-name" data-element="channel"></span>
+        <span class="meta-separator"> • </span>
+        <span class="timestamp-footer" data-element="timestamp"></span>
+      </div>
     </div>
   </div>
 </template>`;
