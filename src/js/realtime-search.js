@@ -32,17 +32,24 @@ class RealtimeSearch {
    * Инициализация real-time поиска
    */
   init() {
+    console.log('[Realtime Search] Начинаем инициализацию...');
+    console.log('[Realtime Search] DOM ready state:', document.readyState);
+    
     this.searchInput = document.getElementById('search-input');
     
     if (!this.searchInput) {
-      console.warn('[Realtime Search] Поисковое поле не найдено');
+      console.warn('[Realtime Search] Поисковое поле не найдено, доступные элементы с ID:');
+      const allIds = Array.from(document.querySelectorAll('[id]')).map(el => el.id);
+      console.warn('[Realtime Search] IDs на странице:', allIds);
       return;
     }
 
+    console.log('[Realtime Search] Поисковое поле найдено:', this.searchInput);
+    
     this.setupSearchHandlers();
     this.setupWebSocketListeners();
     
-    console.log('[Realtime Search] Инициализирован');
+    console.log('[Realtime Search] ✅ Инициализирован успешно');
   }
 
   /**
@@ -738,7 +745,14 @@ document.head.appendChild(searchStyleSheet);
 // Глобальный экспорт
 window.RealtimeSearch = RealtimeSearch;
 
-// Создаем глобальный экземпляр
-window.realtimeSearch = new RealtimeSearch();
-
-console.log('[Phase 3.2] Realtime Search Manager инициализирован');
+// Инициализируем после загрузки DOM
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.realtimeSearch = new RealtimeSearch();
+    console.log('[Phase 3.2] Realtime Search Manager инициализирован после DOMContentLoaded');
+  });
+} else {
+  // DOM уже загружен
+  window.realtimeSearch = new RealtimeSearch();
+  console.log('[Phase 3.2] Realtime Search Manager инициализирован сразу');
+}
