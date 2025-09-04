@@ -381,6 +381,19 @@ class SimpleBotNotifications {
   getSettings() {
     return { ...this.settings };
   }
+
+  /**
+   * Получение статуса для совместимости со старым кодом
+   */
+  getStatus() {
+    return {
+      enabled: this.settings.enabled,
+      userId: 'simplified_user',
+      chatId: 'simplified_user',
+      settings: this.settings,
+      quietTime: false
+    };
+  }
 }
 
 // Глобальный экспорт
