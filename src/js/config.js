@@ -29,6 +29,11 @@ window.APP_CONFIG = {
   SUPABASE_URL: envConfig.SUPABASE_URL,
   SUPABASE_ANON_KEY: envConfig.SUPABASE_ANON_KEY,
   
+  // Error Monitor конфигурация
+  ERROR_BOT_TOKEN: window.ENV?.ERROR_BOT_TOKEN || '8356223189:AAEuNYcDDz-CyzICtf2L2MJM8KL9OIzQm1A',
+  ERROR_CHAT_ID: window.ENV?.ERROR_CHAT_ID || '1521478462',
+  ERROR_MONITOR_ENABLED: true, // Включаем для тестирования (в production будет true автоматически)
+  
   // Параметры приложения
   PAGE_SIZE_MAIN: 10,
   RETRY_OPTIONS: { retries: 2, backoffMs: 400 },

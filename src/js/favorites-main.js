@@ -8,6 +8,8 @@ import './config.js';
 import './constants.js';
 import './utils.min.js';
 import './csp-manager.js';
+import './error-monitor.js';
+import './error-helpers.js';
 
 // 2. UI модули
 import './theme-manager.js';

@@ -73,8 +73,8 @@
         // Изображения: собственные + GitHub + data URLs для base64
         `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
         
-        // Сетевые запросы: Supabase API + Socket.IO CDN + WebSocket серверы
-        `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.socket.io https://unpkg.com https://cdnjs.cloudflare.com wss://localhost:* ws://localhost:* wss://*.oshuwork.ru https://*.oshuwork.ru wss://* ws://*`,
+        // Сетевые запросы: Supabase API + Socket.IO CDN + WebSocket серверы + Telegram Bot API
+        `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.socket.io https://unpkg.com https://cdnjs.cloudflare.com https://api.telegram.org wss://localhost:* ws://localhost:* wss://*.oshuwork.ru https://*.oshuwork.ru wss://* ws://*`,
         
         // Медиа: только собственные
         `media-src 'self'`,
@@ -119,8 +119,8 @@
         // Изображения: собственные + GitHub + data URLs для base64
         `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
         
-        // Сетевые запросы: Supabase API + Socket.IO CDN + WebSocket серверы
-        `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.socket.io https://unpkg.com https://cdnjs.cloudflare.com wss://localhost:* ws://localhost:* wss://*.oshuwork.ru https://*.oshuwork.ru wss://* ws://*`,
+        // Сетевые запросы: Supabase API + Socket.IO CDN + WebSocket серверы + Telegram Bot API
+        `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.socket.io https://unpkg.com https://cdnjs.cloudflare.com https://api.telegram.org wss://localhost:* ws://localhost:* wss://*.oshuwork.ru https://*.oshuwork.ru wss://* ws://*`,
         
         // Медиа: только собственные
         `media-src 'self'`,

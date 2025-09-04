@@ -9,6 +9,8 @@ import './csp-manager.js';
 import './env-dev.js';
 import './env-config.js';
 import './config.js';
+import './error-monitor.js';
+import './error-helpers.js';
 
 // 2. UI модули  
 import './theme-manager.js';

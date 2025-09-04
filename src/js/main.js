@@ -8,6 +8,8 @@ import '../css/variables.css';
 import './config.js';
 import './constants.js';
 import './csp-manager.js';
+import './error-monitor.js';
+import './error-helpers.js';
 
 // Supabase клиент для Realtime
 import './supabase-client.js';
