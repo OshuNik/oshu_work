@@ -1,9 +1,6 @@
 // Main entry point для Vite - Phase 3.2 Simplified
 console.log('🚀 [MAIN] oshu://work v15.1.0 loading...');
 
-// Импортируем CSS переменные первыми для быстрого рендера
-import '../css/variables.css';
-
 // Импортируем основные модули
 import './config.js';
 import './constants.js';
