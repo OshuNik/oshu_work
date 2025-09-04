@@ -1,6 +1,9 @@
 // Settings page entry point для Vite
 // Импортируем все необходимые модули
 
+// 0. CSS переменные первыми
+import '../css/variables.css';
+
 // 1. Критичные модули
 import './csp-manager.js';
 import './env-dev.js';

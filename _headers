@@ -16,15 +16,22 @@
   # Кэширование для статических ресурсов
   Cache-Control: public, max-age=3600
 
-# Специальные настройки для JavaScript файлов
+# Специальные настройки для JavaScript файлов (включая bundled)
 /src/js/*
   Cache-Control: public, max-age=86400
   Content-Type: application/javascript
 
-# Специальные настройки для CSS файлов  
+/js/*
+  Cache-Control: public, max-age=31536000
+  Content-Type: application/javascript
+
+# Специальные настройки для CSS файлов (включая bundled)
 /src/css/*
   Cache-Control: public, max-age=86400
   Content-Type: text/css
+
+/assets/*
+  Cache-Control: public, max-age=31536000
 
 # HTML файлы - короткое кэширование
 /*.html

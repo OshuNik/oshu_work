@@ -40,8 +40,9 @@
   <!-- Основные стили (убрано дублирование preload) -->
   <link rel="stylesheet" href="src/css/style.css">
   
-  <!-- Fonts loaded asynchronously -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Fonts loaded asynchronously with optimal loading -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap"></noscript>
 </head>
 <body>
 

@@ -1,22 +1,9 @@
 /* CRITICAL CSS - Стили для above-the-fold контента */
 /* Основано на Context7 принципах First Paint оптимизации */
+/* Variables moved to variables.css */
 
 :root {
-    /* Основные цвета */
-    --background-color: #F0F0F0;
-    --card-color: #FFFFFF;
-    --text-color: #000000;
-    --border-width: 2px;
-    --border-color: #000000;
-    --shadow-offset: 4px;
-    --box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
     --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--border-color);
-    --accent-green: #6BCB77;
-    --accent-blue: #41A6FF;
-    --transition-fast: 0.1s ease-out;
-    --transition-normal: 0.2s ease-out;
-    --font-mono: 'Roboto Mono', 'Courier New', monospace;
-    --font-pixel: 'Press Start 2P', 'Courier New', monospace;
 }
 
 /* КРИТИЧЕСКИ ВАЖНО - Footer карточки для горизонтальной разметки */
