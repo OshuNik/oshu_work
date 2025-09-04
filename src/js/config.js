@@ -5,7 +5,7 @@ const isLocalhost = window.location.hostname === 'localhost' ||
                    window.location.hostname === '127.0.0.1' ||
                    window.location.hostname === '';
 const isGitHubPages = window.location.hostname.includes('github.io');
-const isDevelopment = isLocalhost || isGitHubPages;
+const isDevelopment = isLocalhost; // GitHub Pages это production!
 
 // Centralized Environment Configuration
 const ENVIRONMENTS = {
