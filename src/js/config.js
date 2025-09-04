@@ -32,7 +32,7 @@ window.APP_CONFIG = {
   // Error Monitor конфигурация
   ERROR_BOT_TOKEN: window.ENV?.ERROR_BOT_TOKEN || '8356223189:AAEuNYcDDz-CyzICtf2L2MJM8KL9OIzQm1A',
   ERROR_CHAT_ID: window.ENV?.ERROR_CHAT_ID || '1521478462',
-  ERROR_MONITOR_ENABLED: true, // Включаем для тестирования (в production будет true автоматически)
+  ERROR_MONITOR_ENABLED: currentEnv === 'production', // Только в production
   
   // Параметры приложения
   PAGE_SIZE_MAIN: 10,
