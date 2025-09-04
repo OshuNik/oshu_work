@@ -1,145 +1,257 @@
 /**
- * Telegram Bot Integration - Phase 3.2
- * Интеграция с Telegram Bot API для уведомлений
+ * Simple Telegram Bot Notifications - Phase 3.2 Simplified
+ * Простые уведомления для Telegram Mini App
  */
 
-class TelegramBotIntegration {
+class SimpleBotNotifications {
   constructor() {
-    this.botToken = null;
-    this.userId = null;
-    this.chatId = null;
-    this.isEnabled = false;
-    
-    // Настройки уведомлений по умолчанию
-    this.notificationSettings = {
-      newVacancies: true,
-      favoriteUpdates: true,
-      categoryFilter: 'all', // all|main|maybe|other
-      quietHours: {
-        enabled: false,
-        start: '22:00',
-        end: '08:00'
-      },
-      enabled: true
-    };
-    
-    // API endpoints (mock для разработки)
-    this.apiEndpoints = {
-      webhook: '/api/telegram/webhook',
-      sendMessage: '/api/telegram/send-message',
-      setSettings: '/api/telegram/settings'
+    // Простые настройки
+    this.settings = {
+      enabled: localStorage.getItem('notifications-enabled') === 'true',
+      categoryFilter: localStorage.getItem('notifications-category') || 'all' // all|main|maybe|other
     };
     
     this.init();
   }
 
   /**
-   * Инициализация Bot интеграции
+   * Инициализация
    */
-  async init() {
-    try {
-      // Получаем данные пользователя из Telegram WebApp
-      await this.initializeTelegramUser();
-      
-      // Загружаем сохраненные настройки
-      await this.loadNotificationSettings();
-      
-      // Настраиваем слушатели событий
-      this.setupEventListeners();
-      
-      console.log('[Bot Integration] Инициализирован для пользователя:', this.userId);
-      
-    } catch (error) {
-      console.error('[Bot Integration] Ошибка инициализации:', error);
-      this.isEnabled = false;
-    }
-  }
-
-  /**
-   * Инициализация данных пользователя Telegram
-   */
-  async initializeTelegramUser() {
-    if (!window.Telegram?.WebApp) {
-      throw new Error('Telegram WebApp API недоступен');
-    }
-
-    const tg = window.Telegram.WebApp;
+  init() {
+    console.log('[Simple Bot] Инициализирован с настройками:', this.settings);
     
-    // Получаем данные пользователя
-    if (tg.initDataUnsafe?.user) {
-      const user = tg.initDataUnsafe.user;
-      this.userId = user.id;
-      this.chatId = user.id; // В Mini App чат ID = user ID
-      
-      console.log('[Bot Integration] Пользователь Telegram:', {
-        id: this.userId,
-        username: user.username,
-        first_name: user.first_name
-      });
-      
-      this.isEnabled = true;
-    } else {
-      console.warn('[Bot Integration] Данные пользователя недоступны');
-      
-      // Fallback для разработки
-      if (window.location.hostname === 'localhost') {
-        this.userId = 'dev_user_123';
-        this.chatId = 'dev_user_123';
-        this.isEnabled = true;
-        console.log('[Bot Integration] Режим разработки активирован');
-      }
+    // Настраиваем UI кнопку если мы на странице настроек
+    this.setupNotificationButton();
+    
+    // Слушаем события новых вакансий (только если включено)
+    if (this.settings.enabled) {
+      this.setupEventListeners();
     }
   }
 
   /**
-   * Загрузка настроек уведомлений
+   * Настройка кнопки уведомлений в settings.html
    */
-  async loadNotificationSettings() {
-    try {
-      // Загружаем из localStorage
-      const saved = localStorage.getItem('telegramNotificationSettings');
-      if (saved) {
-        this.notificationSettings = {
-          ...this.notificationSettings,
-          ...JSON.parse(saved)
-        };
-      }
+  setupNotificationButton() {
+    const button = document.getElementById('notifications-toggle');
+    if (!button) return;
 
-      // Дополнительно загружаем с сервера (если доступно)
-      await this.loadServerSettings();
-      
-      console.log('[Bot Integration] Настройки загружены:', this.notificationSettings);
-      
-    } catch (error) {
-      console.warn('[Bot Integration] Не удалось загрузить настройки:', error);
-    }
-  }
+    // Устанавливаем начальное состояние кнопки
+    this.updateButtonState(button);
 
-  /**
-   * Загрузка настроек с сервера
-   */
-  async loadServerSettings() {
-    if (!this.isEnabled) return;
+    // Обычный клик - переключение вкл/выкл
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.toggleNotifications();
+      this.updateButtonState(button);
+    });
 
-    try {
-      const response = await fetch(`${this.apiEndpoints.setSettings}?userId=${this.userId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-ID': this.userId
+    // Долгое нажатие - меню выбора категории
+    let longPressTimer;
+    let isLongPress = false;
+
+    button.addEventListener('mousedown', () => {
+      isLongPress = false;
+      longPressTimer = setTimeout(() => {
+        isLongPress = true;
+        this.showCategoryMenu();
+      }, 800); // 800ms для долгого нажатия
+    });
+
+    button.addEventListener('mouseup', () => {
+      clearTimeout(longPressTimer);
+    });
+
+    button.addEventListener('mouseleave', () => {
+      clearTimeout(longPressTimer);
+    });
+
+    // Для мобильных устройств
+    button.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      isLongPress = false;
+      longPressTimer = setTimeout(() => {
+        isLongPress = true;
+        this.showCategoryMenu();
+        // Вибрация при долгом нажатии
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
         }
-      });
+      }, 800);
+    });
 
-      if (response.ok) {
-        const serverSettings = await response.json();
-        this.notificationSettings = {
-          ...this.notificationSettings,
-          ...serverSettings
-        };
+    button.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      clearTimeout(longPressTimer);
+      
+      // Если это не было долгое нажатие - делаем обычный клик
+      if (!isLongPress) {
+        setTimeout(() => {
+          this.toggleNotifications();
+          this.updateButtonState(button);
+        }, 50);
       }
-    } catch (error) {
-      console.warn('[Bot Integration] Сервер настроек недоступен:', error);
+    });
+  }
+
+  /**
+   * Переключение уведомлений вкл/выкл
+   */
+  toggleNotifications() {
+    this.settings.enabled = !this.settings.enabled;
+    localStorage.setItem('notifications-enabled', this.settings.enabled.toString());
+    
+    if (this.settings.enabled) {
+      this.setupEventListeners();
+      this.showToast('🔔 Уведомления включены');
+    } else {
+      this.showToast('🔕 Уведомления выключены');
     }
+  }
+
+  /**
+   * Обновление внешнего вида кнопки
+   */
+  updateButtonState(button) {
+    const icon = button.querySelector('i');
+    
+    if (this.settings.enabled) {
+      button.classList.remove('disabled');
+      icon.className = 'bi bi-bell-fill';
+      button.title = 'Уведомления включены (долгий клик - настройки)';
+    } else {
+      button.classList.add('disabled');
+      icon.className = 'bi bi-bell-slash';
+      button.title = 'Уведомления выключены (клик - включить)';
+    }
+  }
+
+  /**
+   * Показ меню выбора категории при долгом нажатии
+   */
+  showCategoryMenu() {
+    const categories = [
+      { id: 'all', name: 'Все категории', emoji: '📝' },
+      { id: 'main', name: 'Точно твоё', emoji: '🎯' },
+      { id: 'maybe', name: 'Может быть', emoji: '🤔' },
+      { id: 'other', name: 'Не твоё', emoji: '🚫' }
+    ];
+
+    // Создаем простое модальное окно
+    const overlay = document.createElement('div');
+    overlay.className = 'notification-menu-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 200ms ease;
+    `;
+
+    const menu = document.createElement('div');
+    menu.className = 'notification-category-menu';
+    menu.style.cssText = `
+      background: var(--card-color);
+      border: var(--border-width) solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 280px;
+      width: 90%;
+      box-shadow: var(--box-shadow);
+      transform: scale(0.9);
+      transition: transform 200ms ease;
+    `;
+
+    let menuHTML = '<h3 style="margin-top: 0; font-family: var(--font-pixel); font-size: 14px;">УВЕДОМЛЕНИЯ ИЗ:</h3>';
+    
+    categories.forEach(category => {
+      const isActive = this.settings.categoryFilter === category.id;
+      menuHTML += `
+        <div class="category-option ${isActive ? 'active' : ''}" data-category="${category.id}" 
+             style="
+               padding: 12px;
+               margin: 8px 0;
+               border: 2px solid ${isActive ? 'var(--accent-green)' : 'var(--border-color)'};
+               border-radius: 6px;
+               cursor: pointer;
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               font-family: var(--font-mono);
+               background: ${isActive ? 'var(--accent-green)' : 'var(--card-color)'};
+               color: ${isActive ? 'white' : 'var(--text-color)'};
+               transition: all 150ms ease;
+             ">
+          <span style="font-size: 16px;">${category.emoji}</span>
+          <span>${category.name}</span>
+        </div>
+      `;
+    });
+
+    menu.innerHTML = menuHTML;
+    overlay.appendChild(menu);
+    document.body.appendChild(overlay);
+
+    // Анимация появления
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '1';
+      menu.style.transform = 'scale(1)';
+    });
+
+    // Обработчики кликов
+    menu.addEventListener('click', (e) => {
+      const option = e.target.closest('.category-option');
+      if (option) {
+        const category = option.dataset.category;
+        this.setCategoryFilter(category);
+        this.closeMenu(overlay);
+      }
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        this.closeMenu(overlay);
+      }
+    });
+  }
+
+  /**
+   * Закрытие меню категорий
+   */
+  closeMenu(overlay) {
+    overlay.style.opacity = '0';
+    const menu = overlay.querySelector('.notification-category-menu');
+    menu.style.transform = 'scale(0.9)';
+    
+    setTimeout(() => {
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+    }, 200);
+  }
+
+  /**
+   * Установка фильтра категории
+   */
+  setCategoryFilter(category) {
+    this.settings.categoryFilter = category;
+    localStorage.setItem('notifications-category', category);
+    
+    const categoryNames = {
+      all: 'всех категорий',
+      main: 'категории "Точно твоё"',
+      maybe: 'категории "Может быть"',
+      other: 'категории "Не твоё"'
+    };
+    
+    this.showToast(`📂 Уведомления из ${categoryNames[category]}`);
   }
 
   /**
@@ -148,148 +260,53 @@ class TelegramBotIntegration {
   setupEventListeners() {
     // Слушаем события новых вакансий
     document.addEventListener('vacancy:new', (event) => {
-      if (this.shouldSendNotification('newVacancies', event.detail)) {
-        this.sendVacancyNotification('new', event.detail);
+      if (this.shouldShowNotification(event.detail)) {
+        this.showVacancyNotification(event.detail);
       }
-    });
-
-    // Обновления в избранном
-    document.addEventListener('favorite:added', (event) => {
-      if (this.shouldSendNotification('favoriteUpdates')) {
-        this.sendFavoriteNotification('added', event.detail);
-      }
-    });
-
-    document.addEventListener('favorite:removed', (event) => {
-      if (this.shouldSendNotification('favoriteUpdates')) {
-        this.sendFavoriteNotification('removed', event.detail);
-      }
-    });
-
-    // Изменения настроек уведомлений
-    document.addEventListener('notification-settings-changed', (event) => {
-      this.updateNotificationSettings(event.detail);
     });
   }
 
   /**
-   * Проверка нужно ли отправлять уведомление
+   * Проверка нужно ли показывать уведомление
    */
-  shouldSendNotification(type, vacancyData = null) {
-    // Основная проверка включенности
-    if (!this.isEnabled || !this.notificationSettings.enabled || !this.notificationSettings[type]) {
-      return false;
-    }
-
-    // Проверка тихих часов
-    if (this.isQuietTime()) {
-      return false;
-    }
-
-    // Проверка фильтра категорий для вакансий
-    if (vacancyData && this.notificationSettings.categoryFilter !== 'all') {
-      const filterMap = {
+  shouldShowNotification(vacancy) {
+    if (!this.settings.enabled) return false;
+    
+    // Проверяем фильтр категории
+    if (this.settings.categoryFilter !== 'all') {
+      const categoryMap = {
         main: 'ТОЧНО ТВОЁ',
-        maybe: 'МОЖЕТ БЫТЬ', 
+        maybe: 'МОЖЕТ БЫТЬ',
         other: 'НЕ ТВОЁ'
       };
       
-      const allowedCategory = filterMap[this.notificationSettings.categoryFilter];
-      if (allowedCategory && vacancyData.category !== allowedCategory) {
+      const allowedCategory = categoryMap[this.settings.categoryFilter];
+      if (vacancy.category !== allowedCategory) {
         return false;
       }
     }
-
+    
     return true;
   }
 
   /**
-   * Проверка тихих часов
+   * Показ уведомления о вакансии
    */
-  isQuietTime() {
-    if (!this.notificationSettings.quietHours.enabled) {
-      return false;
-    }
-
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    const startTime = this.parseTime(this.notificationSettings.quietHours.start);
-    const endTime = this.parseTime(this.notificationSettings.quietHours.end);
-    
-    // Проверяем период через полночь
-    if (startTime > endTime) {
-      return currentTime >= startTime || currentTime <= endTime;
-    } else {
-      return currentTime >= startTime && currentTime <= endTime;
-    }
-  }
-
-  /**
-   * Парсинг времени "HH:MM" в минуты
-   */
-  parseTime(timeString) {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    return hours * 60 + minutes;
-  }
-
-  /**
-   * Отправка уведомления о вакансии
-   */
-  async sendVacancyNotification(type, vacancyData) {
-    let message = '';
-    let keyboard = null;
-
-    switch (type) {
-      case 'new':
-        message = this.formatNewVacancyMessage(vacancyData);
-        keyboard = this.createVacancyKeyboard(vacancyData);
-        break;
-      case 'updated':
-        message = this.formatUpdatedVacancyMessage(vacancyData);
-        keyboard = this.createVacancyKeyboard(vacancyData);
-        break;
-    }
-
-    if (message) {
-      await this.sendMessage(message, keyboard);
-    }
-  }
-
-  /**
-   * Форматирование сообщения о новой вакансии
-   */
-  formatNewVacancyMessage(vacancy) {
-    const emoji = this.getCategoryEmoji(vacancy.category);
-    
-    let message = `${emoji} *Новая вакансия!*\n\n`;
-    message += `*${vacancy.title || 'Без названия'}*\n`;
-    
-    if (vacancy.company) {
-      message += `🏢 ${vacancy.company}\n`;
+  showVacancyNotification(vacancy) {
+    // В режиме разработки показываем как toast
+    if (window.location.hostname === 'localhost') {
+      const emoji = this.getCategoryEmoji(vacancy.category);
+      this.showToast(`${emoji} Новая вакансия: ${vacancy.title || 'Без названия'}`, 4000);
     }
     
-    if (vacancy.salary) {
-      message += `💰 ${vacancy.salary}\n`;
+    // В реальном Telegram Mini App можно использовать:
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      if (tg.showAlert) {
+        const emoji = this.getCategoryEmoji(vacancy.category);
+        tg.showAlert(`${emoji} Новая вакансия!\n\n${vacancy.title || 'Без названия'}`);
+      }
     }
-    
-    message += `📂 ${vacancy.category}\n`;
-    
-    if (vacancy.description) {
-      const shortDesc = vacancy.description.length > 100 
-        ? vacancy.description.substring(0, 100) + '...'
-        : vacancy.description;
-      message += `\n${shortDesc}`;
-    }
-
-    return message;
-  }
-
-  /**
-   * Форматирование сообщения об обновлении вакансии
-   */
-  formatUpdatedVacancyMessage(vacancy) {
-    return `🔄 *Обновлена вакансия*\n\n*${vacancy.title}*\n🏢 ${vacancy.company || 'Компания не указана'}`;
   }
 
   /**
@@ -305,367 +322,71 @@ class TelegramBotIntegration {
   }
 
   /**
-   * Создание клавиатуры для вакансии
+   * Показ toast уведомления
    */
-  createVacancyKeyboard(vacancy) {
-    return {
-      inline_keyboard: [
-        [
-          { 
-            text: '📱 Открыть в приложении', 
-            web_app: { url: `${window.location.origin}/?vacancy=${vacancy.id}` }
-          }
-        ],
-        [
-          { text: '⭐ Добавить в избранное', callback_data: `fav_${vacancy.id}` },
-          { text: '📧 Откликнуться', callback_data: `apply_${vacancy.id}` }
-        ],
-        [
-          { text: '⚙️ Настройки уведомлений', callback_data: 'settings_notifications' }
-        ]
-      ]
-    };
-  }
-
-  /**
-   * Отправка уведомления об избранном
-   */
-  async sendFavoriteNotification(action, vacancy) {
-    const actionText = action === 'added' ? 'добавлена в' : 'удалена из';
-    const emoji = action === 'added' ? '⭐' : '🗑️';
-    
-    const message = `${emoji} Вакансия *${vacancy.title}* ${actionText} избранного`;
-    
-    await this.sendMessage(message);
-  }
-
-  /**
-   * Отправка сообщения через Bot API
-   */
-  async sendMessage(text, keyboard = null) {
-    if (!this.isEnabled || !this.chatId) {
-      console.warn('[Bot Integration] Отправка сообщения невозможна - нет chatId');
-      return false;
+  showToast(message, duration = 2500) {
+    // Удаляем предыдущий toast если есть
+    const existingToast = document.querySelector('.simple-toast');
+    if (existingToast) {
+      existingToast.remove();
     }
 
-    const messageData = {
-      chat_id: this.chatId,
-      text: text,
-      parse_mode: 'Markdown',
-      disable_web_page_preview: true
-    };
-
-    if (keyboard) {
-      messageData.reply_markup = keyboard;
-    }
-
-    try {
-      // В режиме разработки просто логируем
-      if (window.location.hostname === 'localhost') {
-        console.log('[Bot Integration] DEV: Отправка сообщения:', messageData);
-        this.showDevNotification(text);
-        return true;
-      }
-
-      // Отправляем через API
-      const response = await fetch(this.apiEndpoints.sendMessage, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-ID': this.userId
-        },
-        body: JSON.stringify(messageData)
-      });
-
-      if (response.ok) {
-        console.log('[Bot Integration] Уведомление отправлено');
-        return true;
-      } else {
-        console.error('[Bot Integration] Ошибка отправки:', response.status);
-        return false;
-      }
-      
-    } catch (error) {
-      console.error('[Bot Integration] Ошибка API:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Показ dev уведомления для режима разработки
-   */
-  showDevNotification(message) {
-    // Создаем элемент уведомления для разработки
-    const notification = document.createElement('div');
-    notification.className = 'dev-bot-notification';
-    notification.style.cssText = `
+    const toast = document.createElement('div');
+    toast.className = 'simple-toast';
+    toast.style.cssText = `
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      max-width: 300px;
-      background: #0088cc;
-      color: white;
-      padding: 12px 16px;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card-color);
+      color: var(--text-color);
+      padding: 12px 20px;
       border-radius: 8px;
-      font-size: 13px;
-      line-height: 1.4;
-      z-index: 10000;
+      border: 2px solid var(--border-color);
+      box-shadow: var(--box-shadow);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      z-index: 10001;
       opacity: 0;
-      transform: translateY(20px);
       transition: all 300ms ease;
-      white-space: pre-line;
+      max-width: 90%;
+      text-align: center;
     `;
-
-    // Убираем Markdown для отображения
-    const plainText = message.replace(/\*([^*]+)\*/g, '$1');
-    notification.textContent = `🤖 Bot: ${plainText}`;
-
-    document.body.appendChild(notification);
+    
+    toast.textContent = message;
+    document.body.appendChild(toast);
 
     // Анимация появления
     requestAnimationFrame(() => {
-      notification.style.opacity = '1';
-      notification.style.transform = 'translateY(0)';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
     });
 
-    // Автоскрытие через 5 секунд
+    // Автоскрытие
     setTimeout(() => {
-      notification.style.opacity = '0';
-      notification.style.transform = 'translateY(20px)';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-20px)';
       
       setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
         }
       }, 300);
-    }, 5000);
+    }, duration);
   }
 
   /**
-   * Обновление настроек уведомлений
-   */
-  async updateNotificationSettings(newSettings) {
-    // Обновляем локальные настройки
-    this.notificationSettings = {
-      ...this.notificationSettings,
-      ...newSettings
-    };
-
-    // Сохраняем в localStorage
-    try {
-      localStorage.setItem('telegramNotificationSettings', 
-        JSON.stringify(this.notificationSettings));
-    } catch (error) {
-      console.warn('[Bot Integration] Не удалось сохранить настройки локально:', error);
-    }
-
-    // Отправляем на сервер
-    await this.saveServerSettings();
-    
-    console.log('[Bot Integration] Настройки обновлены:', this.notificationSettings);
-    
-    // Отправляем подтверждение
-    if (newSettings.enabled !== undefined) {
-      const status = newSettings.enabled ? 'включены' : 'отключены';
-      await this.sendMessage(`⚙️ Уведомления ${status}`);
-    }
-  }
-
-  /**
-   * Сохранение настроек на сервер
-   */
-  async saveServerSettings() {
-    if (!this.isEnabled) return;
-
-    try {
-      const response = await fetch(this.apiEndpoints.setSettings, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-ID': this.userId
-        },
-        body: JSON.stringify({
-          userId: this.userId,
-          settings: this.notificationSettings
-        })
-      });
-
-      if (!response.ok) {
-        console.warn('[Bot Integration] Не удалось сохранить настройки на сервере');
-      }
-    } catch (error) {
-      console.warn('[Bot Integration] Сервер настроек недоступен:', error);
-    }
-  }
-
-  /**
-   * Включение/отключение уведомлений
-   */
-  async setEnabled(enabled) {
-    await this.updateNotificationSettings({ enabled });
-  }
-
-  /**
-   * Настройка фильтра категорий
-   */
-  async setCategoryFilter(filter) {
-    await this.updateNotificationSettings({ categoryFilter: filter });
-  }
-
-  /**
-   * Настройка тихих часов
-   */
-  async setQuietHours(enabled, startTime = '22:00', endTime = '08:00') {
-    await this.updateNotificationSettings({
-      quietHours: {
-        enabled,
-        start: startTime,
-        end: endTime
-      }
-    });
-  }
-
-  /**
-   * Настройка типов уведомлений
-   */
-  async setNotificationTypes(types) {
-    const validTypes = ['newVacancies', 'favoriteUpdates'];
-    const updates = {};
-    
-    validTypes.forEach(type => {
-      if (types.hasOwnProperty(type)) {
-        updates[type] = types[type];
-      }
-    });
-    
-    await this.updateNotificationSettings(updates);
-  }
-
-  /**
-   * Тест уведомления
-   */
-  async testNotification() {
-    const testMessage = `🧪 *Тест уведомлений*\n\nЭто тестовое сообщение для проверки работы уведомлений.\n\n✅ Уведомления работают корректно!`;
-    
-    return await this.sendMessage(testMessage, {
-      inline_keyboard: [
-        [{ text: '⚙️ Настройки уведомлений', callback_data: 'settings_notifications' }]
-      ]
-    });
-  }
-
-  /**
-   * Получение текущих настроек
+   * Получение настроек
    */
   getSettings() {
-    return { ...this.notificationSettings };
-  }
-
-  /**
-   * Получение статуса интеграции
-   */
-  getStatus() {
-    return {
-      enabled: this.isEnabled,
-      userId: this.userId,
-      chatId: this.chatId,
-      settings: this.notificationSettings,
-      quietTime: this.isQuietTime()
-    };
-  }
-
-  /**
-   * Обработка callback от бота
-   */
-  handleBotCallback(callbackData, messageId) {
-    console.log('[Bot Integration] Callback получен:', callbackData);
-    
-    if (callbackData.startsWith('fav_')) {
-      const vacancyId = callbackData.replace('fav_', '');
-      this.handleFavoriteCallback(vacancyId, messageId);
-    } else if (callbackData.startsWith('apply_')) {
-      const vacancyId = callbackData.replace('apply_', '');
-      this.handleApplyCallback(vacancyId, messageId);
-    } else if (callbackData === 'settings_notifications') {
-      this.handleSettingsCallback(messageId);
-    }
-  }
-
-  /**
-   * Обработка добавления в избранное через бот
-   */
-  async handleFavoriteCallback(vacancyId, messageId) {
-    // Эмулируем добавление в избранное
-    document.dispatchEvent(new CustomEvent('bot-favorite-request', {
-      detail: { vacancyId, messageId }
-    }));
-  }
-
-  /**
-   * Обработка отклика через бот
-   */
-  async handleApplyCallback(vacancyId, messageId) {
-    // Эмулируем отклик на вакансию
-    document.dispatchEvent(new CustomEvent('bot-apply-request', {
-      detail: { vacancyId, messageId }
-    }));
-  }
-
-  /**
-   * Обработка запроса настроек
-   */
-  async handleSettingsCallback(messageId) {
-    const settingsMessage = this.formatSettingsMessage();
-    const keyboard = this.createSettingsKeyboard();
-    
-    await this.sendMessage(settingsMessage, keyboard);
-  }
-
-  /**
-   * Форматирование сообщения настроек
-   */
-  formatSettingsMessage() {
-    const settings = this.notificationSettings;
-    
-    let message = '⚙️ *Настройки уведомлений*\n\n';
-    message += `Статус: ${settings.enabled ? '✅ Включены' : '❌ Отключены'}\n`;
-    message += `Новые вакансии: ${settings.newVacancies ? '✅' : '❌'}\n`;
-    message += `Обновления избранного: ${settings.favoriteUpdates ? '✅' : '❌'}\n`;
-    
-    const filterMap = {
-      all: 'Все категории',
-      main: 'Только "Точно твоё"',
-      maybe: 'Только "Может быть"',
-      other: 'Только "Не твоё"'
-    };
-    message += `Фильтр: ${filterMap[settings.categoryFilter]}\n`;
-    
-    if (settings.quietHours.enabled) {
-      message += `Тихие часы: ${settings.quietHours.start} - ${settings.quietHours.end}\n`;
-    } else {
-      message += `Тихие часы: Отключены\n`;
-    }
-    
-    return message;
-  }
-
-  /**
-   * Создание клавиатуры настроек
-   */
-  createSettingsKeyboard() {
-    return {
-      inline_keyboard: [
-        [{ text: '📱 Открыть настройки в приложении', web_app: { url: `${window.location.origin}/settings.html` } }],
-        [{ text: '🧪 Тест уведомлений', callback_data: 'test_notification' }]
-      ]
-    };
+    return { ...this.settings };
   }
 }
 
 // Глобальный экспорт
-window.TelegramBotIntegration = TelegramBotIntegration;
+window.SimpleBotNotifications = SimpleBotNotifications;
 
 // Создаем глобальный экземпляр
-window.botIntegration = new TelegramBotIntegration();
+window.botIntegration = new SimpleBotNotifications();
 
-console.log('[Phase 3.2] Telegram Bot Integration инициализирован');
+console.log('[Phase 3.2] Simple Bot Notifications инициализирован');

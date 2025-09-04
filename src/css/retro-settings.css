@@ -877,9 +877,44 @@ input:checked + .toggle-slider:before {
 /* Стили для фокуса */
 .action-button:focus,
 .add-button:focus,
-.theme-toggle:focus {
+.theme-toggle:focus,
+.notifications-toggle:focus {
   outline: 2px solid var(--accent-blue);
   outline-offset: 2px;
+}
+
+/* === КНОПКА УВЕДОМЛЕНИЙ === */
+.notifications-toggle {
+  background: var(--card-color);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: var(--box-shadow);
+  transition: all var(--transition-fast);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+}
+
+.notifications-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px var(--border-color);
+}
+
+.notifications-toggle:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px var(--border-color);
+}
+
+/* Состояние выключенных уведомлений */
+.notifications-toggle.disabled {
+  background: var(--secondary-bg);
+  color: var(--hint-color);
 }
 
 /* Убираем скроллбар для двухколоночной сетки каналов */

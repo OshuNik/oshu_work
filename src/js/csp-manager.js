@@ -64,8 +64,8 @@
         // Скрипты: разрешаем inline handlers + CDN (без nonce чтобы не блокировать unsafe-inline)
         `script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
         
-        // Стили: собственные + Google Fonts + inline стили
-        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+        // Стили: собственные + Google Fonts + Bootstrap Icons + inline стили
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net`,
         
         // Шрифты: Google Fonts + Bootstrap Icons
         `font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net`,
@@ -110,8 +110,8 @@
         // Скрипты: разрешаем inline handlers + CDN (без nonce чтобы не блокировать unsafe-inline)
         `script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
         
-        // Стили: собственные + Google Fonts + inline стили
-        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+        // Стили: собственные + Google Fonts + Bootstrap Icons + inline стили
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net`,
         
         // Шрифты: Google Fonts + Bootstrap Icons
         `font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net`,

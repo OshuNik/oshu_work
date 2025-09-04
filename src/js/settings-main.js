@@ -9,6 +9,7 @@ import './config.js';
 
 // 2. UI модули  
 import './theme-manager.js';
+import './bot-integration.js';
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
