@@ -52,6 +52,10 @@ class SimpleBotNotifications {
 
     button.addEventListener('mousedown', () => {
       isLongPress = false;
+      
+      // Добавляем класс для анимации заливки
+      button.classList.add('long-pressing');
+      
       longPressTimer = setTimeout(() => {
         isLongPress = true;
         this.showCategoryMenu();
@@ -60,16 +64,24 @@ class SimpleBotNotifications {
 
     button.addEventListener('mouseup', () => {
       clearTimeout(longPressTimer);
+      // Убираем класс анимации заливки
+      button.classList.remove('long-pressing');
     });
 
     button.addEventListener('mouseleave', () => {
       clearTimeout(longPressTimer);
+      // Убираем класс анимации заливки
+      button.classList.remove('long-pressing');
     });
 
     // Для мобильных устройств
     button.addEventListener('touchstart', (e) => {
       e.preventDefault();
       isLongPress = false;
+      
+      // Добавляем класс для анимации заливки
+      button.classList.add('long-pressing');
+      
       longPressTimer = setTimeout(() => {
         isLongPress = true;
         this.showCategoryMenu();
@@ -83,6 +95,9 @@ class SimpleBotNotifications {
     button.addEventListener('touchend', (e) => {
       e.preventDefault();
       clearTimeout(longPressTimer);
+      
+      // Убираем класс анимации заливки
+      button.classList.remove('long-pressing');
       
       // Если это не было долгое нажатие - делаем обычный клик
       if (!isLongPress) {

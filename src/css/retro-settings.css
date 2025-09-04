@@ -194,7 +194,7 @@ body {
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Изменено на 3 колонки для 3-х вкладок */
+  grid-template-columns: repeat(2, 1fr); /* Изменено на 2 колонки для 2-х вкладок */
   background-color: transparent;
   padding: 0 10px;
   padding-bottom: env(safe-area-inset-bottom);
@@ -291,7 +291,7 @@ body {
 /* === КОНТЕНТ === */
 .settings-content {
   padding: var(--card-padding);
-  padding-bottom: 120px; /* Увеличенное место для 3-х вкладок */
+  padding-bottom: 100px; /* Место для 2-х вкладок */
   min-height: calc(100vh - 200px);
   max-width: 100%;
   overflow-x: hidden;
@@ -899,6 +899,32 @@ input:checked + .toggle-slider:before {
   align-items: center;
   justify-content: center;
   color: var(--text-color);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Анимация заливки при долгом нажатии */
+.notifications-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.8s ease-out;
+  z-index: 0;
+}
+
+.notifications-toggle.long-pressing::before {
+  transform: scaleX(1);
+}
+
+.notifications-toggle i {
+  position: relative;
+  z-index: 1;
 }
 
 .notifications-toggle:hover {
@@ -1069,19 +1095,19 @@ input:checked + .toggle-slider:before {
   }
   
   .tab-button {
-    padding: 8px 6px; /* Уменьшено для 3-х вкладок */
+    padding: 10px 8px; /* Увеличено для 2-х вкладок */
     min-width: 0; /* Позволяет сжиматься */
   }
   
   .tab-label {
-    font-size: 10px; /* Уменьшено для 3-х вкладок */
+    font-size: 12px; /* Увеличено для 2-х вкладок */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   
   .tab-count {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   /* Анимация для счетчиков во вкладках */
