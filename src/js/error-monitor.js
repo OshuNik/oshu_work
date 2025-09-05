@@ -254,7 +254,7 @@
 
     formatTelegramMessage(error) {
       const analysis = this.analyzeError(error);
-      const env = error.app.environment === 'production' ? '🔴 PROD' : '🟡 DEV';
+      const env = error.app.environment === 'production' ? '🌐 САЙТ' : '💻 ТЕСТ';
       
       // ЗАГОЛОВОК - компактно в одну строку
       let message = `${analysis.priorityEmoji} <b>${error.app.name}</b> ${env} ${analysis.urgencyBadge} ${analysis.categoryBadge}\n\n`;
@@ -495,15 +495,15 @@
 
     getCategoryBadge(category) {
       const badges = {
-        'Сетевая ошибка': '🌐 СЕТЬ',
+        'Сетевая ошибка': '🌐 ИНТЕРНЕТ',
         'Проблема загрузки': '📦 ЗАГРУЗКА',
-        'Авторизация': '🔐 AUTH',
-        'UI ошибка': '🎨 UI',
-        'LocalStorage': '💾 STORAGE',
-        'Debug': '🐛 DEBUG',
-        'Общая ошибка': '❌ ERROR'
+        'Авторизация': '🔐 ВХОД',
+        'UI ошибка': '🎨 ДИЗАЙН',
+        'LocalStorage': '💾 ПАМЯТЬ',
+        'Debug': '🔍 ОТЛАДКА',
+        'Общая ошибка': '⚠️ ОШИБКА'
       };
-      return badges[category] || '❓ UNKNOWN';
+      return badges[category] || '❓ НЕИЗВЕСТНО';
     }
 
     getErrorEmoji(type) {
