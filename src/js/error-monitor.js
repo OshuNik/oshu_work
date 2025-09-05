@@ -256,61 +256,59 @@
       const analysis = this.analyzeError(error);
       const env = error.app.environment === 'production' ? '🔴 PROD' : '🟡 DEV';
       
-      let message = `${analysis.priorityEmoji} <b>${error.app.name} ${env}</b>\n`;
-      message += `${analysis.urgencyBadge} ${analysis.categoryBadge}\n\n`;
+      // ЗАГОЛОВОК - компактно в одну строку
+      let message = `${analysis.priorityEmoji} <b>${error.app.name}</b> ${env} ${analysis.urgencyBadge} ${analysis.categoryBadge}\n\n`;
       
-      // Основная информация об ошибке
-      message += `📋 <b>Ошибка:</b> ${error.type}\n`;
-      message += `💬 <b>Сообщение:</b> <code>${this.escapeHtml(error.message)}</code>\n`;
+      // БЛОК 1: ОСНОВНАЯ ИНФОРМАЦИЯ
+      message += `📋 <b>ОШИБКА</b>\n`;
+      message += `${error.type}: <code>${this.escapeHtml(error.message)}</code>\n`;
       
       if (error.filename && error.filename !== 'unknown') {
-        message += `📄 <b>Файл:</b> ${error.filename}:${error.lineno}:${error.colno}\n`;
+        message += `📍 ${error.filename}:${error.lineno}:${error.colno}\n`;
       }
+      message += `🕐 ${new Date(error.timestamp).toLocaleString('ru')}\n\n`;
       
-      message += `🔗 <b>URL:</b> ${error.context.url}\n`;
-      message += `⏰ <b>Время:</b> ${new Date(error.timestamp).toLocaleString('ru')}\n`;
+      // БЛОК 2: АНАЛИЗ - сокращенно
+      message += `🎯 <b>АНАЛИЗ</b>\n`;
+      message += `Приоритет: <b>${analysis.priority}</b> | Влияние: ${analysis.impact}\n\n`;
       
-      // Информация о пользователе
-      if (error.telegram) {
-        message += `📱 <b>Платформа:</b> Telegram ${error.telegram.platform}\n`;
-      }
-      message += `💻 <b>Браузер:</b> ${error.context.platform}\n`;
-      message += `📐 <b>Экран:</b> ${error.context.viewport}\n`;
-      
-      // Блок анализа и рекомендаций
-      message += `\n🔍 <b>АНАЛИЗ:</b>\n`;
-      message += `• <b>Приоритет:</b> ${analysis.priority}\n`;
-      message += `• <b>Влияние:</b> ${analysis.impact}\n`;
-      message += `• <b>Частота:</b> ${analysis.frequency}\n`;
-      
-      message += `\n💡 <b>РЕКОМЕНДАЦИИ:</b>\n`;
-      analysis.recommendations.forEach((rec, i) => {
-        message += `${i + 1}. ${rec}\n`;
-      });
-      
-      // Если есть быстрые действия
+      // БЛОК 3: ДЕЙСТВИЯ - только важные
       if (analysis.quickActions.length > 0) {
-        message += `\n⚡ <b>БЫСТРЫЕ ДЕЙСТВИЯ:</b>\n`;
-        analysis.quickActions.forEach((action, i) => {
+        message += `⚡ <b>ДЕЙСТВИЯ</b>\n`;
+        analysis.quickActions.slice(0, 2).forEach((action, i) => {
           message += `${i + 1}. ${action}\n`;
         });
+        message += '\n';
+      } else if (analysis.recommendations.length > 0) {
+        message += `💡 <b>РЕКОМЕНДАЦИИ</b>\n`;
+        analysis.recommendations.slice(0, 2).forEach((rec, i) => {
+          message += `${i + 1}. ${rec}\n`;
+        });
+        message += '\n';
       }
       
-      // Stack trace (сокращенный для критичных ошибок)
-      if (error.stack) {
-        const stackLines = error.stack.split('\n').slice(0, analysis.priority === 'КРИТИЧЕСКИЙ' ? 3 : 5);
-        message += `\n📍 <b>Stack Trace:</b>\n<pre>${this.escapeHtml(stackLines.join('\n'))}</pre>`;
+      // БЛОК 4: ТЕХНИЧЕСКАЯ ИНФОРМАЦИЯ - кратко
+      message += `🔧 <b>КОНТЕКСТ</b>\n`;
+      if (error.telegram) {
+        message += `Telegram ${error.telegram.platform} | `;
+      }
+      message += `${error.context.platform}\n`;
+      message += `Экран: ${error.context.viewport} | <a href="${error.context.url}">Открыть страницу</a>\n\n`;
+      
+      // БЛОК 5: STACK TRACE - только для критичных ошибок
+      if (error.stack && analysis.priority === 'КРИТИЧЕСКИЙ') {
+        const stackLines = error.stack.split('\n').slice(0, 3);
+        message += `📍 <b>STACK</b>\n<pre>${this.escapeHtml(stackLines.join('\n'))}</pre>\n`;
       }
 
-      // Дополнительный контекст для критичных ошибок
+      // КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ
       if (analysis.priority === 'КРИТИЧЕСКИЙ') {
-        message += `\n🚨 <b>ТРЕБУЕТ НЕМЕДЛЕННОГО ВНИМАНИЯ!</b>\n`;
-        message += `Пользователи могут испытывать серьезные проблемы.`;
+        message += `\n🚨 <b>ТРЕБУЕТ НЕМЕДЛЕННОГО ВНИМАНИЯ!</b>`;
       }
 
       // Обрезаем сообщение если слишком длинное (Telegram limit 4096)
       if (message.length > 4000) {
-        message = message.substring(0, 3900) + '\n\n...[сообщение обрезано]';
+        message = message.substring(0, 3900) + '\n\n...[обрезано]';
       }
 
       return message;
