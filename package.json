@@ -12,18 +12,33 @@
     "serve": "vite preview --port 4173",
     "clean": "rm -rf dist",
     "mock-ws": "node mock-websocket-server.js",
-    "dev:full": "concurrently \"npm run mock-ws\" \"npm run dev\""
+    "dev:full": "concurrently \"npm run mock-ws\" \"npm run dev\"",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
+    "test:modules": "vitest run src/modules",
+    "test:ci": "vitest run --reporter=verbose --coverage"
   },
   "devDependencies": {
-    "vite": "^5.4.3",
-    "terser": "^5.31.6",
+    "@vitest/ui": "^3.2.4",
     "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
+    "happy-dom": "^18.0.1",
+    "jsdom": "^26.1.0",
     "socket.io": "^4.7.5",
-    "cors": "^2.8.5"
+    "terser": "^5.31.6",
+    "vite": "^5.4.3",
+    "vitest": "^3.2.4"
   },
-  "dependencies": {},
-  "keywords": ["telegram", "mini-app", "job-parser", "vite"],
+  "keywords": [
+    "telegram",
+    "mini-app",
+    "job-parser",
+    "vite"
+  ],
   "author": "",
   "license": "MIT",
   "repository": {
