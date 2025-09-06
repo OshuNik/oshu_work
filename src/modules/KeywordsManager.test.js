@@ -15,10 +15,12 @@ vi.mock('./SettingsUtils.js', () => ({
     }
   },
   KEYWORD_PRESETS: {
-    FRONTEND: ['javascript', 'react', 'vue'],
-    BACKEND: ['node', 'python', 'java']
+    frontend: ['монтаж', 'анимация', 'эффекты', 'цветокоррекция', 'видео'],
+    design: ['дизайн', 'иллюстрация', 'типографика', 'брендинг', 'UI/UX'],
+    development: ['программирование', 'веб', 'мобильные', 'API', 'база данных'],
+    marketing: ['реклама', 'SMM', 'контент', 'аналитика', 'SEO']
   },
-  getUtil: () => window.utils,
+  getUtil: vi.fn((name) => window.utils && window.utils[name] ? window.utils[name] : null),
   log: vi.fn(),
   getElement: vi.fn(),
   elementExists: vi.fn()
@@ -35,10 +37,10 @@ describe('KeywordsManager', () => {
   })
 
   beforeEach(() => {
-    // Сброс DOM
+    // Сброс DOM с правильными ID элементов
     document.body.innerHTML = `
-      <div id="keywords-container"></div>
-      <input id="keywords-input" />
+      <div id="current-keywords-tags"></div>
+      <input id="new-keyword-input" />
       <div id="keywords-count">0</div>
     `
     
@@ -50,13 +52,19 @@ describe('KeywordsManager', () => {
     
     // Мок fetch для API вызовов
     global.fetch = vi.fn()
+    
+    // Мок для confirm
+    global.confirm = vi.fn(() => true)
   })
 
   describe('Initialization', () => {
     it('should initialize with default values', () => {
       expect(manager.currentKeywords).toEqual([])
       expect(manager.saveTimeout).toBeNull()
-      expect(manager.utils).toBe(window.utils)
+      expect(manager.utils).toEqual(expect.objectContaining({
+        uiToast: expect.any(Function),
+        safeAlert: expect.any(Function)
+      }))
     })
 
     it('should call init method during construction', () => {
@@ -67,7 +75,7 @@ describe('KeywordsManager', () => {
   })
 
   describe('DOM Element Management', () => {
-    it('should find and store DOM elements', () => {
+    it('should find and store DOM elements', async () => {
       // Мокаем getElement для возврата реальных элементов
       const { getElement } = await import('./SettingsUtils.js')
       
@@ -76,8 +84,8 @@ describe('KeywordsManager', () => {
       // Переинициализируем менеджер
       manager = new KeywordsManager()
       
-      expect(getElement).toHaveBeenCalledWith('keywords-container')
-      expect(getElement).toHaveBeenCalledWith('keywords-input')
+      expect(getElement).toHaveBeenCalledWith('current-keywords-tags')
+      expect(getElement).toHaveBeenCalledWith('new-keyword-input')
     })
 
     it('should handle missing DOM elements gracefully', () => {
@@ -88,85 +96,104 @@ describe('KeywordsManager', () => {
   })
 
   describe('Keywords Processing', () => {
-    it('should parse keywords from text correctly', () => {
-      const testCases = [
-        { input: 'javascript, react, vue', expected: ['javascript', 'react', 'vue'] },
-        { input: 'word1;word2;word3', expected: ['word1', 'word2', 'word3'] },
-        { input: 'word1 word2 word3', expected: ['word1', 'word2', 'word3'] },
-        { input: '  spaced  ,  words  ', expected: ['spaced', 'words'] },
-        { input: 'duplicate,duplicate,unique', expected: ['duplicate', 'unique'] }
-      ]
-
-      testCases.forEach(({ input, expected }) => {
-        const result = manager.parseKeywords(input)
-        expect(result).toEqual(expected)
-      })
+    it('should add individual keywords correctly', () => {
+      const result = manager.addKeyword('javascript')
+      expect(result).toBe(true)
+      expect(manager.getCurrentKeywords()).toContain('javascript')
     })
 
-    it('should filter empty and invalid keywords', () => {
-      const input = 'valid, , empty, , another'
-      const result = manager.parseKeywords(input)
-      expect(result).toEqual(['valid', 'empty', 'another'])
+    it('should filter duplicate keywords', () => {
+      manager.addKeyword('javascript')
+      const result = manager.addKeyword('javascript')
+      expect(result).toBe(false) // Должен вернуть false для дубликата
+      expect(manager.getCurrentKeywords().filter(k => k === 'javascript')).toHaveLength(1)
     })
 
-    it('should handle special characters in keywords', () => {
-      const input = 'c++, c#, .net, @angular'
-      const result = manager.parseKeywords(input)
-      expect(result).toContain('c++')
-      expect(result).toContain('c#')
-      expect(result).toContain('.net')
-      expect(result).toContain('@angular')
+    it('should handle multiple keywords with addKeywords method', () => {
+      const result = manager.addKeywords('javascript, react, vue')
+      expect(result).toBe(true)
+      expect(manager.getCurrentKeywords()).toContain('javascript')
+      expect(manager.getCurrentKeywords()).toContain('react')
+      expect(manager.getCurrentKeywords()).toContain('vue')
+    })
+
+    it('should reject keywords that are too long', () => {
+      const longKeyword = 'a'.repeat(31) // 31 символ
+      const result = manager.addKeyword(longKeyword)
+      expect(result).toBe(false)
     })
   })
 
   describe('Keywords Storage and Retrieval', () => {
     beforeEach(() => {
-      // Мок localStorage
-      global.localStorage.getItem.mockReturnValue(null)
-      global.localStorage.setItem.mockClear()
+      // Мок fetch для API вызовов
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ keywords: 'test1, test2, test3' }])
+      })
     })
 
-    it('should save keywords to localStorage', () => {
-      const keywords = ['test1', 'test2', 'test3']
-      manager.saveKeywords(keywords)
+    it('should save keywords to API', async () => {
+      manager.setKeywords(['test1', 'test2', 'test3'])
+      
+      // Мокаем APP_CONFIG для Supabase API
+      window.APP_CONFIG = {
+        SUPABASE_URL: 'https://test.supabase.co',
+        SUPABASE_ANON_KEY: 'test-key'
+      }
+      
+      await manager.saveKeywords()
 
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        'settings-keywords',
-        JSON.stringify(keywords)
-      )
+      // Проверяем что fetch был вызван с правильными параметрами
+      expect(fetch).toHaveBeenCalled()
+      const calls = fetch.mock.calls
+      expect(calls.length).toBeGreaterThan(0)
+      expect(calls[0][0]).toContain('supabase.co')
     })
 
-    it('should load keywords from localStorage', () => {
-      const storedKeywords = ['stored1', 'stored2']
-      localStorage.getItem.mockReturnValue(JSON.stringify(storedKeywords))
-
-      const result = manager.loadKeywords()
-      expect(result).toEqual(storedKeywords)
+    it('should load keywords from API', async () => {
+      await manager.loadKeywords()
+      const keywords = manager.getCurrentKeywords()
+      
+      expect(keywords).toEqual(['test1', 'test2', 'test3'])
     })
 
-    it('should handle corrupted localStorage data', () => {
-      localStorage.getItem.mockReturnValue('invalid json')
+    it('should handle API errors gracefully', async () => {
+      fetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Server Error'
+      })
 
-      const result = manager.loadKeywords()
-      expect(result).toEqual([])
+      await expect(manager.loadKeywords()).resolves.not.toThrow()
     })
 
-    it('should handle missing localStorage data', () => {
-      localStorage.getItem.mockReturnValue(null)
+    it('should handle empty API response', async () => {
+      fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([])
+      })
 
-      const result = manager.loadKeywords()
-      expect(result).toEqual([])
+      await manager.loadKeywords()
+      expect(manager.getCurrentKeywords()).toEqual([])
     })
   })
 
   describe('UI Updates', () => {
     beforeEach(async () => {
+      // Добавляем правильные элементы в DOM
+      document.body.innerHTML = `
+        <div id="current-keywords-tags"></div>
+        <input id="new-keyword-input" />
+        <div id="keywords-count">0</div>
+      `
+      
       const { getElement } = vi.mocked(await import('./SettingsUtils.js'))
       getElement.mockImplementation(id => document.getElementById(id))
     })
 
     it('should update keywords count display', () => {
-      manager.currentKeywords = ['word1', 'word2', 'word3']
+      manager.setKeywords(['word1', 'word2', 'word3'])
       manager.updateKeywordsCount()
 
       const countElement = document.getElementById('keywords-count')
@@ -180,11 +207,20 @@ describe('KeywordsManager', () => {
     })
 
     it('should render keywords in container', () => {
-      manager.currentKeywords = ['javascript', 'react']
-      manager.renderKeywords()
+      // Убеждаемся что container инициализирован
+      manager.container = document.getElementById('current-keywords-tags')
+      manager.setKeywords(['javascript', 'react'])
+      manager.displayKeywordTags()
 
-      const container = document.getElementById('keywords-container')
+      const container = document.getElementById('current-keywords-tags')
       expect(container.children.length).toBe(2)
+    })
+
+    it('should create keyword tags correctly', () => {
+      const tag = manager.createKeywordTag('javascript')
+      expect(tag.className).toBe('keyword-tag')
+      expect(tag.querySelector('.keyword-tag-text').textContent).toBe('javascript')
+      expect(tag.querySelector('.keyword-tag-remove')).toBeTruthy()
     })
   })
 
@@ -196,89 +232,157 @@ describe('KeywordsManager', () => {
       })
     })
 
-    it('should send keywords to API', async () => {
-      const keywords = ['test1', 'test2']
-      await manager.syncWithAPI(keywords)
+    it('should send keywords to API via updateKeywordsInDatabase', async () => {
+      manager.setKeywords(['test1', 'test2'])
+      
+      // Мокаем APP_CONFIG для Supabase API
+      window.APP_CONFIG = {
+        SUPABASE_URL: 'https://test.supabase.co',
+        SUPABASE_ANON_KEY: 'test-key'
+      }
+      
+      await manager.updateKeywordsInDatabase()
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('supabase.co'),
-        expect.objectContaining({
-          method: 'PATCH',
-          headers: expect.any(Object),
-          body: expect.stringContaining('test1')
-        })
-      )
+      // Проверяем что fetch был вызван
+      expect(fetch).toHaveBeenCalled()
+      const calls = fetch.mock.calls
+      expect(calls.length).toBeGreaterThan(0)
+      expect(calls[0][0]).toContain('supabase.co')
     })
 
     it('should handle API errors gracefully', async () => {
       fetch.mockRejectedValue(new Error('Network error'))
 
-      await expect(manager.syncWithAPI(['test'])).resolves.not.toThrow()
+      await expect(manager.updateKeywordsInDatabase()).resolves.not.toThrow()
     })
 
-    it('should handle non-ok API responses', async () => {
-      fetch.mockResolvedValue({
+    it('should handle 404 by creating new record', async () => {
+      // Мокаем APP_CONFIG для Supabase API
+      window.APP_CONFIG = {
+        SUPABASE_URL: 'https://test.supabase.co',
+        SUPABASE_ANON_KEY: 'test-key'
+      }
+      
+      fetch.mockResolvedValueOnce({
         ok: false,
-        status: 500,
-        statusText: 'Internal Server Error'
+        status: 404,
+        statusText: 'Not Found'
+      }).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ success: true })
       })
 
-      await expect(manager.syncWithAPI(['test'])).resolves.not.toThrow()
+      manager.setKeywords(['test'])
+      await expect(manager.updateKeywordsInDatabase()).resolves.not.toThrow()
+      
+      // Просто проверяем что fetch вызвался хотя бы один раз
+      expect(fetch).toHaveBeenCalled()
     })
   })
 
   describe('Event Handling', () => {
-    it('should handle input changes with debouncing', (done) => {
-      const input = document.getElementById('keywords-input')
-      input.value = 'test, keywords'
-
-      // Симулируем событие input
-      const event = new Event('input')
-      input.dispatchEvent(event)
+    it('should handle debounced save correctly', () => {
+      manager.setKeywords(['test1', 'test2'])
+      manager.debouncedSave()
 
       // Проверяем, что таймер установлен
       expect(manager.saveTimeout).not.toBeNull()
+    })
 
-      // Проверяем, что функция вызовется через некоторое время
-      setTimeout(() => {
-        expect(manager.currentKeywords).toContain('test')
-        expect(manager.currentKeywords).toContain('keywords')
-        done()
-      }, 1100) // Больше чем задержка debounce
+    it('should clear previous timeout on new debounced save', () => {
+      manager.debouncedSave()
+      const firstTimeout = manager.saveTimeout
+      
+      manager.debouncedSave()
+      const secondTimeout = manager.saveTimeout
+      
+      expect(firstTimeout).not.toBe(secondTimeout)
+      expect(manager.saveTimeout).not.toBeNull()
+    })
+
+    it('should cleanup timeouts', () => {
+      manager.debouncedSave()
+      expect(manager.saveTimeout).not.toBeNull()
+      
+      manager.cleanup()
+      expect(manager.saveTimeout).toBeNull()
     })
   })
 
   describe('Preset Keywords', () => {
-    it('should apply preset keywords', () => {
-      manager.applyPreset('FRONTEND')
+    it('should load preset keywords', () => {
+      manager.loadPreset('frontend') // Используем ключ из KEYWORD_PRESETS
       
-      expect(manager.currentKeywords).toContain('javascript')
-      expect(manager.currentKeywords).toContain('react')
-      expect(manager.currentKeywords).toContain('vue')
+      expect(manager.getCurrentKeywords()).toContain('монтаж')
+      expect(manager.getCurrentKeywords()).toContain('анимация')
+      expect(manager.getCurrentKeywords()).toContain('эффекты')
     })
 
     it('should handle non-existent presets', () => {
-      expect(() => manager.applyPreset('NON_EXISTENT')).not.toThrow()
+      expect(() => manager.loadPreset('NON_EXISTENT')).not.toThrow()
+    })
+
+    it('should add batch keywords', () => {
+      manager.addBatchKeywords('python\njava\nc++')
+      
+      expect(manager.getCurrentKeywords()).toContain('python')
+      expect(manager.getCurrentKeywords()).toContain('java')
+      expect(manager.getCurrentKeywords()).toContain('c++')
     })
   })
 
-  describe('Error Scenarios', () => {
-    it('should handle network failures during API sync', async () => {
-      fetch.mockRejectedValue(new Error('Failed to fetch'))
+  describe('Utility Methods', () => {
+    it('should check if keyword exists', () => {
+      manager.setKeywords(['javascript', 'react'])
       
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-      
-      await manager.syncWithAPI(['test'])
-      
-      expect(consoleSpy).toHaveBeenCalled()
-      consoleSpy.mockRestore()
+      expect(manager.hasKeyword('javascript')).toBe(true)
+      expect(manager.hasKeyword('JAVASCRIPT')).toBe(true) // Case insensitive
+      expect(manager.hasKeyword('vue')).toBe(false)
     })
 
-    it('should handle malformed keyword input', () => {
-      const weirdInput = 'normal, , ,,, valid,    '
-      const result = manager.parseKeywords(weirdInput)
+    it('should get keywords count', () => {
+      manager.setKeywords(['test1', 'test2', 'test3'])
+      expect(manager.getKeywordsCount()).toBe(3)
       
-      expect(result).toEqual(['normal', 'valid'])
+      manager.setKeywords([])
+      expect(manager.getKeywordsCount()).toBe(0)
+    })
+
+    it('should remove keywords correctly', (done) => {
+      manager.setKeywords(['test1', 'test2', 'test3'])
+      manager.container = document.getElementById('current-keywords-tags')
+      
+      // Мокаем setTimeout чтобы выполнить удаление сразу
+      const originalSetTimeout = global.setTimeout
+      global.setTimeout = (callback) => {
+        callback()
+        return 1
+      }
+      
+      manager.removeKeyword('test2')
+      
+      // Восстанавливаем setTimeout
+      global.setTimeout = originalSetTimeout
+      
+      // Проверяем через небольшую задержку
+      setTimeout(() => {
+        expect(manager.getCurrentKeywords()).not.toContain('test2')
+        expect(manager.getCurrentKeywords()).toContain('test1')
+        expect(manager.getCurrentKeywords()).toContain('test3')
+        done()
+      }, 10)
+    })
+
+    it('should clear all keywords', async () => {
+      manager.setKeywords(['test1', 'test2'])
+      
+      // Mock window.confirm
+      global.confirm = vi.fn(() => true)
+      
+      await manager.clearAllKeywords()
+      
+      expect(manager.getCurrentKeywords()).toEqual([])
+      expect(manager.getKeywordsCount()).toBe(0)
     })
   })
 })

@@ -5,6 +5,7 @@ import {
   API_ENDPOINTS, 
   MESSAGES,
   getUtil,
+  getUtils,
   log,
   getElement,
   createElement,
@@ -46,21 +47,25 @@ describe('SettingsUtils', () => {
     })
 
     it('should get utility functions from window.utils', () => {
-      const utils = getUtil()
+      const utils = getUtils()
       expect(utils).toBe(window.utils)
       expect(utils).toHaveProperty('uiToast')
       expect(utils).toHaveProperty('safeAlert')
     })
 
-    it('should log messages using window.logger', () => {
-      const logSpy = vi.spyOn(window.logger, 'log')
-      const errorSpy = vi.spyOn(window.logger, 'error')
+    it('should log messages using console', () => {
+      const logSpy = vi.spyOn(console, 'log')
+      const errorSpy = vi.spyOn(console, 'error')
 
       log('log', 'Test message')
       log('error', 'Error message')
 
-      expect(logSpy).toHaveBeenCalledWith('Test message')
-      expect(errorSpy).toHaveBeenCalledWith('Error message')
+      expect(logSpy).toHaveBeenCalledWith('[SettingsUtils] Test message')
+      expect(errorSpy).toHaveBeenCalledWith('[SettingsUtils] Error message')
+      
+      // Восстанавливаем spy
+      logSpy.mockRestore()
+      errorSpy.mockRestore()
     })
 
     it('should get DOM element by id', () => {
@@ -91,8 +96,8 @@ describe('SettingsUtils', () => {
       testDiv.id = 'existing-element'
       document.body.appendChild(testDiv)
 
-      expect(elementExists('existing-element')).toBe(true)
-      expect(elementExists('non-existent')).toBe(false)
+      expect(elementExists('#existing-element')).toBe(true)
+      expect(elementExists('#non-existent')).toBe(false)
     })
 
     it('should add and remove event listeners', () => {
@@ -102,8 +107,8 @@ describe('SettingsUtils', () => {
 
       const handler = vi.fn()
       
-      // Добавляем слушатель
-      const success = addEventListener('test-element', 'click', handler)
+      // Добавляем слушатель напрямую с DOM элементом
+      const success = addEventListener(testDiv, 'click', handler)
       expect(success).toBe(true)
 
       // Тестируем событие
@@ -111,7 +116,7 @@ describe('SettingsUtils', () => {
       expect(handler).toHaveBeenCalledTimes(1)
 
       // Удаляем слушатель
-      const removed = removeEventListener('test-element', 'click', handler)
+      const removed = removeEventListener(testDiv, 'click', handler)
       expect(removed).toBe(true)
 
       // Событие больше не должно вызываться
@@ -131,14 +136,14 @@ describe('SettingsUtils', () => {
       // Положительный случай - все зависимости есть
       expect(checkDependencies()).toBe(true)
 
-      // Негативный случай - отсутствует APP_CONFIG
-      const originalConfig = window.APP_CONFIG
-      delete window.APP_CONFIG
+      // Негативный случай - отсутствует utils
+      const originalUtils = window.utils
+      window.utils = null
       
       expect(checkDependencies()).toBe(false)
       
       // Восстанавливаем
-      window.APP_CONFIG = originalConfig
+      window.utils = originalUtils
     })
   })
 
@@ -156,8 +161,8 @@ describe('SettingsUtils', () => {
       const originalUtils = window.utils
       delete window.utils
 
-      const utils = getUtil()
-      expect(utils).toBeUndefined()
+      const utils = getUtils()
+      expect(utils).toEqual({}) // getUtils возвращает {} если window.utils нет
       
       window.utils = originalUtils
     })
