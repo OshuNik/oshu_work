@@ -26,7 +26,7 @@ class TelegramIntegration {
     // Определяем версию по доступным методам/свойствам
     if (this.tg.version) {
       this.apiVersion = this.tg.version;
-      console.log(`📱 Telegram WebApp API версия: ${this.apiVersion}`);
+      logger.log(`📱 Telegram WebApp API версия: ${this.apiVersion}`);
     } else {
       // Fallback определение версии по возможностям
       if (this.tg.SettingsButton) {
@@ -34,7 +34,7 @@ class TelegramIntegration {
       } else {
         this.apiVersion = '6.0';
       }
-      console.log(`📱 Telegram WebApp API версия (определена): ${this.apiVersion}`);
+      logger.log(`📱 Telegram WebApp API версия (определена): ${this.apiVersion}`);
     }
 
     // Логируем доступные возможности
@@ -46,7 +46,7 @@ class TelegramIntegration {
       BackButton: !!this.tg.BackButton
     };
     
-    console.log('🔍 Доступные возможности:', capabilities);
+    logger.log('🔍 Доступные возможности:', capabilities);
   }
 
   async init() {
@@ -67,19 +67,19 @@ class TelegramIntegration {
       if (this.isClosingConfirmationSupported()) {
         try {
           this.tg.enableClosingConfirmation();
-          console.log('✅ Closing confirmation активирован');
+          logger.log('✅ Closing confirmation активирован');
         } catch (error) {
           console.warn('⚠️ Closing confirmation не поддерживается:', error.message);
         }
       } else {
-        console.log('ℹ️ Closing confirmation требует более новую версию Telegram WebApp API');
+        logger.log('ℹ️ Closing confirmation требует более новую версию Telegram WebApp API');
       }
       
       // Уведомляем о готовности
       this.tg.ready();
       this.isReady = true;
       
-      console.log('✅ Telegram Integration готов');
+      logger.log('✅ Telegram Integration готов');
     } catch (error) {
       console.error('❌ Ошибка инициализации Telegram Integration:', error);
     }
@@ -158,7 +158,7 @@ class TelegramIntegration {
 
     // Строгая проверка версии API - только для 6.1+
     if (!this.tg.SettingsButton) {
-      console.log('ℹ️ SettingsButton не поддерживается в Telegram WebApp API версии ' + (this.apiVersion || 'неизвестной'));
+      logger.log('ℹ️ SettingsButton не поддерживается в Telegram WebApp API версии ' + (this.apiVersion || 'неизвестной'));
       return;
     }
 
@@ -166,7 +166,7 @@ class TelegramIntegration {
     if (this.apiVersion && this.apiVersion !== '6.1+') {
       const version = parseFloat(this.apiVersion);
       if (version && version < 6.1) {
-        console.log('ℹ️ SettingsButton требует Telegram WebApp API версии 6.1 или выше');
+        logger.log('ℹ️ SettingsButton требует Telegram WebApp API версии 6.1 или выше');
         return;
       }
     }
@@ -183,7 +183,7 @@ class TelegramIntegration {
           });
         }
         
-        console.log('✅ SettingsButton активирован');
+        logger.log('✅ SettingsButton активирован');
       }
     } catch (error) {
       console.warn('⚠️ Ошибка при настройке SettingsButton:', error.message);

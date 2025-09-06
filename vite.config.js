@@ -9,13 +9,27 @@ export default defineConfig(({ command, mode }) => {
     // Base path для GitHub Pages
     base: isProd ? '/oshu_work/' : '/',
     
-    // Настройки сервера разработки
+    // Настройки сервера разработки с warmup
     server: {
       port: 5173,
       host: true, // Позволяет доступ из сети (полезно для тестирования на мобильных)
       open: true,
       // HTTPS для тестирования Telegram Mini App
-      https: false // включить при необходимости тестирования в Telegram
+      https: false, // включить при необходимости тестирования в Telegram
+      
+      // Advanced: Warmup стратегия для быстрого старта
+      warmup: {
+        clientFiles: [
+          // Предварительно прогреваем критичные файлы
+          './src/js/main.js',
+          './src/js/settings-main.js', 
+          './src/js/favorites-main.js',
+          './src/js/utils.min.js',
+          './src/js/constants.js',
+          './src/css/style.css',
+          './src/css/retro-settings.css'
+        ]
+      }
     },
     
     // Настройки превью
@@ -39,12 +53,27 @@ export default defineConfig(({ command, mode }) => {
         
         // Экстремальная оптимизация для Telegram Mini App
         output: {
-          // Ultra-compact filenames для кэширования
-          chunkFileNames: isProd ? 'js/[hash:8].js' : 'js/[name]-[hash:8].js',
-          assetFileNames: isProd ? 'assets/[hash:8].[ext]' : 'assets/[name]-[hash:8].[ext]',
-          entryFileNames: isProd ? 'js/[hash:8].js' : 'js/[name]-[hash:8].js',
+          // Продвинутое разделение чанков для оптимального кэширования
+          manualChunks: (id) => {
+            // Простое разделение на vendor и собственный код
+            if (id.includes('node_modules')) {
+              return 'vendor'
+            }
+            // Группировка собственных утилит 
+            if (id.includes('src/js/utils') || id.includes('src/js/constants')) {
+              return 'utils'
+            }
+            return null
+          },
           
-          // Упрощенное разделение чанков - пусть Vite сам оптимизирует
+          // Оптимизированные имена файлов для кэширования
+          chunkFileNames: (chunkInfo) => {
+            const facadeModuleId = chunkInfo.facadeModuleId ? 
+              chunkInfo.facadeModuleId.split('/').pop().replace(/\.[^/.]+$/, '') : 'chunk';
+            return isProd ? `js/${facadeModuleId}-[hash:8].js` : `js/${facadeModuleId}-[hash:8].js`;
+          },
+          assetFileNames: isProd ? 'assets/[hash:8].[ext]' : 'assets/[name]-[hash:8].[ext]',
+          entryFileNames: isProd ? 'js/[name]-[hash:8].js' : 'js/[name]-[hash:8].js',
           
           // Экстремальная оптимизация размера
           compact: true,
@@ -102,11 +131,19 @@ export default defineConfig(({ command, mode }) => {
         polyfill: false // Убираем polyfill для размера
       },
       
+      // JSON оптимизация
+      json: {
+        stringify: true // Быстрее парсинг JSON файлов
+      },
+      
       // Experimental optimizations
       experimental: {
         renderBuiltUrl: (filename) => {
-          // Custom asset URL handling если нужно
-          return filename;
+          // Оптимизированная URL генерация для CDN
+          if (isProd && filename.startsWith('assets/')) {
+            return `https://cdn.oshu.work/${filename}`
+          }
+          return filename
         }
       }
     },
@@ -119,14 +156,29 @@ export default defineConfig(({ command, mode }) => {
     // Настройки ассетов
     assetsInclude: ['**/*.gif', '**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg'],
     
-    // Optimizations
+    // Advanced Dependency Optimization
     optimizeDeps: {
+      // Принудительная оптимизация часто используемых модулей
       include: [
-        // Предварительная оптимизация зависимостей
+        // Оптимизация общих утилит
+        'src/js/utils.min.js',
+        'src/js/constants.js'
       ],
       exclude: [
-        // Исключения если нужны
-      ]
+        // Исключаем уже оптимизированные модули
+      ],
+      // Новая экспериментальная стратегия для больших проектов
+      holdUntilCrawlEnd: false, // Ускоряет cold start
+      // Принудительная перезагрузка оптимизации
+      force: false,
+      // Отключаем автообнаружение для контроля
+      noDiscovery: false,
+      // ESbuild настройки для оптимизации
+      esbuildOptions: {
+        target: 'es2015',
+        keepNames: false,
+        minify: isProd
+      }
     },
     
     // Plugin configuration (если понадобятся)

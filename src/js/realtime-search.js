@@ -32,8 +32,8 @@ class RealtimeSearch {
    * Инициализация real-time поиска
    */
   init() {
-    console.log('[Realtime Search] Начинаем инициализацию...');
-    console.log('[Realtime Search] DOM ready state:', document.readyState);
+    logger.log('[Realtime Search] Начинаем инициализацию...');
+    logger.log('[Realtime Search] DOM ready state:', document.readyState);
     
     this.searchInput = document.getElementById('search-input');
     
@@ -44,12 +44,12 @@ class RealtimeSearch {
       return;
     }
 
-    console.log('[Realtime Search] Поисковое поле найдено:', this.searchInput);
+    logger.log('[Realtime Search] Поисковое поле найдено:', this.searchInput);
     
     this.setupSearchHandlers();
     this.setupWebSocketListeners();
     
-    console.log('[Realtime Search] ✅ Инициализирован успешно');
+    logger.log('[Realtime Search] ✅ Инициализирован успешно');
   }
 
   /**
@@ -139,7 +139,7 @@ class RealtimeSearch {
    * Локальный поиск в уже загруженных вакансиях
    */
   performLocalSearch(query) {
-    console.log('[Realtime Search] Локальный поиск:', query);
+    logger.log('[Realtime Search] Локальный поиск:', query);
 
     const results = [];
     const normalizedQuery = query.toLowerCase();
@@ -169,12 +169,12 @@ class RealtimeSearch {
    * Server-side поиск через WebSocket
    */
   performServerSearch(query) {
-    console.log('[Realtime Search] Server-side поиск:', query);
+    logger.log('[Realtime Search] Server-side поиск:', query);
 
     // Проверяем кэш
     const cachedResults = this.getFromCache(query);
     if (cachedResults) {
-      console.log('[Realtime Search] Результаты из кэша');
+      logger.log('[Realtime Search] Результаты из кэша');
       this.handleServerSearchResults(cachedResults);
       return;
     }
@@ -261,7 +261,7 @@ class RealtimeSearch {
    * Обработка результатов server-side поиска
    */
   handleServerSearchResults(data) {
-    console.log('[Realtime Search] Server-side результаты:', data);
+    logger.log('[Realtime Search] Server-side результаты:', data);
     
     if (!data || !data.results) {
       this.showNoResults(data?.query || this.lastQuery);
@@ -566,7 +566,7 @@ class RealtimeSearch {
    */
   showSearchSuggestion(message) {
     // Реализация показа предложений
-    console.log('[Realtime Search] Предложение:', message);
+    logger.log('[Realtime Search] Предложение:', message);
   }
 
   /**
@@ -630,7 +630,7 @@ class RealtimeSearch {
   showSearchHistory() {
     if (this.searchHistory.length === 0) return;
     
-    console.log('[Realtime Search] История поиска:', this.searchHistory);
+    logger.log('[Realtime Search] История поиска:', this.searchHistory);
     // Реализация показа истории поиска
   }
 
@@ -655,7 +655,7 @@ class RealtimeSearch {
    * Fallback обработка поиска
    */
   handleSearchFallback(data) {
-    console.log('[Realtime Search] Fallback поиск:', data);
+    logger.log('[Realtime Search] Fallback поиск:', data);
     this.performLocalSearch(data.query);
   }
 
@@ -744,10 +744,10 @@ window.RealtimeSearch = RealtimeSearch;
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     window.realtimeSearch = new RealtimeSearch();
-    console.log('[Phase 3.2] Realtime Search Manager инициализирован после DOMContentLoaded');
+    logger.log('[Phase 3.2] Realtime Search Manager инициализирован после DOMContentLoaded');
   });
 } else {
   // DOM уже загружен
   window.realtimeSearch = new RealtimeSearch();
-  console.log('[Phase 3.2] Realtime Search Manager инициализирован сразу');
+  logger.log('[Phase 3.2] Realtime Search Manager инициализирован сразу');
 }

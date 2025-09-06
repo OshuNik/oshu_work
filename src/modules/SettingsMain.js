@@ -8,18 +8,26 @@ import {
 import { KeywordsManager } from './KeywordsManager.js';
 import { ChannelsManager } from './ChannelsManager.js';
 import { SettingsUI } from './SettingsUI.js';
+import { createHealthChecker } from './HealthChecker.js';
 
 /**
  * Главный класс настроек
  */
 export class SettingsMain {
   constructor() {
+    this.initializeProperties();
+    this.init();
+  }
+
+  /**
+   * Инициализация свойств класса
+   * @private
+   */
+  initializeProperties() {
     this.keywordsManager = null;
     this.channelsManager = null;
     this.ui = null;
     this.initialized = false;
-    
-    this.init();
   }
 
   /**
@@ -27,31 +35,54 @@ export class SettingsMain {
    */
   async init() {
     try {
-      // Проверяем зависимости
-      if (!checkDependencies()) {
-        throw new Error('Не все зависимости готовы');
-      }
-
-      // Инициализируем UI
-      this.ui = new SettingsUI();
-      
-      // Инициализируем менеджеры
-      this.keywordsManager = new KeywordsManager();
-      this.channelsManager = new ChannelsManager();
-      
-      // Настраиваем связь между модулями
+      this.validateDependencies();
+      this.initializeModules();
       this.setupModuleConnections();
-      
-      // Загружаем данные
       await this.loadData();
-      
-      this.initialized = true;
-      log('log', 'SettingsMain успешно инициализирован');
+      this.markAsInitialized();
       
     } catch (error) {
-      log('error', 'Ошибка инициализации SettingsMain:', error);
-      this.showError('Ошибка инициализации настроек');
+      this.handleInitializationError(error);
     }
+  }
+
+  /**
+   * Валидация зависимостей
+   * @private
+   */
+  validateDependencies() {
+    if (!checkDependencies()) {
+      throw new Error('Не все зависимости готовы');
+    }
+  }
+
+  /**
+   * Инициализация всех модулей
+   * @private
+   */
+  initializeModules() {
+    this.ui = new SettingsUI();
+    this.keywordsManager = new KeywordsManager();
+    this.channelsManager = new ChannelsManager();
+  }
+
+  /**
+   * Отметка об успешной инициализации
+   * @private
+   */
+  markAsInitialized() {
+    this.initialized = true;
+    log('log', 'SettingsMain успешно инициализирован');
+  }
+
+  /**
+   * Обработка ошибок инициализации
+   * @private
+   * @param {Error} error - Ошибка инициализации
+   */
+  handleInitializationError(error) {
+    log('error', 'Ошибка инициализации SettingsMain:', error);
+    this.showError('Ошибка инициализации настроек');
   }
 
   /**
@@ -418,61 +449,99 @@ export class SettingsMain {
    * @returns {Object} Состояние модулей
    */
   checkModulesHealth() {
-    const health = {
-      keywordsManager: this.keywordsManager ? 'healthy' : 'missing',
-      channelsManager: this.channelsManager ? 'healthy' : 'missing',
-      ui: this.ui ? 'healthy' : 'missing',
-      overall: 'healthy'
-    };
-    
-    if (health.keywordsManager === 'missing' || 
-        health.channelsManager === 'missing' || 
-        health.ui === 'missing') {
-      health.overall = 'degraded';
-    }
-    
-    return health;
+    const healthChecker = createHealthChecker(this);
+    return healthChecker.perform();
   }
 
   /**
-   * Перезапустить модуль
-   * @param {string} moduleName - Имя модуля для перезапуска
+   * Получить детальный отчет о состоянии модулей
+   * @returns {Object} Детальный отчет
    */
-  async restartModule(moduleName) {
-    try {
-      switch (moduleName) {
-        case 'keywords':
-          if (this.keywordsManager) {
-            this.keywordsManager.cleanup();
-            this.keywordsManager = new KeywordsManager();
-            await this.keywordsManager.loadKeywords();
-          }
-          break;
-          
-        case 'channels':
-          if (this.channelsManager) {
-            this.channelsManager.cleanup();
-            this.channelsManager = new ChannelsManager();
-            await this.channelsManager.loadChannels();
-          }
-          break;
-          
-        case 'ui':
-          if (this.ui) {
-            this.ui.cleanup();
-            this.ui = new SettingsUI();
-          }
-          break;
-          
-        default:
-          throw new Error(`Неизвестный модуль: ${moduleName}`);
+  getDetailedHealthReport() {
+    const healthChecker = createHealthChecker(this);
+    return healthChecker.getDetailedReport();
+  }
+
+  /**
+   * Перезапустить модуль Keywords
+   */
+  async restartKeywordsModule() {
+    return this.restartSpecificModule(
+      'keywords',
+      () => this.keywordsManager,
+      async () => {
+        this.keywordsManager = new KeywordsManager();
+        await this.keywordsManager.loadKeywords();
       }
+    );
+  }
+
+  /**
+   * Перезапустить модуль Channels
+   */
+  async restartChannelsModule() {
+    return this.restartSpecificModule(
+      'channels', 
+      () => this.channelsManager,
+      async () => {
+        this.channelsManager = new ChannelsManager();
+        await this.channelsManager.loadChannels();
+      }
+    );
+  }
+
+  /**
+   * Перезапустить модуль UI
+   */
+  async restartUIModule() {
+    return this.restartSpecificModule(
+      'ui',
+      () => this.ui,
+      () => {
+        this.ui = new SettingsUI();
+      }
+    );
+  }
+
+  /**
+   * Универсальный метод перезапуска модуля
+   * @private
+   * @param {string} moduleName - Имя модуля
+   * @param {Function} getModule - Функция получения модуля
+   * @param {Function} recreateModule - Функция пересоздания модуля
+   */
+  async restartSpecificModule(moduleName, getModule, recreateModule) {
+    try {
+      const existingModule = getModule();
+      if (existingModule && typeof existingModule.cleanup === 'function') {
+        existingModule.cleanup();
+      }
+      
+      await recreateModule();
       
       log('log', `Модуль ${moduleName} перезапущен`);
       this.showMessage(`Модуль ${moduleName} перезапущен`, 'success');
     } catch (error) {
       log('error', `Ошибка перезапуска модуля ${moduleName}:`, error);
       this.showError(`Ошибка перезапуска модуля ${moduleName}`);
+    }
+  }
+
+  /**
+   * Перезапустить модуль (устаревший метод для обратной совместимости)
+   * @deprecated Используйте специфичные методы: restartKeywordsModule, restartChannelsModule, restartUIModule
+   * @param {string} moduleName - Имя модуля для перезапуска
+   */
+  async restartModule(moduleName) {
+    switch (moduleName) {
+      case 'keywords':
+        return this.restartKeywordsModule();
+      case 'channels':
+        return this.restartChannelsModule();
+      case 'ui':
+        return this.restartUIModule();
+      default:
+        throw new Error(`Неизвестный модуль: ${moduleName}`);
     }
   }
 

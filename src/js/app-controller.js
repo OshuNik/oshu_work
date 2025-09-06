@@ -377,7 +377,7 @@
     // Выполнить инициализацию
     async _performInitialization() {
       try {
-        console.log('🚀 Запуск инициализации приложения');
+        logger.log('🚀 Запуск инициализации приложения');
 
         // Показываем skeleton loaders для лучшего UX
         window.domManager?.showSkeleton('main', 4);
@@ -465,7 +465,7 @@
         window.vacancyManager.updateSearchStats();
         this.initialized = true;
 
-        console.log('✅ Приложение успешно инициализировано');
+        logger.log('✅ Приложение успешно инициализировано');
 
       } catch (error) {
         console.error('❌ Критическая ошибка инициализации:', error);
@@ -573,7 +573,7 @@
 
   // Функция для переинициализации event listeners
   function reinitializeEventHandlers() {
-    console.log('🔄 Переинициализация обработчиков событий после возврата на страницу');
+    logger.log('🔄 Переинициализация обработчиков событий после возврата на страницу');
     
     if (window.appController && window.appController.initialized) {
       try {
@@ -590,7 +590,7 @@
           window.SwipeHandler.reinitialize();
         }
         
-        console.log('✅ Обработчики событий полностью переинициализированы');
+        logger.log('✅ Обработчики событий полностью переинициализированы');
       } catch (error) {
         console.error('❌ Ошибка при переинициализации:', error);
       }
@@ -615,7 +615,7 @@
   window.addEventListener('pageshow', function(event) {
     // Если страница была восстановлена из кэша (bfcache)
     if (event.persisted) {
-      console.log('📄 Страница восстановлена из bfcache');
+      logger.log('📄 Страница восстановлена из bfcache');
       scheduleReinitialize();
     }
   });
@@ -623,7 +623,7 @@
   // Обработчик для изменения видимости страницы (дополнительная защита)
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') {
-      console.log('👁️ Страница стала видимой');
+      logger.log('👁️ Страница стала видимой');
       scheduleReinitialize();
     }
   });

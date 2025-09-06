@@ -55,7 +55,7 @@
       }
 
       if (stateManager.isCategoryBusy(key)) {
-        console.log(`Категория ${key} уже загружается`);
+        logger.log(`Категория ${key} уже загружается`);
         return;
       }
 
@@ -256,7 +256,7 @@
 
     // Обновить статус вакансии
     async updateVacancyStatus(vacancyId, newStatus, isFromSwipe = false) {
-      console.log('🔄 updateVacancyStatus вызван:', { vacancyId, newStatus, isFromSwipe });
+      logger.log('🔄 updateVacancyStatus вызван:', { vacancyId, newStatus, isFromSwipe });
       
       if (!vacancyId) {
         console.warn('ID вакансии не указан');
@@ -265,7 +265,7 @@
 
       // Предотвращаем race conditions
       if (this.updateStatusLocks.has(vacancyId)) {
-        console.log('updateStatus уже выполняется для ID:', vacancyId);
+        logger.log('updateStatus уже выполняется для ID:', vacancyId);
         return;
       }
 
@@ -284,10 +284,10 @@
         
         // Если это свайп, используем специальную логику с возможностью отмены
         if (isFromSwipe) {
-          console.log('🔄 Это свайп, используем performSwipeStatusUpdate');
+          logger.log('🔄 Это свайп, используем performSwipeStatusUpdate');
           await this.performSwipeStatusUpdate(vacancyId, newStatus, isFavorite);
         } else {
-          console.log('🔄 Это кнопка, используем performStatusUpdate');
+          logger.log('🔄 Это кнопка, используем performStatusUpdate');
           // Сразу выполняем действие без подтверждения для кнопок
           await this.performStatusUpdate(vacancyId, newStatus, isFavorite);
         }
@@ -303,7 +303,7 @@
 
     // Выполнить обновление статуса для свайпов с возможностью отмены
     async performSwipeStatusUpdate(vacancyId, newStatus, isFavorite) {
-      console.log('🔄 performSwipeStatusUpdate вызван:', { vacancyId, newStatus, isFavorite });
+      logger.log('🔄 performSwipeStatusUpdate вызван:', { vacancyId, newStatus, isFavorite });
       
       const cardElement = document.querySelector(`#card-${CSS.escape(vacancyId)}`);
       if (!cardElement) {
@@ -316,11 +316,11 @@
 
       // Анимация скрытия для свайпа
       this.animateCardHidingForSwipe(cardElement);
-      console.log('✅ Анимация скрытия применена для свайпа');
+      logger.log('✅ Анимация скрытия применена для свайпа');
 
       // Функция отмены с transition-анимацией въезда (как в избранном)
       const onUndo = () => {
-        console.log('🔄 Отмена свайпа для вакансии:', vacancyId);
+        logger.log('🔄 Отмена свайпа для вакансии:', vacancyId);
         
         // Возвращаем карточку на место
         parent.insertBefore(cardElement, nextSibling);
@@ -356,7 +356,7 @@
           // Убираем transition после анимации
           setTimeout(() => {
             cardElement.style.transition = '';
-            console.log('✅ Анимация возврата завершена для вакансии:', vacancyId);
+            logger.log('✅ Анимация возврата завершена для вакансии:', vacancyId);
           }, 300);
         });
       };
@@ -371,12 +371,12 @@
         triggerHaptic('impact', 'medium');
       }
       
-      console.log('📱 Показываем toast с возможностью отмены для свайпа');
+      logger.log('📱 Показываем toast с возможностью отмены для свайпа');
       UTIL.uiToast?.(toastMessage, {
         timeout: 5000,
         onUndo,
         onTimeout: async () => {
-          console.log('⏰ Таймаут toast для свайпа, финализируем удаление:', vacancyId);
+          logger.log('⏰ Таймаут toast для свайпа, финализируем удаление:', vacancyId);
           await this.finalizeStatusUpdate(vacancyId, newStatus, cardElement, parent);
         }
       });
