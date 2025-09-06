@@ -6,6 +6,7 @@ import './env-dev.js';
 import './env-config.js';
 import './config.js';
 import './constants.js';
+import './debug-logger.js'; // Умный логгер
 import './utils.min.js';
 import './csp-manager.js';
 import './error-monitor.js';

@@ -6,6 +6,7 @@ import './csp-manager.js';
 import './env-dev.js';
 import './env-config.js';
 import './config.js';
+import './debug-logger.js'; // Умный логгер
 import './error-monitor.js';
 import './error-helpers.js';
 

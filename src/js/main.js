@@ -4,6 +4,7 @@ console.log('🚀 [MAIN] oshu://work v15.1.0 loading...');
 // Импортируем основные модули
 import './config.js';
 import './constants.js';
+import './debug-logger.js'; // Умный логгер - первым после config
 import './csp-manager.js';
 import './error-monitor.js';
 import './error-helpers.js';
