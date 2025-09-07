@@ -15,6 +15,9 @@ import './error-helpers.js';
 import './theme-manager.js';
 import './bot-integration.js';
 
+// 3. Settings модули
+import { SettingsMain } from '../modules/SettingsMain.js';
+
 // Инициализация
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('⚙️ Settings page initialized via Vite');
@@ -42,9 +45,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Dependencies loaded successfully!');
     console.log('APP_CONFIG keys:', Object.keys(window.APP_CONFIG));
     console.log('utils keys:', Object.keys(window.utils));
-    
-    // Динамический импорт SettingsMain
-    const { SettingsMain } = await import('../modules/SettingsMain.js?v=15.1.2-hotfix3');
     
     // Инициализируем главный модуль настроек
     console.log('🏗️ Creating SettingsMain instance...');
