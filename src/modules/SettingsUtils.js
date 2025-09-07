@@ -75,11 +75,8 @@ export function checkDependencies() {
   const CFG = getConfig();
   const UTIL = getUtils();
   
-  // Context7: Separate Query from Modifier - проверяем точные условия
-  const configMissing = !window.APP_CONFIG;
-  const utilsMissing = !window.utils;
-  
-  if (configMissing || utilsMissing) {
+  // Context7: Separate Query from Modifier - безопасная проверка для production
+  if (!CFG || Object.keys(CFG).length === 0 || !UTIL) {
     console.error('SettingsUtils: CFG или UTIL не найдены');
     return false;
   }

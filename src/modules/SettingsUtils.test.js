@@ -138,12 +138,18 @@ describe('SettingsUtils', () => {
 
       // Негативный случай - отсутствует utils
       const originalUtils = window.utils
-      window.utils = null
+      const originalConfig = window.APP_CONFIG
       
+      window.utils = null
       expect(checkDependencies()).toBe(false)
       
-      // Восстанавливаем
+      // Восстанавливаем utils, тестируем пустой config
       window.utils = originalUtils
+      window.APP_CONFIG = {}
+      expect(checkDependencies()).toBe(false)
+      
+      // Восстанавливаем всё
+      window.APP_CONFIG = originalConfig
     })
   })
 
