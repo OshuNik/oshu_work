@@ -125,12 +125,19 @@ class VacancySimulator {
     // Генерация новой вакансии
     
     // Отправляем событие как будто пришло от WebSocket
+    console.log('📡 [Vacancy Simulator] Отправка события vacancy:new:', {
+      title: newVacancy.title,
+      category: newVacancy.category,
+      id: newVacancy.id
+    });
+    
     const event = new CustomEvent('vacancy:new', {
       detail: newVacancy,
       bubbles: true
     });
     
     document.dispatchEvent(event);
+    console.log('✅ [Vacancy Simulator] Событие vacancy:new отправлено');
   }
   
   /**

@@ -308,10 +308,19 @@ class SimpleBotNotifications {
    * Показ уведомления о вакансии
    */
   showVacancyNotification(vacancy) {
+    console.log('🔔 [Bot Integration] Попытка отправить уведомление:', {
+      vacancy: vacancy.title || 'Без названия',
+      category: vacancy.category,
+      enabled: this.settings.enabled,
+      filter: this.settings.categoryFilter,
+      shouldShow: this.shouldShowNotification(vacancy)
+    });
+
     // В режиме разработки показываем как toast
     if (window.location.hostname === 'localhost') {
       const emoji = this.getCategoryEmoji(vacancy.category);
       this.showToast(`${emoji} Новая вакансия: ${vacancy.title || 'Без названия'}`, 4000);
+      console.log('✅ [Bot Integration] Toast уведомление показано (localhost)');
     }
     
     // В реальном Telegram Mini App можно использовать:
@@ -320,8 +329,12 @@ class SimpleBotNotifications {
       if (tg.showAlert) {
         const emoji = this.getCategoryEmoji(vacancy.category);
         tg.showAlert(`${emoji} Новая вакансия!\n\n${vacancy.title || 'Без названия'}`);
+        console.log('✅ [Bot Integration] Telegram alert показан');
       }
     }
+
+    // TODO: Здесь должен быть вызов API для отправки в канал
+    console.log('⚠️ [Bot Integration] API для отправки в канал не настроен - уведомление только в приложении');
   }
 
   /**
