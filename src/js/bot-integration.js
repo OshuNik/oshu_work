@@ -328,49 +328,73 @@ class SimpleBotNotifications {
   }
 
   /**
-   * Отправка уведомления через Telegram Bot API
+   * Отправка уведомления через Supabase (просто как с ошибками)
    */
   async sendTelegramBotNotification(vacancy) {
     try {
-      console.log('📱 [Bot Integration] Отправка уведомления через Telegram Bot...');
+      console.log('📱 [Bot Integration] Сохранение уведомления в Supabase...');
 
-      // Определяем URL API (в production это будет URL парсера на Amvera)
-      const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:3000/api/send-notification'  // Для тестов
-        : 'https://your-amvera-domain.com/api/send-notification'; // Замените на ваш домен
+      // Проверяем доступность Supabase клиента
+      if (!window.supabaseClient) {
+        console.error('❌ [Bot Integration] Supabase клиент недоступен');
+        return;
+      }
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          vacancy: {
-            id: vacancy.id,
+      // Сохраняем уведомление в таблицу notifications
+      const { data, error } = await window.supabaseClient
+        .from('notifications')
+        .insert([
+          {
+            user_id: '1521478462', // Ваш Telegram ID
+            vacancy_id: vacancy.id,
             title: vacancy.title || vacancy.reason || 'Без названия',
-            company: vacancy.company_name || vacancy.company || '',
-            industry: vacancy.industry || '',
+            message: this.formatNotificationMessage(vacancy),
             category: vacancy.category || vacancy.ai_category || 'НЕ ТВОЁ',
-            reason: vacancy.reason || '',
-            text: vacancy.text || vacancy.text_highlighted || ''
-          },
-          category_filter: this.settings.categoryFilter,
-          enabled: this.settings.enabled
-        }),
-      });
+            category_filter: this.settings.categoryFilter,
+            enabled: this.settings.enabled,
+            status: 'pending', // pending/sent/failed
+            created_at: new Date().toISOString()
+          }
+        ]);
 
-      const result = await response.json();
-
-      if (result.success) {
-        console.log('✅ [Bot Integration] Уведомление отправлено через Telegram Bot');
+      if (error) {
+        console.error('❌ [Bot Integration] Ошибка сохранения уведомления:', error);
       } else {
-        console.warn('⚠️ [Bot Integration] Уведомление не отправлено:', result.reason);
+        console.log('✅ [Bot Integration] Уведомление сохранено в Supabase, парсер его обработает');
       }
 
     } catch (error) {
       console.error('❌ [Bot Integration] Ошибка отправки уведомления:', error);
-      console.log('📱 [Bot Integration] Используем fallback - уведомление только в приложении');
     }
+  }
+
+  /**
+   * Форматирование сообщения для уведомления
+   */
+  formatNotificationMessage(vacancy) {
+    const categoryEmoji = {
+      'ТОЧНО ТВОЁ': '🎯',
+      'МОЖЕТ БЫТЬ': '🤔', 
+      'НЕ ТВОЁ': '❌'
+    };
+
+    const emoji = categoryEmoji[vacancy.category] || '📋';
+    
+    let message = `${emoji} Новая вакансия!\n\n`;
+    
+    if (vacancy.title || vacancy.reason) {
+      message += `💼 ${vacancy.title || vacancy.reason}\n`;
+    }
+    
+    if (vacancy.company_name || vacancy.company) {
+      message += `🏢 ${vacancy.company_name || vacancy.company}\n`;
+    }
+    
+    if (vacancy.category) {
+      message += `📂 ${vacancy.category}\n`;
+    }
+    
+    return message;
   }
 
   /**
