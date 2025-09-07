@@ -32,7 +32,8 @@
     "socket.io": "^4.7.5",
     "terser": "^5.31.6",
     "vite": "^5.4.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "ws": "^8.18.0"
   },
   "keywords": [
     "telegram",

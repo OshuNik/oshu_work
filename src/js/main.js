@@ -17,6 +17,7 @@ import './utils.min.js';
 import './utils-empty-state.js';
 
 // Core модули  
+import './websocket-manager.js'; // WebSocket для получения новых вакансий
 import './state-manager.js';
 import './api-service.js';
 import './dom-manager.js';
