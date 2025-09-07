@@ -1,5 +1,7 @@
 // Vitest setup file - инициализация тестового окружения
-import { vi } from 'vitest'
+import { vi, beforeAll, afterEach, afterAll } from 'vitest'
+import { setupServer } from 'msw/node'
+import { http, HttpResponse } from 'msw'
 
 // Mock Telegram WebApp API для тестов
 global.Telegram = {
@@ -97,8 +99,31 @@ global.window.logger = {
   }
 }
 
-// Mock fetch для API тестов
-global.fetch = vi.fn()
+// MSW setup для правильного мокирования fetch (Context7 best practice)
+// Настройка MSW сервера для тестов
+export const server = setupServer(
+  // Default handlers для KeywordsManager тестов (Context7: правильный формат данных)
+  http.get('*/rest/v1/settings*', () => {
+    return HttpResponse.json([
+      { keywords: 'test1, test2, test3' }
+    ])
+  }),
+  
+  http.post('*/rest/v1/settings*', async ({ request }) => {
+    const body = await request.json()
+    return HttpResponse.json(body, { status: 201 })
+  }),
+  
+  // 404 handler для тестирования error cases  
+  http.patch('*/rest/v1/settings*', () => {
+    return HttpResponse.json({ error: 'Not found' }, { status: 404 })
+  })
+)
+
+// MSW lifecycle management (Context7 pattern)
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }))
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 // Mock localStorage
 const localStorageMock = {

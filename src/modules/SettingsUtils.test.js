@@ -162,7 +162,7 @@ describe('SettingsUtils', () => {
       delete window.utils
 
       const utils = getUtils()
-      expect(utils).toEqual({}) // getUtils возвращает {} если window.utils нет
+      expect(utils).toEqual(null) // getUtils возвращает null если window.utils нет (Context7 fix)
       
       window.utils = originalUtils
     })

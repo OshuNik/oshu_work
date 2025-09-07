@@ -61,10 +61,10 @@ export function getConfig() {
 
 /**
  * Получить утилиты приложения
- * @returns {Object} Утилиты приложения
+ * @returns {Object|null} Утилиты приложения или null если не найдены
  */
 export function getUtils() {
-  return window.utils || {};
+  return window.utils || null;
 }
 
 /**
@@ -75,7 +75,11 @@ export function checkDependencies() {
   const CFG = getConfig();
   const UTIL = getUtils();
   
-  if (!CFG || !UTIL) {
+  // Context7: Separate Query from Modifier - проверяем точные условия
+  const configMissing = !window.APP_CONFIG;
+  const utilsMissing = !window.utils;
+  
+  if (configMissing || utilsMissing) {
     console.error('SettingsUtils: CFG или UTIL не найдены');
     return false;
   }
