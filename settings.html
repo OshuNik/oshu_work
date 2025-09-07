@@ -342,6 +342,15 @@
     
     document.addEventListener('DOMContentLoaded', async function() {
       try {
+        // Ждем загрузки зависимостей (race condition fix)
+        let attempts = 0;
+        while ((!window.APP_CONFIG || !window.utils) && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        console.log('🚀 Dependencies loaded, initializing SettingsMain...');
+        
         // Инициализируем главный модуль настроек
         settingsApp = new SettingsMain();
         
