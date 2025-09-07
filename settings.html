@@ -342,19 +342,36 @@
     
     document.addEventListener('DOMContentLoaded', async function() {
       try {
+        console.log('🔄 Starting settings initialization...');
+        
         // Ждем загрузки зависимостей (race condition fix)
         let attempts = 0;
         while ((!window.APP_CONFIG || !window.utils) && attempts < 50) {
+          console.log(`⏳ Waiting for dependencies... attempt ${attempts + 1}/50`);
+          console.log('APP_CONFIG:', !!window.APP_CONFIG, 'utils:', !!window.utils);
           await new Promise(resolve => setTimeout(resolve, 100));
           attempts++;
         }
         
-        console.log('🚀 Dependencies loaded, initializing SettingsMain...');
+        if (!window.APP_CONFIG || !window.utils) {
+          console.error('❌ Dependencies failed to load after 5 seconds');
+          console.log('Final state - APP_CONFIG:', window.APP_CONFIG, 'utils:', window.utils);
+          return;
+        }
+        
+        console.log('🚀 Dependencies loaded successfully!');
+        console.log('APP_CONFIG keys:', Object.keys(window.APP_CONFIG));
+        console.log('utils keys:', Object.keys(window.utils));
         
         // Инициализируем главный модуль настроек
+        console.log('🏗️ Creating SettingsMain instance...');
         settingsApp = new SettingsMain();
         
-        // Ждем инициализации
+        // Запускаем инициализацию вручную (после загрузки зависимостей)
+        console.log('🔄 Initializing settings manually...');
+        await settingsApp.init();
+        
+        // Ждем полной инициализации
         while (!settingsApp.initialized) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
