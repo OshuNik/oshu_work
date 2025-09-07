@@ -16,7 +16,7 @@ import { createHealthChecker } from './HealthChecker.js?v=15.1.2-hotfix2';
 export class SettingsMain {
   constructor() {
     this.initializeProperties();
-    this.init();
+    // init() будет вызван вручную после загрузки зависимостей
   }
 
   /**
