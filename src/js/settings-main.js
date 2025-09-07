@@ -6,7 +6,7 @@ import './csp-manager.js';
 import './env-dev.js';
 import './env-config.js';
 import './config.js';
-import './utils.js'; // Необходимо для window.utils
+import './utils.min.js'; // Необходимо для window.utils
 import './debug-logger.js'; // Умный логгер
 import './error-monitor.js';
 import './error-helpers.js';
