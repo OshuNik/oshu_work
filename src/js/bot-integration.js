@@ -326,10 +326,15 @@ class SimpleBotNotifications {
     // В реальном Telegram Mini App можно использовать:
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
-      if (tg.showAlert) {
+      // Проверяем версию WebApp API перед использованием showAlert
+      if (tg.showAlert && tg.version >= '6.1') {
         const emoji = this.getCategoryEmoji(vacancy.category);
         tg.showAlert(`${emoji} Новая вакансия!\n\n${vacancy.title || 'Без названия'}`);
         console.log('✅ [Bot Integration] Telegram alert показан');
+      } else {
+        // Для старых версий Telegram используем другие методы
+        console.log('📱 [Bot Integration] showAlert не поддерживается в версии', tg.version);
+        console.log('🔔 [Bot Integration] Уведомление обработано (без popup)');
       }
     }
 
