@@ -316,30 +316,61 @@ class SimpleBotNotifications {
       shouldShow: this.shouldShowNotification(vacancy)
     });
 
+    // Отправляем уведомление через Telegram Bot API
+    this.sendTelegramBotNotification(vacancy);
+
     // В режиме разработки показываем как toast
     if (window.location.hostname === 'localhost') {
       const emoji = this.getCategoryEmoji(vacancy.category);
       this.showToast(`${emoji} Новая вакансия: ${vacancy.title || 'Без названия'}`, 4000);
       console.log('✅ [Bot Integration] Toast уведомление показано (localhost)');
     }
-    
-    // В реальном Telegram Mini App можно использовать:
-    if (window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      // Проверяем версию WebApp API перед использованием showAlert
-      if (tg.showAlert && tg.version >= '6.1') {
-        const emoji = this.getCategoryEmoji(vacancy.category);
-        tg.showAlert(`${emoji} Новая вакансия!\n\n${vacancy.title || 'Без названия'}`);
-        console.log('✅ [Bot Integration] Telegram alert показан');
-      } else {
-        // Для старых версий Telegram используем другие методы
-        console.log('📱 [Bot Integration] showAlert не поддерживается в версии', tg.version);
-        console.log('🔔 [Bot Integration] Уведомление обработано (без popup)');
-      }
-    }
+  }
 
-    // TODO: Здесь должен быть вызов API для отправки в канал
-    console.log('⚠️ [Bot Integration] API для отправки в канал не настроен - уведомление только в приложении');
+  /**
+   * Отправка уведомления через Telegram Bot API
+   */
+  async sendTelegramBotNotification(vacancy) {
+    try {
+      console.log('📱 [Bot Integration] Отправка уведомления через Telegram Bot...');
+
+      // Определяем URL API (в production это будет URL парсера на Amvera)
+      const apiUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000/api/send-notification'  // Для тестов
+        : 'https://your-amvera-domain.com/api/send-notification'; // Замените на ваш домен
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          vacancy: {
+            id: vacancy.id,
+            title: vacancy.title || vacancy.reason || 'Без названия',
+            company: vacancy.company_name || vacancy.company || '',
+            industry: vacancy.industry || '',
+            category: vacancy.category || vacancy.ai_category || 'НЕ ТВОЁ',
+            reason: vacancy.reason || '',
+            text: vacancy.text || vacancy.text_highlighted || ''
+          },
+          category_filter: this.settings.categoryFilter,
+          enabled: this.settings.enabled
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('✅ [Bot Integration] Уведомление отправлено через Telegram Bot');
+      } else {
+        console.warn('⚠️ [Bot Integration] Уведомление не отправлено:', result.reason);
+      }
+
+    } catch (error) {
+      console.error('❌ [Bot Integration] Ошибка отправки уведомления:', error);
+      console.log('📱 [Bot Integration] Используем fallback - уведомление только в приложении');
+    }
   }
 
   /**
