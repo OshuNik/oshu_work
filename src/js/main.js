@@ -11,6 +11,7 @@ import './error-helpers.js';
 
 // Supabase клиент для Realtime
 import './supabase-client.js';
+import './realtime-manager.js'; // Realtime подписки на новые вакансии
 
 // Utils модули (КРИТИЧЕСКИ ВАЖНО - содержит createVacancyCard, renderEmptyState)
 import './utils.min.js';

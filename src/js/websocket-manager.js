@@ -28,7 +28,7 @@ class WebSocketManager {
                        
     if (isLocalhost) {
       // Для разработки - подключаемся к mock серверу
-      return 'ws://localhost:8080/ws';
+      return 'ws://localhost:8081/ws';
     } else {
       // Для production - здесь должен быть реальный WebSocket сервер
       // TODO: Настроить production WebSocket сервер

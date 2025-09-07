@@ -3,10 +3,10 @@
  * Симулирует поступление новых вакансий из Telegram каналов
  */
 
-const express = require('express');
-const cors = require('cors');
-const { createServer } = require('http');
-const { WebSocketServer } = require('ws');
+import express from 'express';
+import cors from 'cors';
+import { createServer } from 'http';
+import { WebSocketServer } from 'ws';
 
 const app = express();
 const server = createServer(app);
@@ -146,7 +146,7 @@ app.get('/status', (req, res) => {
 });
 
 // Запуск сервера
-const PORT = process.env.WS_PORT || 8080;
+const PORT = process.env.WS_PORT || 8081;
 server.listen(PORT, () => {
   console.log(`🚀 Mock WebSocket Server запущен на порту ${PORT}`);
   console.log(`📡 WebSocket: ws://localhost:${PORT}/ws`);
