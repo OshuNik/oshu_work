@@ -4,11 +4,11 @@ import {
   checkDependencies,
   log,
   getElement
-} from './SettingsUtils.js';
-import { KeywordsManager } from './KeywordsManager.js';
-import { ChannelsManager } from './ChannelsManager.js';
-import { SettingsUI } from './SettingsUI.js';
-import { createHealthChecker } from './HealthChecker.js';
+} from './SettingsUtils.js?v=15.1.2-hotfix2';
+import { KeywordsManager } from './KeywordsManager.js?v=15.1.2-hotfix2';
+import { ChannelsManager } from './ChannelsManager.js?v=15.1.2-hotfix2';
+import { SettingsUI } from './SettingsUI.js?v=15.1.2-hotfix2';
+import { createHealthChecker } from './HealthChecker.js?v=15.1.2-hotfix2';
 
 /**
  * Главный класс настроек
