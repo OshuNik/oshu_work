@@ -1,0 +1,45 @@
+/* CSS Variables - Common for all pages */
+:root {
+  /* Colors */
+  --background-color: #F5F5F5;
+  --card-color: #FFFFFF;
+  --text-color: #2C2C2C;
+  --hint-color: #666666;
+  --border-color: #CCCCCC;
+  --secondary-bg: #E8E8E8;
+  
+  /* Accent colors */
+  --accent-green: #4CAF50;
+  --accent-yellow: #FFC107;
+  --accent-red: #F44336;
+  --accent-blue: #2196F3;
+  
+  /* Typography */
+  --font-mono: 'Roboto Mono', monospace;
+  --font-pixel: 'Press Start 2P', monospace;
+  
+  /* Spacing */
+  --card-padding: 16px;
+  --border-width: 2px;
+  --border-radius: 8px;
+  
+  /* Effects */
+  --box-shadow: 3px 3px 0px var(--border-color);
+  --shadow-offset: 3px;
+  
+  /* Animation */
+  --transition-fast: 0.15s ease-out;
+  --transition-medium: 0.3s ease-out;
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --background-color: #121212;
+  --card-color: #1E1E1E;
+  --text-color: #E8E8E8;
+  --hint-color: #A0A0A0;
+  --border-color: #333333;
+  --secondary-bg: #2A2A2A;
+  --box-shadow: none;
+  --shadow-offset: 0px;
+}

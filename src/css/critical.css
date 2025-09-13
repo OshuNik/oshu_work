@@ -1,0 +1,208 @@
+/* CRITICAL CSS - Стили для above-the-fold контента */
+/* Основано на Context7 принципах First Paint оптимизации */
+/* Variables moved to variables.css */
+
+:root {
+    --box-shadow-pressed: calc(var(--shadow-offset)/2) calc(var(--shadow-offset)/2) 0px var(--border-color);
+}
+
+/* КРИТИЧЕСКИ ВАЖНО - Footer карточки для горизонтальной разметки */
+.card-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    margin-top: 15px !important;
+    padding-top: 10px !important;
+    border-top: 1px dashed var(--hint-color) !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+}
+
+/* КРИТИЧЕСКИ ВАЖНО - Контейнер тегов навыков в строку */
+.footer-skill-tags {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    justify-content: flex-start !important;
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+}
+
+/* КРИТИЧЕСКИ ВАЖНО - Теги навыков в карточках */
+.footer-skill-tag {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 10px !important;
+    font-weight: normal !important;
+    background-color: var(--background-color) !important;
+    color: var(--text-color) !important;
+    padding: 5px 8px !important;
+    border: var(--border-width) solid var(--border-color) !important;
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    display: inline-block !important;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color) !important;
+}
+
+/* Базовые утилиты */
+.hidden { display: none !important; }
+
+/* Основные стили body */
+body {
+    font-family: var(--font-mono);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0; /* Убираем отступы для чистого фона */
+    overflow-x: hidden;
+}
+
+/* Main wrapper - критично для layout */
+.main-wrapper {
+    position: relative;
+    z-index: 1;
+    background-color: var(--background-color);
+    padding: 15px; /* Перемещаем отступы сюда */
+    padding-bottom: 80px;
+    padding-top: 20px;
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+}
+
+/* Header - видимый above-the-fold */
+.header {
+    padding-bottom: 25px;
+    text-align: center;
+}
+
+.header h1 {
+    font-family: var(--font-pixel);
+    font-size: 28px;
+    color: var(--text-color);
+    margin: 0 0 15px 0;
+    letter-spacing: 1.5px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    position: relative;
+}
+
+.header-button {
+    font-size: 14px;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background-color: var(--card-color);
+    border: var(--border-width) solid var(--border-color);
+    box-shadow: var(--box-shadow);
+    color: var(--text-color);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    letter-spacing: 0.5px;
+}
+
+.header-button:active {
+    transform: translate(calc(var(--shadow-offset)/2), calc(var(--shadow-offset)/2));
+    box-shadow: var(--box-shadow-pressed);
+}
+
+/* Search container - критично для UX */
+.search-container {
+    padding: 0 0 15px 0;
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 15px 50px 15px 20px;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: 12px;
+    background-color: var(--card-color);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+    box-shadow: var(--box-shadow);
+    outline: none;
+    transition: all var(--transition-normal);
+    box-sizing: border-box;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.search-clear-btn::before {
+    content: '✕';
+    font-size: 16px;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+/* Loader - критично для первой загрузки */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.loader-container.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Pull-to-refresh bar - видим при pull */
+.ptr-bar {
+    box-sizing: border-box;
+    position: absolute;
+    top: -80px;
+    left: 15px;
+    right: 15px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background-color: var(--background-color);
+    border: var(--border-width) solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+    color: var(--text-color);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    will-change: opacity;
+}
+
+.ptr-bar.ptr-visible {
+    opacity: 1;
+}
