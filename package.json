@@ -1,0 +1,53 @@
+{
+  "name": "oshu-work-telegram-mini-app",
+  "version": "14.0.1",
+  "type": "module",
+  "description": "oshu://work - Telegram Mini App для поиска вакансий с real-time функциями",
+  "scripts": {
+    "dev": "vite --port 4176 --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --port 4176 --host 0.0.0.0",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
+    "serve": "vite preview --port 4173",
+    "clean": "rm -rf dist",
+    "mock-ws": "node mock-websocket-server.js",
+    "dev:full": "concurrently \"npm run mock-ws\" \"npm run dev\"",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
+    "test:modules": "vitest run src/modules",
+    "test:ci": "vitest run --reporter=verbose --coverage"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^3.2.4",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "happy-dom": "^18.0.1",
+    "jsdom": "^26.1.0",
+    "msw": "^2.4.9",
+    "socket.io": "^4.7.5",
+    "terser": "^5.31.6",
+    "vite": "^7.1.5",
+    "vitest": "^3.2.4",
+    "ws": "^8.18.0"
+  },
+  "keywords": [
+    "telegram",
+    "mini-app",
+    "job-parser",
+    "vite"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "your-repo-url"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,17 +1,25 @@
 # Dependencies
 node_modules/
-package-lock.json
+# package-lock.json  # NEEDED for GitHub Actions
 
 # Build output
 dist/
+dist-ssr/
 build/
+out/
 
-# Environment variables
+# Environment variables - НИКОГДА не коммитить!
 .env
 .env.local
+.env.development
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
+
+# Автогенерированные файлы
+src/js/env-vars-generated.js
 
 # OS generated files
 .DS_Store
@@ -43,6 +51,7 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
 
 # Optional npm cache directory
 .npm
@@ -56,6 +65,21 @@ coverage/
 # Yarn Integrity file
 .yarn-integrity
 
+# Package managers
+yarn.lock
+pnpm-lock.yaml
+
+# Vite cache
+.cache/
+.parcel-cache/
+
 # Temporary folders
 tmp/
 temp/
+*.tmp
+*.temp
+*.bak
+*.local
+
+# Архивные файлы - не деплоить
+архив/

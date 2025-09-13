@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Настройки - oshu://work v15.1.2</title>
+  
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+  
+  <!-- Стили -->
+  <link rel="stylesheet" href="src/css/retro-settings.css">
+</head>
+<body>
+
+  <div class="mini-app-settings">
+    <!-- Заголовок -->
+    <header class="settings-header">
+      <div class="header-left">
+        <h1>НАСТРОЙКИ</h1>
+      </div>
+      <div class="header-controls">
+        <a href="index.html" class="back-button" title="Назад">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <button class="theme-toggle" id="theme-toggle" title="Сменить тему">
+          <i class="bi bi-sun-fill"></i>
+        </button>
+        <button class="notifications-toggle" id="notifications-toggle" title="Уведомления">
+          <i class="bi bi-bell"></i>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Контент -->
+    <div class="settings-content">
+      
+      <!-- Секция ключевых слов -->
+      <div class="settings-section active" id="keywords-section">
+        <div class="section-header">
+          <span class="section-title">КЛЮЧЕВЫЕ СЛОВА</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="keywords-count" class="favorites-count">0</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+        
+        <!-- Добавление -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Одно слово или несколько через запятую:</p>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите ключевые слова..." id="new-keyword-input">
+              <button class="input-clear-btn" aria-label="Очистить поле"></button>
+            </div>
+            <button id="add-keyword-btn" class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button id="load-presets-btn" class="action-button success">Загрузить пресет</button>
+          </div>
+        </div>
+        
+        <!-- Активные ключевые слова -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КЛЮЧЕВЫЕ СЛОВА</h3>
+          
+          <div class="tags-container" id="current-keywords-tags">
+            <div class="loading-indicator">Загрузка...</div>
+          </div>
+          
+          <div class="actions-container">
+            <button id="save-as-preset-btn" class="action-button success">Сохранить как пресет</button>
+            <button id="clear-all-keywords-btn" class="action-button danger">Удалить все</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Секция каналов -->
+      <div class="settings-section" id="channels-section">
+        <div class="section-header">
+          <span class="section-title">КАНАЛЫ</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="channels-count" class="favorites-count">0</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+        
+        <!-- Добавление канала -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ДОБАВИТЬ</h3>
+          <p class="card-description">Кликабельные примеры:</p>
+          
+          <div class="tags-container" style="margin-bottom: 15px;">
+            <div class="tag example-tag" style="cursor: pointer;">@username</div>
+            <div class="tag example-tag" style="cursor: pointer;">t.me/channel</div>
+          </div>
+          
+          <div class="input-container">
+            <div class="input-wrapper">
+              <input type="text" class="input-field" placeholder="Введите @username или ссылку на канал..." id="channel-input">
+              <button class="input-clear-btn" aria-label="Очистить поле"></button>
+            </div>
+            <button id="add-channel-btn" class="add-button">+</button>
+          </div>
+          
+          <div class="actions-container">
+            <button id="load-defaults-channels-btn" class="action-button info">Загрузить стандартные каналы</button>
+          </div>
+        </div>
+        
+        <!-- Активные каналы -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">АКТИВНЫЕ КАНАЛЫ</h3>
+          
+          <div class="channels-list" id="channels-list">
+            <div class="loading-indicator">Загрузка каналов...</div>
+          </div>
+          
+          <div class="actions-container">
+            <button id="save-channels-preset-btn" class="action-button success">Сохранить как пресет</button>
+            <button id="clear-all-channels-btn" class="action-button danger">Удалить все</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Секция уведомлений -->
+      <div class="settings-section" id="notifications-section">
+        <div class="section-header">
+          <span class="section-title">УВЕДОМЛЕНИЯ</span>
+          <div class="pixel-counter">
+            <span class="pixel-bar">■■■</span>
+            <span id="notification-status" class="favorites-count">OFF</span>
+            <span class="pixel-bar">■■■</span>
+          </div>
+        </div>
+
+        <!-- Основные настройки уведомлений -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ОСНОВНЫЕ НАСТРОЙКИ</h3>
+          <p class="card-description">Управление уведомлениями через Telegram бота:</p>
+          
+          <div class="settings-controls">
+            <!-- Главный переключатель -->
+            <div class="control-row">
+              <label class="control-label" for="notifications-enabled">
+                <i class="bi bi-bell"></i>
+                Включить уведомления
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notifications-enabled" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+
+            <!-- Новые вакансии -->
+            <div class="control-row">
+              <label class="control-label" for="notify-new-vacancies">
+                <i class="bi bi-plus-circle"></i>
+                Новые вакансии
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notify-new-vacancies" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+
+            <!-- Обновления избранного -->
+            <div class="control-row">
+              <label class="control-label" for="notify-favorites">
+                <i class="bi bi-star"></i>
+                Изменения в избранном
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notify-favorites" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions-container">
+            <button id="test-notification-btn" class="action-button info">
+              <i class="bi bi-send"></i>
+              Тест уведомления
+            </button>
+          </div>
+        </div>
+
+        <!-- Фильтры уведомлений -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ФИЛЬТРЫ</h3>
+          <p class="card-description">Настройте для каких категорий получать уведомления:</p>
+
+          <div class="filter-options">
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" id="filter-all" name="category-filter" value="all">
+                <label for="filter-all">
+                  <i class="bi bi-collection"></i>
+                  Все категории
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="filter-main" name="category-filter" value="main">
+                <label for="filter-main">
+                  <i class="bi bi-bullseye"></i>
+                  Только "Точно твоё"
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="filter-maybe" name="category-filter" value="maybe">
+                <label for="filter-maybe">
+                  <i class="bi bi-question-circle"></i>
+                  Только "Может быть"
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="filter-other" name="category-filter" value="other">
+                <label for="filter-other">
+                  <i class="bi bi-x-circle"></i>
+                  Только "Не твоё"
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Тихие часы -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">ТИХИЕ ЧАСЫ</h3>
+          <p class="card-description">Отключение уведомлений в определенное время:</p>
+
+          <div class="settings-controls">
+            <div class="control-row">
+              <label class="control-label" for="quiet-hours-enabled">
+                <i class="bi bi-moon"></i>
+                Включить тихие часы
+              </label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="quiet-hours-enabled" class="toggle-input">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>
+
+            <div class="time-range-controls" id="time-range-controls" style="display: none;">
+              <div class="time-input-group">
+                <label for="quiet-start">С:</label>
+                <input type="time" id="quiet-start" value="22:00" class="time-input">
+              </div>
+              <div class="time-input-group">
+                <label for="quiet-end">До:</label>
+                <input type="time" id="quiet-end" value="08:00" class="time-input">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Статус подключения -->
+        <div class="settings-card">
+          <h3 class="card-subtitle">СТАТУС</h3>
+          
+          <div class="status-info">
+            <div class="status-row">
+              <span class="status-label">Telegram Bot:</span>
+              <span id="bot-status" class="status-value">Проверка...</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">Real-time обновления:</span>
+              <span id="websocket-status" class="status-value">Проверка...</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">Пользователь:</span>
+              <span id="user-status" class="status-value">Загрузка...</span>
+            </div>
+          </div>
+
+          <div class="actions-container">
+            <button id="refresh-status-btn" class="action-button secondary">
+              <i class="bi bi-arrow-clockwise"></i>
+              Обновить статус
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно пресетов -->
+  <div class="modal" id="presets-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>ВЫБРАТЬ ПРЕСЕТ</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="preset-item" data-preset="default">
+          <span class="preset-name">Стандартный</span>
+          <span class="preset-description">Базовые настройки для начала работы</span>
+        </div>
+        <div class="preset-item" data-preset="developer">
+          <span class="preset-name">Разработчик</span>
+          <span class="preset-description">Настройки для IT-специалистов</span>
+        </div>
+        <div class="preset-item" data-preset="designer">
+          <span class="preset-name">Дизайнер</span>
+          <span class="preset-description">Настройки для творческих профессий</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Навигация по вкладкам (внизу как на главной странице) -->
+<div id="category-tabs" class="category-tabs" role="tablist" aria-label="Разделы настроек">
+  <button id="tab-keywords" class="tab-button keywords active" data-target="keywords-section" data-category-name="КЛЮЧЕВЫЕ СЛОВА" 
+        role="tab" aria-selected="true" aria-controls="keywords-section">
+    <span class="tab-label">КЛЮЧЕВЫЕ СЛОВА</span>
+  </button>
+  <button id="tab-channels" class="tab-button channels" data-target="channels-section" data-category-name="КАНАЛЫ"
+        role="tab" aria-selected="false" aria-controls="channels-section">
+    <span class="tab-label">КАНАЛЫ</span>
+  </button>
+</div>
+
+  <!-- Entry point - ES модуль -->
+  <script type="module" src="/src/js/settings-main.js"></script>
+  <!-- Phase 3.2: Notification Settings -->
+  <script type="module" src="/src/js/notification-settings.js"></script>
+  <!-- SettingsMain теперь инициализируется в settings-main.js после загрузки зависимостей -->
+
+  <script type="module">
+    // Инициализация новых вкладок
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      
+      tabButtons.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const target = this.dataset.target;
+          
+          // Убираем активность со всех вкладок
+          tabButtons.forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.remove('active');
+          });
+          
+          // Активируем выбранную вкладку
+          this.classList.add('active');
+          const targetSection = document.getElementById(target);
+          if (targetSection) {
+            targetSection.classList.add('active');
+          }
+        });
+      });
+
+      // Инициализация переключения темы
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          
+          // Используем ThemeManager для правильного применения темы
+          if (window.ThemeManager) {
+            window.ThemeManager.setTheme(newTheme);
+          } else {
+            // Fallback если ThemeManager не загружен
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('app-theme', newTheme);
+          }
+          
+          // Обновляем иконку
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.className = newTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+          }
+        });
+
+        // Загружаем сохраненную тему (унифицированный ключ)
+        const savedTheme = localStorage.getItem('app-theme');
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+          }
+        }
+      }
+    });
+
+    // Обработка кликабельных примеров
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('example-tag')) {
+        const input = e.target.closest('.settings-card').querySelector('.input-field');
+        input.value = e.target.textContent;
+        input.focus();
+        // Показываем крестик
+        updateClearButtonVisibility(input);
+      }
+    });
+
+    // Функция для обновления видимости кнопки очистки
+    function updateClearButtonVisibility(input) {
+      const wrapper = input.closest('.input-wrapper');
+      if (input.value.trim()) {
+        wrapper.classList.add('has-text');
+      } else {
+        wrapper.classList.remove('has-text');
+      }
+    }
+
+    // Обработка ввода в поля для показа/скрытия крестика
+    document.addEventListener('input', (e) => {
+      if (e.target.classList.contains('input-field')) {
+        updateClearButtonVisibility(e.target);
+      }
+    });
+
+    // Обработка кликов по крестикам
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('input-clear-btn')) {
+        const input = e.target.closest('.input-wrapper').querySelector('.input-field');
+        input.value = '';
+        input.focus();
+        updateClearButtonVisibility(input);
+      }
+    });
+
+    // Обработка модального окна пресетов
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-close')) {
+        const modal = e.target.closest('.modal');
+        modal.classList.remove('active');
+      }
+      
+      if (e.target.classList.contains('preset-item')) {
+        const preset = e.target.dataset.preset;
+        console.log('Выбран пресет:', preset);
+        // Здесь будет логика загрузки пресета
+        const modal = e.target.closest('.modal');
+        modal.classList.remove('active');
+      }
+    });
+
+    // Показать модальное окно пресетов
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'load-presets-btn') {
+        const modal = document.getElementById('presets-modal');
+        modal.classList.add('active');
+      }
+    });
+
+  </script>
+
+  <!-- Инициализация CSP после загрузки всех скриптов -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.cspManager) {
+      window.cspManager.init();
+    }
+  });
+  </script>
+</body>
+</html>
