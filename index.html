@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <!-- CSP будет установлен динамически через csp-manager.js с nonce-based security -->
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
+  
+  <title>oshu://work v15.1 - Telegram Mini App</title>
+  <!-- Preload критических ресурсов для быстрого First Paint -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
+  
+  <!-- Preload handled by Vite automatically -->
+  
+  <!-- Critical CSS для быстрого First Paint -->
+  <link rel="stylesheet" href="src/css/critical.css">
+  
+  <!-- Умная инициализация темы для предотвращения мерцания -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('app-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        // Применяем темную тему сразу
+        document.documentElement.style.setProperty('--background-color', '#121212');
+        document.documentElement.style.setProperty('--card-color', '#1E1E1E');
+        document.documentElement.style.setProperty('--text-color', '#E8E8E8');
+        document.documentElement.style.setProperty('--border-color', '#333333');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  
+  <!-- Основные стили (убрано дублирование preload) -->
+  <link rel="stylesheet" href="src/css/style.css">
+  
+  <!-- Fonts loaded asynchronously with optimal loading -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap"></noscript>
+</head>
+<body>
+
+<div class="main-wrapper">
+  <div class="ptr-bar"><div class="ptr-text">Потяните для обновления</div></div>
+  
+  <div id="main-header">
+    <header class="header">
+      <h1>oshu://work <small>v15</small></h1>
+      <div id="header-actions" class="header-actions">
+        <a href="favorites.html" class="header-button telegram-haptic">★ Избранное</a>
+        <a href="settings.html" class="header-button telegram-haptic">⚙︎ Настройки</a>
+      </div>
+    </header>
+    <div id="search-container" class="search-container">
+      <div class="search-input-wrapper">
+        <input type="search" id="search-input" class="search-input" placeholder="🔍 Поиск по названию, компании, зарплате...">
+        <button id="search-clear-btn" class="search-clear-btn" aria-label="Очистить поиск"></button>
+      </div>
+    </div>
+  </div>
+
+  <main class="content" id="vacancies-content">
+    <div id="vacancies-list-main" class="vacancy-list active" role="tabpanel" aria-labelledby="tab-main" aria-label="Вакансии категории: Точно твоё"></div>
+    <div id="vacancies-list-maybe" class="vacancy-list" role="tabpanel" aria-labelledby="tab-maybe" aria-label="Вакансии категории: Может быть" aria-hidden="true"></div>
+    <div id="vacancies-list-other" class="vacancy-list" role="tabpanel" aria-labelledby="tab-other" aria-label="Вакансии категории: Не твоё" aria-hidden="true"></div>
+  </main>
+</div>
+
+<div id="loader" class="loader-container hidden">
+  <div class="retro-progress-bar-outline">
+    <div class="retro-progress-bar-fill"></div>
+  </div>
+  <div class="loader-text">Загрузка вакансий...</div>
+</div>
+
+<div id="category-tabs" class="category-tabs" role="tablist" aria-label="Категории вакансий">
+    <button id="tab-main" class="tab-button main active" data-target="vacancies-list-main" data-category-name="ТОЧНО ТВОЁ" 
+          role="tab" aria-selected="true" aria-controls="vacancies-list-main">
+    <span class="tab-label">ТОЧНО ТВОЁ</span>
+    <span id="count-main" class="tab-count">0</span>
+  </button>
+  <button id="tab-maybe" class="tab-button maybe" data-target="vacancies-list-maybe" data-category-name="МОЖЕТ БЫТЬ"
+          role="tab" aria-selected="false" aria-controls="vacancies-list-maybe">
+    <span class="tab-label">МОЖЕТ БЫТЬ</span>
+    <span id="count-maybe" class="tab-count">0</span>
+  </button>
+  <button id="tab-other" class="tab-button other" data-target="vacancies-list-other" data-category-name="НЕ ТВОЁ"
+          role="tab" aria-selected="false" aria-controls="vacancies-list-other">
+    <span class="tab-label">НЕ ТВОЁ</span>
+    <span id="count-other" class="tab-count">0</span>
+  </button>
+</div>
+
+<div id="custom-confirm-overlay" class="custom-confirm-overlay hidden">
+    <div class="custom-confirm-box">
+    <p id="custom-confirm-text"></p>
+    <div class="custom-confirm-actions">
+      <button id="confirm-btn-cancel" class="custom-confirm-button" aria-label="Отменить действие">Отмена</button>
+      <button id="confirm-btn-ok" class="custom-confirm-button ok" aria-label="Подтвердить действие">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Подключение общего template -->
+<template id="vacancy-card-template">
+    <div class="vacancy-card">
+    <div class="card-actions">
+      <button class="card-action-btn apply" data-element="apply-btn" aria-label="Откликнуться">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><title>Откликнуться на вакансию</title><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+      </button>
+      <button class="card-action-btn favorite" data-element="favorite-btn" aria-label="В избранное">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><title>Добавить в избранное</title><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"/></svg>
+      </button>
+      <button class="card-action-btn delete" data-element="delete-btn" aria-label="Удалить">
+        <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><title>Удалить вакансию</title><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="card-header">
+      <h3 data-element="category">NO_CATEGORY</h3>
+    </div>
+    <div class="card-body">
+      <p class="card-summary" data-element="summary"></p>
+      <div class="info-window" data-element="info-window"></div>
+      <details data-element="details">
+        <summary>Показать полный текст</summary>
+        <div class="vacancy-text">
+            <div class="attachments" data-element="attachments"></div>
+            <div data-element="full-text"></div>
+        </div>
+      </details>
+    </div>
+    <div class="card-footer">
+      <div class="footer-skill-tags" data-element="skills"></div>
+      <div class="footer-meta">
+        <span class="channel-name" data-element="channel"></span>
+        <span class="meta-separator"> • </span>
+        <span class="timestamp-footer" data-element="timestamp"></span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Telegram WebApp API - загружаем первым для Phase 3 -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Phase 3: Telegram Mini App optimizations -->
+<script>
+// Preload optimizations для Telegram Mini App
+if (window.Telegram?.WebApp) {
+  // Расширяем на весь экран сразу
+  window.Telegram.WebApp.expand();
+  
+  // Применяем тему быстро чтобы избежать flash
+  const tg = window.Telegram.WebApp;
+  if (tg.themeParams.bg_color) {
+    document.documentElement.style.setProperty('--tg-bg-color', tg.themeParams.bg_color);
+    document.body.style.backgroundColor = tg.themeParams.bg_color;
+  }
+}
+</script>
+
+<!-- Supabase SDK - UMD build для статического подключения -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Supabase конфигурация загружается через env-dev.js -->
+
+<script>
+// Fallback загрузка interact.js
+(function() {
+  function loadScript(url, callback) {
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = () => {
+      window.dispatchEvent(new CustomEvent('interactLoaded'));
+      callback(true);
+    };
+    script.onerror = () => callback(false);
+    document.head.appendChild(script);
+  }
+
+  // Пробуем разные CDN (начинаем с самого стабильного)
+  const cdnUrls = [
+    'https://unpkg.com/interactjs@1.10.11/dist/interact.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js',
+    'https://cdn.interactjs.io/v1.10.11/interact.min.js'
+  ];
+
+  function tryNextCdn(index = 0) {
+    if (index >= cdnUrls.length) return;
+    loadScript(cdnUrls[index], (success) => {
+      if (!success) tryNextCdn(index + 1);
+    });
+  }
+
+  tryNextCdn();
+})();
+</script>
+<!-- Entry point - ES модуль -->
+<script>
+console.log('🔧 [HTML] Пытаемся загрузить ES модуль main.js...');
+</script>
+<script type="module" src="./src/js/main.js" 
+        onload="console.log('✅ [HTML] ES модуль загружен!')" 
+        onerror="console.error('❌ [HTML] Ошибка загрузки ES модуля!')"></script>
+
+
+<!-- Инициализация CSP после загрузки всех скриптов -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.cspManager) {
+    window.cspManager.init();
+  }
+});
+</script>
+</body>
+</html>

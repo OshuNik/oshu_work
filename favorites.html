@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <!-- CSP будет установлен динамически через csp-manager.js с nonce-based security -->
+  <title>Избранное - oshu://work v13</title>
+  <!-- Preload критических ресурсов для быстрого First Paint -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://lwfhtwnfqmdjwzrdznvv.supabase.co">
+  
+  <!-- Preload handled by Vite automatically -->
+  
+  <!-- Critical CSS для быстрого First Paint -->
+  <link rel="stylesheet" href="src/css/critical.css">
+  
+  <!-- Умная инициализация темы для предотвращения мерцания -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('app-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        // Применяем темную тему сразу
+        document.documentElement.style.setProperty('--background-color', '#121212');
+        document.documentElement.style.setProperty('--card-color', '#1E1E1E');
+        document.documentElement.style.setProperty('--text-color', '#E8E8E8');
+        document.documentElement.style.setProperty('--border-color', '#333333');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  
+  <!-- Основные стили (убрано дублирование preload) -->
+  <link rel="stylesheet" href="src/css/style.css">
+  
+  <!-- Fonts loaded asynchronously -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="main-wrapper">
+  <div class="ptr-bar"><div class="ptr-text">Потяните для обновления</div></div>
+
+  <header class="header header-centered">
+    <div class="retro-header">
+      <h1>ИЗБРАННОЕ</h1>
+      <div class="pixel-counter">
+        <span class="pixel-bar">■■■</span>
+        <span id="favorites-count" class="favorites-count">0</span>
+        <span class="pixel-bar">■■■</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="header-button">← Назад</a>
+    </div>
+  </header>
+
+  <div class="search-container" id="search-container-fav">
+    <div class="search-input-wrapper">
+      <input type="search" class="search-input" placeholder="🔍 Поиск в избранном..." id="favorites-search">
+      <button id="favorites-search-clear" class="search-clear-btn" aria-label="Очистить поиск"></button>
+    </div>
+  </div>
+
+  <div class="content" id="favorites-content">
+    <div id="favorites-list"></div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Шаблон карточки вакансии -->
+<template id="vacancy-card-template">
+    <div class="vacancy-card">
+    <div class="card-actions">
+      <button class="card-action-btn apply" data-element="apply-btn" aria-label="Откликнуться">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><title>Откликнуться на вакансию</title><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+      </button>
+      <button class="card-action-btn favorite" data-element="favorite-btn" aria-label="В избранное">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><title>Добавить в избранное</title><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"/></svg>
+      </button>
+      <button class="card-action-btn delete" data-element="delete-btn" aria-label="Удалить">
+        <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><title>Удалить вакансию</title><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="card-header">
+      <h3 data-element="category">NO_CATEGORY</h3>
+    </div>
+    <div class="card-body">
+      <p class="card-summary" data-element="summary"></p>
+      <div class="info-window" data-element="info-window"></div>
+      <details data-element="details">
+        <summary>Показать полный текст</summary>
+        <div class="vacancy-text" style="margin-top:10px;">
+            <div class="attachments" data-element="attachments"></div>
+            <div data-element="full-text"></div>
+        </div>
+      </details>
+    </div>
+    <div class="card-footer">
+      <div class="footer-skill-tags" data-element="skills"></div>
+      <div class="footer-meta">
+        <span class="channel-name" data-element="channel"></span>
+        <span class="meta-separator"> • </span>
+        <span class="timestamp-footer" data-element="timestamp"></span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Скрипты -->
+<script>
+// Fallback загрузка interact.js
+(function() {
+  function loadScript(url, callback) {
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = () => {
+      window.dispatchEvent(new CustomEvent('interactLoaded'));
+      callback(true);
+    };
+    script.onerror = () => callback(false);
+    document.head.appendChild(script);
+  }
+
+  // Пробуем разные CDN (начинаем с самого стабильного)
+  const cdnUrls = [
+    'https://unpkg.com/interactjs@1.10.11/dist/interact.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js',
+    'https://cdn.interactjs.io/v1.10.11/interact.min.js'
+  ];
+
+  function tryNextCdn(index = 0) {
+    if (index >= cdnUrls.length) return;
+    loadScript(cdnUrls[index], (success) => {
+      if (!success) tryNextCdn(index + 1);
+    });
+  }
+
+  tryNextCdn();
+})();
+</script>
+<!-- Entry point - ES модуль -->
+<script type="module" src="/src/js/favorites-main.js"></script>
+
+<!-- Инициализация CSP после загрузки всех скриптов -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.cspManager) {
+    window.cspManager.init();
+  }
+});
+</script>
+
+</body>
+</html>

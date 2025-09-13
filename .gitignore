@@ -1,0 +1,56 @@
+# Архивные файлы - не деплоить
+архив/
+
+# Временные файлы
+*.tmp
+*.temp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Логи
+*.log
+
+# Переменные окружения - НИКОГДА не коммитить!
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Автогенерированные файлы
+src/js/env-vars-generated.js
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vite build output
+dist/
+dist-ssr/
+*.local
+
+# Vite cache
+.cache/
+.parcel-cache/
+
+# Build outputs
+build/
+out/
+
+# Package managers (keep package-lock.json for reproducible deployments)
+# package-lock.json  # NEEDED for GitHub Actions
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage
+coverage/
+*.lcov
