@@ -328,6 +328,15 @@
           const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
           overlays.forEach(overlay => overlay.classList.remove('visible'));
 
+          // Возвращаем видимость и размеры ПЕРЕД анимацией
+          cardElement.style.maxHeight = '500px';
+          cardElement.style.paddingTop = '';
+          cardElement.style.paddingBottom = '';
+          cardElement.style.marginTop = '';
+          cardElement.style.marginBottom = '';
+          cardElement.style.borderWidth = '';
+
+          // Запускаем анимацию
           cardElement.style.transition = 'transform 0.35s ease-out, opacity 0.35s ease-out';
           cardElement.style.opacity = '1';
           cardElement.style.transform = 'translate3d(0, 0, 0)';
