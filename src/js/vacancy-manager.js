@@ -320,51 +320,39 @@
 
       // Функция отмены с transition-анимацией въезда (как в избранном)
       const onUndo = () => {
-        logger.log('🔄 Отмена свайпа для вакансии:', vacancyId);
-        
-        // Возвращаем карточку на место
-        parent.insertBefore(cardElement, nextSibling);
-        
-        requestAnimationFrame(() => {
-          // Убираем все свайп-классы чтобы карточка не была залитой
-          cardElement.classList.remove('swipe-left', 'swipe-right');
-          
-          // Принудительно убираем любые overlays
-          const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
-          overlays.forEach(overlay => {
-            overlay.classList.remove('visible');
-            overlay.style.opacity = '0';
-          });
-          
-          // Анимация возврата карточки для свайпов (как в избранном)
-          cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
-          cardElement.style.opacity = '1';
-          cardElement.style.transform = 'translate3d(0, 0, 0)'; // Возврат на место (как в избранном для свайпов)
-          cardElement.style.maxHeight = '500px';
-          cardElement.style.paddingTop = '';
-          cardElement.style.paddingBottom = '';
-          cardElement.style.marginTop = '';
-          cardElement.style.marginBottom = '';
-          cardElement.style.borderWidth = '';
-          
-          // Сбрасываем также стили background если они остались
-          cardElement.style.background = '';
-          cardElement.style.backgroundColor = '';
-          cardElement.style.removeProperty('background');
-          cardElement.style.removeProperty('background-color');
-          
-          // Убираем transition после анимации
-          setTimeout(() => {
-            cardElement.style.transition = '';
-            logger.log('✅ Анимация возврата завершена для вакансии:', vacancyId);
-            
-            // Принудительно переинициализируем свайпы, чтобы сбросить внутреннее состояние interact.js
+        logger.log('🔄 Отмена свайпа для вакансии (новая логика):', vacancyId);
+
+        try {
+          const vacancyDataString = cardElement.dataset.vacancyData;
+          if (!vacancyDataString) {
+            throw new Error('Не найдены данные вакансии в data-атрибуте.');
+          }
+
+          const vacancyData = JSON.parse(vacancyDataString);
+          const newCard = window.utils.createVacancyCard(vacancyData, { pageType: 'main' });
+
+          if (newCard) {
+            // Вставляем новую карточку и удаляем старую
+            parent.insertBefore(newCard, nextSibling);
+            cardElement.remove();
+            logger.log('✅ Новая карточка создана и вставлена, старая удалена.');
+
+            // Явный вызов reinitialize, т.к. MutationObserver может не успеть
             if (window.SwipeHandler && window.SwipeHandler.reinitialize) {
               window.SwipeHandler.reinitialize();
-              logger.log('🔄 SwipeHandler переинициализирован после отмены действия.');
+              logger.log('🔄 SwipeHandler принудительно переинициализирован.');
             }
-          }, 300);
-        });
+
+          } else {
+            throw new Error('Не удалось создать новую карточку вакансии.');
+          }
+        } catch (error) {
+          logger.error('Критическая ошибка в onUndo:', error);
+          // Аварийный возврат старой карточки, если что-то пошло не так
+          parent.insertBefore(cardElement, nextSibling);
+          cardElement.style.opacity = '1';
+          cardElement.style.transform = 'translate3d(0, 0, 0)';
+        }
       };
 
       // Показываем toast с возможностью отмены для свайпов
