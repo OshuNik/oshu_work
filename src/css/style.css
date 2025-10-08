@@ -1,3 +1,7 @@
+html, body {
+    background-color: var(--background-color);
+}
+
 /* Шрифты теперь загружаются через preconnect в HTML для лучшей производительности */
 
 :root {
