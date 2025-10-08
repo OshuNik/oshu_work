@@ -1,6 +1,6 @@
 {
   "name": "oshu-work-telegram-mini-app",
-  "version": "14.0.1",
+  "version": "15.1.3",
   "type": "module",
   "description": "oshu://work - Telegram Mini App для поиска вакансий с real-time функциями",
   "scripts": {

@@ -357,6 +357,12 @@
           setTimeout(() => {
             cardElement.style.transition = '';
             logger.log('✅ Анимация возврата завершена для вакансии:', vacancyId);
+            
+            // Принудительно переинициализируем свайпы, чтобы сбросить внутреннее состояние interact.js
+            if (window.SwipeHandler && window.SwipeHandler.reinitialize) {
+              window.SwipeHandler.reinitialize();
+              logger.log('🔄 SwipeHandler переинициализирован после отмены действия.');
+            }
           }, 300);
         });
       };
