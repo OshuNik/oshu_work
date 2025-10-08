@@ -308,6 +308,8 @@ body {
 
 /* === Pull-to-Refresh (Финальный Ретро-дизайн) === */
 .main-wrapper {
+    min-height: 100vh;
+    box-sizing: border-box;
     position: relative;
     z-index: 1;
     background-color: var(--background-color);
