@@ -298,21 +298,68 @@
   // Предотвращение race conditions в favorites updateStatus
   const updateStatusLocksFav = new Set();
   
-  async function returnToMain(vacancyId) {
-    // Проверяем блокировку
-    if (updateStatusLocksFav.has(vacancyId)) {
-      console.log('returnToMain уже выполняется для ID:', vacancyId);
-      return;
-    }
+  // Функция для создания обработчика отмены с правильной логикой
+  function createUndoHandler(cardElement) {
+    if (!cardElement) return () => {};
 
-    // Проверяем rate limit
+    const parent = cardElement.parentElement;
+    const nextSibling = cardElement.nextElementSibling;
+
+    return () => {
+      // 1. Анимируем возврат старой карточки
+      requestAnimationFrame(() => {
+        cardElement.classList.remove('swipe-left', 'swipe-right');
+        const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
+        overlays.forEach(overlay => overlay.classList.remove('visible'));
+
+        cardElement.style.maxHeight = '500px';
+        cardElement.style.paddingTop = '';
+        cardElement.style.paddingBottom = '';
+        cardElement.style.marginTop = '';
+        cardElement.style.marginBottom = '';
+        cardElement.style.borderWidth = '';
+
+        cardElement.style.transition = 'transform 0.35s ease-out, opacity 0.35s ease-out';
+        cardElement.style.opacity = '1';
+        cardElement.style.transform = 'scale(1)';
+      });
+
+      // 2. После анимации - заменяем карточку на новую
+      setTimeout(() => {
+        try {
+          const vacancyDataString = cardElement.dataset.vacancyData;
+          if (!vacancyDataString) throw new Error('Нет данных вакансии в data-атрибуте');
+
+          const vacancyData = JSON.parse(vacancyDataString);
+          const newCard = window.utils.createVacancyCard(vacancyData, { pageType: 'favorites' });
+
+          if (newCard) {
+            parent.insertBefore(newCard, nextSibling);
+            cardElement.remove();
+
+            if (window.SwipeHandler && window.SwipeHandler.reinitialize) {
+              window.SwipeHandler.reinitialize();
+            }
+          } else {
+            throw new Error('Не удалось создать новую карточку');
+          }
+        } catch (error) {
+          console.error('Ошибка в обработчике отмены (избранное):', error);
+          cardElement.style.transition = ''; // fallback
+        }
+      }, 350);
+    };
+  }
+
+  async function returnToMain(vacancyId) {
+    if (updateStatusLocksFav.has(vacancyId)) return;
+
     const rateResult = await checkRateLimit('favorite');
-    if (!rateResult.allowed) {
+    if (rateResult && !rateResult.allowed) {
       uiToast(rateResult.message);
       return;
     }
     
-    // Блокируем операцию
     updateStatusLocksFav.add(vacancyId);
     
     try {
@@ -332,79 +379,15 @@
       cardElement.style.marginBottom = '0';
       cardElement.style.borderWidth = '0';
 
-      const onUndo = () => {
-          // Убираем все свайп-классы чтобы карточка не была залитой
-          cardElement.classList.remove('swipe-left', 'swipe-right');
-          
-          // Принудительно убираем любые overlays
-          const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
-          overlays.forEach(overlay => {
-            overlay.classList.remove('visible');
-            overlay.style.opacity = '0';
-          });
-          
-          cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
-          cardElement.style.opacity = '1';
-          cardElement.style.transform = 'scale(1)';
-          cardElement.style.maxHeight = '500px';
-          cardElement.style.paddingTop = '';
-          cardElement.style.paddingBottom = '';
-          cardElement.style.marginTop = '';
-          cardElement.style.marginBottom = '';
-          cardElement.style.borderWidth = '';
-          
-          // Сбрасываем также стили background если они остались
-          cardElement.style.background = '';
-          cardElement.style.backgroundColor = '';
-          cardElement.style.removeProperty('background');
-          cardElement.style.removeProperty('background-color');
-          
-          // Убираем transition после анимации
-          setTimeout(() => {
-            cardElement.style.transition = '';
-          }, 300);
-      };
+      const onUndo = createUndoHandler(cardElement);
 
-      // Haptic feedback для возврата в основные
       triggerHaptic('notification', 'success');
       
       uiToast('Возвращено в основной список', {
           timeout: 5000,
-          onUndo: () => {
-            // Убираем все свайп-классы чтобы карточка не была залитой
-            cardElement.classList.remove('swipe-left', 'swipe-right');
-            
-            // Принудительно убираем любые overlays
-            const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
-            overlays.forEach(overlay => {
-              overlay.classList.remove('visible');
-              overlay.style.opacity = '0';
-            });
-            
-            cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
-            cardElement.style.opacity = '1';
-            cardElement.style.transform = 'scale(1)';
-            cardElement.style.maxHeight = '500px';
-            cardElement.style.paddingTop = '';
-            cardElement.style.paddingBottom = '';
-            cardElement.style.marginTop = '';
-            cardElement.style.marginBottom = '';
-            cardElement.style.borderWidth = '';
-            
-            // Сбрасываем также стили background если они остались
-            cardElement.style.background = '';
-            cardElement.style.backgroundColor = '';
-            cardElement.style.removeProperty('background');
-            cardElement.style.removeProperty('background-color');
-            
-            // Убираем transition после анимации
-            setTimeout(() => {
-              cardElement.style.transition = '';
-            }, 300);
-          },
+          onUndo: onUndo,
           onTimeout: async () => {
               try {
-                // Мгновенно обновляем счетчик при удалении
                 const currentCount = container.querySelectorAll('.vacancy-card').length - 1;
                 updateFavoritesCount(currentCount > 0 ? currentCount : 0);
                 
@@ -441,20 +424,14 @@
   }
   
   async function updateStatus(vacancyId, newStatus) {
-    // Проверяем блокировку - предотвращает двойные клики
-    if (updateStatusLocksFav.has(vacancyId)) {
-      console.log('updateStatus уже выполняется для ID:', vacancyId);
-      return;
-    }
+    if (updateStatusLocksFav.has(vacancyId)) return;
 
-    // Проверяем rate limit для удаления из избранного
     const rateResult = await checkRateLimit('favorite');
-    if (!rateResult.allowed) {
+    if (rateResult && !rateResult.allowed) {
       uiToast(rateResult.message);
       return;
     }
     
-    // Блокируем операцию
     updateStatusLocksFav.add(vacancyId);
     
     try {
@@ -474,46 +451,15 @@
       cardElement.style.marginBottom = '0';
       cardElement.style.borderWidth = '0';
 
-      // Haptic feedback для удаления
+      const onUndo = createUndoHandler(cardElement);
+
       triggerHaptic('impact', 'medium');
       
       uiToast('Вакансия удалена', {
           timeout: 5000,
-          onUndo: () => {
-            // Убираем все свайп-классы чтобы карточка не была залитой
-            cardElement.classList.remove('swipe-left', 'swipe-right');
-            
-            // Принудительно убираем любые overlays
-            const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
-            overlays.forEach(overlay => {
-              overlay.classList.remove('visible');
-              overlay.style.opacity = '0';
-            });
-            
-            cardElement.style.transition = 'opacity .3s, transform .3s, max-height .3s, margin .3s, padding .3s, border-width .3s';
-            cardElement.style.opacity = '1';
-            cardElement.style.transform = 'scale(1)';
-            cardElement.style.maxHeight = '500px';
-            cardElement.style.paddingTop = '';
-            cardElement.style.paddingBottom = '';
-            cardElement.style.marginTop = '';
-            cardElement.style.marginBottom = '';
-            cardElement.style.borderWidth = '';
-            
-            // Сбрасываем также стили background если они остались
-            cardElement.style.background = '';
-            cardElement.style.backgroundColor = '';
-            cardElement.style.removeProperty('background');
-            cardElement.style.removeProperty('background-color');
-            
-            // Убираем transition после анимации
-            setTimeout(() => {
-              cardElement.style.transition = '';
-            }, 300);
-          },
+          onUndo: onUndo,
           onTimeout: async () => {
               try {
-                // Мгновенно обновляем счетчик при удалении
                 const currentCount = container.querySelectorAll('.vacancy-card').length - 1;
                 updateFavoritesCount(currentCount > 0 ? currentCount : 0);
                 
@@ -521,12 +467,7 @@
                 const url = `${CFG.SUPABASE_URL}/rest/v1/vacancies?id=eq.${encodeURIComponent(vacancyId)}`;
                 const resp = await fetchWithRetry(url, {
                   method: 'PATCH',
-                  headers: {
-                    'apikey': CFG.SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${CFG.SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                  },
+                  headers: createSupabaseHeaders({ prefer: 'return=minimal' }),
                   body: JSON.stringify({ status: newStatus })
                 }, RETRY_OPTIONS);
 
@@ -536,7 +477,6 @@
                     localStorage.setItem('needs-refresh-main', 'true');
                 } catch (storageError) {
                     console.warn('localStorage недоступен:', storageError);
-                    // Продолжаем работу без localStorage
                 }
                 allFavorites = allFavorites.filter(v => v.id !== vacancyId);
                 renderFilteredFavorites();
@@ -551,7 +491,6 @@
       triggerHaptic('notification', 'error');
       safeAlert('Произошла ошибка при обновлении статуса');
     } finally {
-      // Всегда снимаем блокировку
       updateStatusLocksFav.delete(vacancyId);
     }
   }
