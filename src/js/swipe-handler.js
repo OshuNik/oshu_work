@@ -56,6 +56,8 @@
             threshold: 8,
             listeners: {
                 start(event) {
+                    // Убираем остаточную анимацию от предыдущего свайпа
+                    event.target.style.transition = 'none';
                     // Добавляем класс для активации touch-action: none
                     event.target.classList.add('swiping');
                     event.target.style.zIndex = '100';
