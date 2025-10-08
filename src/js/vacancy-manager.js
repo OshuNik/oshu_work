@@ -320,39 +320,45 @@
 
       // Функция отмены с transition-анимацией въезда (как в избранном)
       const onUndo = () => {
-        logger.log('🔄 Отмена свайпа для вакансии (новая логика):', vacancyId);
+        logger.log('🔄 Отмена свайпа v3: Анимация + Замена', vacancyId);
 
-        try {
-          const vacancyDataString = cardElement.dataset.vacancyData;
-          if (!vacancyDataString) {
-            throw new Error('Не найдены данные вакансии в data-атрибуте.');
-          }
+        // 1. Анимируем возврат старой карточки
+        requestAnimationFrame(() => {
+          cardElement.classList.remove('swipe-left', 'swipe-right');
+          const overlays = cardElement.querySelectorAll('.swipe-action-overlay');
+          overlays.forEach(overlay => overlay.classList.remove('visible'));
 
-          const vacancyData = JSON.parse(vacancyDataString);
-          const newCard = window.utils.createVacancyCard(vacancyData, { pageType: 'main' });
-
-          if (newCard) {
-            // Вставляем новую карточку и удаляем старую
-            parent.insertBefore(newCard, nextSibling);
-            cardElement.remove();
-            logger.log('✅ Новая карточка создана и вставлена, старая удалена.');
-
-            // Явный вызов reinitialize, т.к. MutationObserver может не успеть
-            if (window.SwipeHandler && window.SwipeHandler.reinitialize) {
-              window.SwipeHandler.reinitialize();
-              logger.log('🔄 SwipeHandler принудительно переинициализирован.');
-            }
-
-          } else {
-            throw new Error('Не удалось создать новую карточку вакансии.');
-          }
-        } catch (error) {
-          logger.error('Критическая ошибка в onUndo:', error);
-          // Аварийный возврат старой карточки, если что-то пошло не так
-          parent.insertBefore(cardElement, nextSibling);
+          cardElement.style.transition = 'transform 0.35s ease-out, opacity 0.35s ease-out';
           cardElement.style.opacity = '1';
           cardElement.style.transform = 'translate3d(0, 0, 0)';
-        }
+        });
+
+        // 2. После анимации - заменяем карточку на новую
+        setTimeout(() => {
+          try {
+            const vacancyDataString = cardElement.dataset.vacancyData;
+            if (!vacancyDataString) throw new Error('Нет данных вакансии');
+
+            const vacancyData = JSON.parse(vacancyDataString);
+            const newCard = window.utils.createVacancyCard(vacancyData, { pageType: 'main' });
+
+            if (newCard) {
+              parent.insertBefore(newCard, nextSibling);
+              cardElement.remove(); // Удаляем старую
+
+              if (window.SwipeHandler && window.SwipeHandler.reinitialize) {
+                window.SwipeHandler.reinitialize();
+              }
+              logger.log('✅ Карточка заменена после анимации.');
+            } else {
+              throw new Error('Не удалось создать новую карточку');
+            }
+          } catch (error) {
+            logger.error('Ошибка в onUndo (v3):', error);
+            // Аварийный план, если замена не удалась
+            cardElement.style.transition = '';
+          }
+        }, 350); // Чуть больше времени анимации
       };
 
       // Показываем toast с возможностью отмены для свайпов
