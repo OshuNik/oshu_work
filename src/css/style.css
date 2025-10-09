@@ -313,9 +313,11 @@ body {
     position: relative;
     z-index: 1;
     background-color: var(--background-color);
-    padding: 15px; /* Перемещаем отступы сюда */
-    padding-bottom: 80px;
-    padding-top: 20px; /* Добавляем небольшой отступ сверху для плашки */
+    /* Адаптивные отступы для безопасных зон (notch, home indicator) */
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+    padding-right: calc(15px + env(safe-area-inset-right, 0px));
+    padding-bottom: 80px; /* Этот отступ нужен, чтобы контент не уходил под вкладки */
+    padding-left: calc(15px + env(safe-area-inset-left, 0px));
     transition: transform 0.3s ease-out;
     will-change: transform; /* Оптимизация анимаций PTR */
 }
