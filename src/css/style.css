@@ -1,4 +1,5 @@
-html, body {
+html {
+    min-height: 100vh; /* Гарантируем, что html занимает весь экран */
     background-color: var(--background-color);
 }
 
@@ -299,6 +300,7 @@ body {
     margin: 0;
     padding: 0; /* Убираем отступы для чистого фона */
     overflow-x: hidden;
+    min-height: 100vh; /* Тело также растягиваем на весь экран */
     /* Блокируем сворачивание мини-аппа */
     overscroll-behavior: contain;
     -webkit-overscroll-behavior: contain;
@@ -635,12 +637,11 @@ mark.highlight {
 
 .category-tabs-container {
     position: fixed;
-    bottom: 0;
+    bottom: env(safe-area-inset-bottom);
     left: 0;
     right: 0;
     z-index: 10;
     background-color: var(--background-color);
-    padding-bottom: env(safe-area-inset-bottom);
     transition: transform 0.3s ease-out;
 }
 
