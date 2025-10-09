@@ -1,6 +1,7 @@
 html {
-    min-height: 100vh; /* Гарантируем, что html занимает весь экран */
-    background-color: var(--background-color);
+  height: 100%;
+  min-height: 100vh; /* Гарантируем, что html занимает весь экран */
+  background-color: var(--background-color);
 }
 
 /* Шрифты теперь загружаются через preconnect в HTML для лучшей производительности */
@@ -300,6 +301,7 @@ body {
     margin: 0;
     padding: 0; /* Убираем отступы для чистого фона */
     overflow-x: hidden;
+    height: 100%;
     min-height: 100vh; /* Тело также растягиваем на весь экран */
     /* Блокируем сворачивание мини-аппа */
     overscroll-behavior: contain;
@@ -635,22 +637,18 @@ mark.highlight {
   to   { transform: scale(1); }
 }
 
-.category-tabs-container {
+.category-tabs {
     position: fixed;
-    bottom: env(safe-area-inset-bottom);
+    bottom: 0;
     left: 0;
     right: 0;
-    z-index: 10;
-    background-color: var(--background-color);
-    transition: transform 0.3s ease-out;
-}
-
-.category-tabs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    background-color: transparent; /* Это ключевое исправление */
     padding: 0 10px;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 10;
     border-top: none;
-    background-color: transparent;
 }
 .tab-button {
     font-family: 'Roboto Mono', monospace;
