@@ -316,10 +316,15 @@ body {
     /* Адаптивные отступы для безопасных зон (notch, home indicator) */
     padding-top: calc(20px + env(safe-area-inset-top, 0px));
     padding-right: calc(15px + env(safe-area-inset-right, 0px));
-    padding-bottom: 80px; /* Этот отступ нужен, чтобы контент не уходил под вкладки */
+    padding-bottom: 20px; /* Стандартный отступ снизу для страниц без вкладок */
     padding-left: calc(15px + env(safe-area-inset-left, 0px));
     transition: transform 0.3s ease-out;
     will-change: transform; /* Оптимизация анимаций PTR */
+}
+
+/* Добавляем отступ снизу только на страницах, где есть вкладки */
+.has-tabs .main-wrapper {
+    padding-bottom: 80px;
 }
 .main-wrapper.ptr-pulling {
     transition: none;
@@ -628,18 +633,23 @@ mark.highlight {
   to   { transform: scale(1); }
 }
 
-.category-tabs {
+.category-tabs-container {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 10;
+    background-color: var(--background-color);
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: transform 0.3s ease-out;
+}
+
+.category-tabs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    background-color: var(--background-color); /* Используем фон приложения */
     padding: 0 10px;
-    padding-bottom: env(safe-area-inset-bottom);
-    z-index: 10;
     border-top: none;
+    background-color: transparent;
 }
 .tab-button {
     font-family: 'Roboto Mono', monospace;
