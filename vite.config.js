@@ -134,17 +134,6 @@ export default defineConfig(({ command, mode }) => {
       // JSON оптимизация
       json: {
         stringify: true // Быстрее парсинг JSON файлов
-      },
-      
-      // Experimental optimizations
-      experimental: {
-        renderBuiltUrl: (filename) => {
-          // Оптимизированная URL генерация для CDN
-          if (isProd && filename.startsWith('assets/')) {
-            return `https://cdn.oshu.work/${filename}`
-          }
-          return filename
-        }
       }
     },
     
