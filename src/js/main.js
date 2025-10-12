@@ -1,5 +1,5 @@
-// Main entry point для Vite - Phase 3.2 Simplified
-console.log('🚀 [MAIN] oshu://work v15.1.0 loading...');
+// Main entry point для Vite - Phase 3.2 Simplified + Security Fixes
+console.log('🚀 [MAIN] oshu://work v15.2.0 loading...');
 
 // Импортируем основные модули
 import './config.js';
@@ -9,12 +9,18 @@ import './csp-manager.js';
 import './error-monitor.js';
 import './error-helpers.js';
 
+// ✅ Security & Performance Modules (NEW)
+import './sanitizer.js';           // XSS Protection
+import './error-boundary.js';      // Global error handler
+import './pagination-manager.js';  // Pagination & infinite scroll
+
 // Supabase клиент для Realtime
 import './supabase-client.js';
 import './realtime-manager.js'; // Realtime подписки на новые вакансии
 
 // Utils модули (КРИТИЧЕСКИ ВАЖНО - содержит createVacancyCard, renderEmptyState)
 import './utils.min.js';
+import './utils-xss-patch.js';   // ✅ XSS Patch для utils.min.js
 import './utils-empty-state.js';
 
 // Core модули  

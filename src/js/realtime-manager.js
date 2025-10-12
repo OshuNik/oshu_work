@@ -189,6 +189,7 @@ class RealtimeManager {
   disconnect() {
     if (this.channel) {
       console.log('[Realtime Manager] Отключение канала...');
+      window.supabaseClient?.removeChannel(this.channel);
       this.channel.unsubscribe();
       this.channel = null;
     }
@@ -204,9 +205,71 @@ class RealtimeManager {
     this.retryAttempts = 0;
     this.setupVacancySubscription();
   }
+
+  /**
+   * ✅ Полная очистка (cleanup) - устраняет memory leaks
+   */
+  cleanup() {
+    console.log('[Realtime Manager] 🧹 Полная очистка...');
+
+    // Отключить канал
+    this.disconnect();
+
+    // Очистить retry attempts
+    this.retryAttempts = 0;
+    this.maxRetries = 0; // Prevent reconnect
+
+    console.log('[Realtime Manager] ✅ Cleanup завершен');
+  }
+
+  /**
+   * ✅ Настройка автоматической очистки при навигации
+   */
+  setupAutoCleanup() {
+    // Cleanup при закрытии страницы/вкладки
+    window.addEventListener('beforeunload', () => {
+      this.cleanup();
+    });
+
+    // Cleanup при переходе на другую страницу (для SPA)
+    window.addEventListener('pagehide', () => {
+      this.cleanup();
+    });
+
+    // Cleanup при долгом нахождении в background (опционально)
+    let backgroundTimeout = null;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        // Отложенный cleanup если > 5 минут в background
+        backgroundTimeout = setTimeout(() => {
+          if (document.visibilityState === 'hidden') {
+            console.log('[Realtime Manager] App долго в background, cleanup...');
+            this.cleanup();
+          }
+        }, 300000); // 5 минут
+      } else {
+        // Вернулись в foreground - отменить cleanup
+        if (backgroundTimeout) {
+          clearTimeout(backgroundTimeout);
+          backgroundTimeout = null;
+        }
+
+        // Если канал отключен - переподключиться
+        if (!this.isSubscribed && this.maxRetries > 0) {
+          console.log('[Realtime Manager] Возвращение из background, переподключение...');
+          this.reconnect();
+        }
+      }
+    });
+
+    console.log('[Realtime Manager] ✅ Auto cleanup настроен');
+  }
 }
 
 // Создаем глобальный экземпляр
 window.realtimeManager = new RealtimeManager();
 
-console.log('[Realtime Manager] ✅ Глобальный realtimeManager создан');
+// ✅ Активировать автоматическую очистку для предотвращения memory leaks
+window.realtimeManager.setupAutoCleanup();
+
+console.log('[Realtime Manager] ✅ Глобальный realtimeManager создан с auto cleanup');
