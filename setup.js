@@ -153,6 +153,23 @@ global.ResizeObserver = vi.fn(() => ({
 // Console warnings для неожиданных вызовов
 beforeEach(() => {
   vi.clearAllMocks()
+  // Clear all timers before each test
+  vi.clearAllTimers()
+})
+
+// Global cleanup after each test
+afterEach(() => {
+  // Run pending timers
+  if (vi.isFakeTimers()) {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  }
+
+  // Clear all intervals
+  vi.clearAllTimers()
+
+  // Clear all mocks
+  vi.clearAllMocks()
 })
 
 // Дополнительные утилиты для тестов

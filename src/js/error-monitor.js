@@ -6,14 +6,14 @@
   class ErrorMonitor {
     constructor(config = {}) {
       this.config = {
-        botToken: config.botToken || window.APP_CONFIG?.ERROR_BOT_TOKEN,
-        chatId: config.chatId || window.APP_CONFIG?.ERROR_CHAT_ID,
+        // ✅ SECURITY FIX: Bot Token и Chat ID больше не нужны в frontend
+        // Они теперь хранятся в Supabase Edge Function секретах
         enabled: config.enabled ?? window.APP_CONFIG?.ERROR_MONITOR_ENABLED ?? false,
         maxErrors: config.maxErrors || 10, // максимум ошибок в час
         throttleMs: config.throttleMs || 300000, // 5 минут между похожими ошибками
         environment: config.environment || (window.location.hostname === 'localhost' ? 'development' : 'production'),
         appName: config.appName || 'oshu://work',
-        version: config.version || '15.1'
+        version: config.version || '16.0'
       };
 
       this.errorQueue = [];
@@ -30,8 +30,12 @@
         return;
       }
 
-      if (!this.config.botToken || !this.config.chatId) {
-        console.warn('📊 Error Monitor: missing bot token or chat ID');
+      // ✅ SECURITY FIX: Проверяем наличие Supabase конфигурации вместо Bot Token
+      const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL;
+      const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY;
+
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        console.warn('📊 Error Monitor: missing Supabase configuration');
         return;
       }
 
@@ -42,7 +46,7 @@
       // Переопределяем console.error для перехвата
       this.overrideConsoleError();
 
-      console.log('📊 Error Monitor: initialized for', this.config.environment);
+      console.log('📊 Error Monitor: initialized for', this.config.environment, '(using Edge Function)');
     }
 
     handleError(event) {
@@ -228,27 +232,50 @@
 
     async sendError(error) {
       try {
-        const message = this.formatTelegramMessage(error);
-        
-        const response = await fetch(`https://api.telegram.org/bot${this.config.botToken}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            chat_id: this.config.chatId,
-            text: message,
-            parse_mode: 'HTML',
-            disable_web_page_preview: true
-          })
-        });
+        // ✅ SECURITY FIX: Используем Edge Function вместо прямого вызова Telegram API
+        // Это позволяет скрыть Bot Token от frontend кода
+
+        const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY;
+
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+          console.warn('Error Monitor: Supabase configuration missing');
+          return;
+        }
+
+        const response = await fetch(
+          `${SUPABASE_URL}/functions/v1/send-error-notification`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({
+              error: {
+                message: error.message,
+                stack: error.stack,
+                type: error.type
+              },
+              context: {
+                url: error.context?.url || window.location.href,
+                userAgent: error.userAgent,
+                timestamp: error.timestamp,
+                app: error.app,
+                telegram: error.telegram,
+                viewport: error.context?.viewport,
+                platform: error.context?.platform
+              }
+            })
+          }
+        );
 
         if (!response.ok) {
-          console.warn('Error Monitor: failed to send to Telegram', response.status);
+          console.warn('Error Monitor: failed to send error notification', response.status);
         }
 
       } catch (e) {
-        console.warn('Error Monitor: network error sending to Telegram', e);
+        console.warn('Error Monitor: network error sending notification', e);
       }
     }
 
@@ -546,7 +573,7 @@
         queueSize: this.errorQueue.length,
         hourlyCount: this.hourlyCount,
         throttledErrors: this.sentErrors.size,
-        config: { ...this.config, botToken: '[hidden]' }
+        config: { ...this.config } // ✅ Больше нет Bot Token для скрытия
       };
     }
 

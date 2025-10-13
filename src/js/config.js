@@ -28,11 +28,11 @@ window.APP_CONFIG = {
   // Supabase конфигурация
   SUPABASE_URL: envConfig.SUPABASE_URL,
   SUPABASE_ANON_KEY: envConfig.SUPABASE_ANON_KEY,
-  
+
   // Error Monitor конфигурация
-  ERROR_BOT_TOKEN: window.ENV?.ERROR_BOT_TOKEN || '8356223189:AAEuNYcDDz-CyzICtf2L2MJM8KL9OIzQm1A',
-  ERROR_CHAT_ID: window.ENV?.ERROR_CHAT_ID || '1521478462',
-  ERROR_MONITOR_ENABLED: currentEnv === 'production', // Только в production (тестирование завершено)
+  // ✅ SECURITY FIX: Bot Token и Chat ID удалены из frontend кода
+  // Теперь они хранятся в Supabase Edge Function секретах
+  ERROR_MONITOR_ENABLED: currentEnv === 'production', // Только в production
   
   // Параметры приложения
   PAGE_SIZE_MAIN: 10,

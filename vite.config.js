@@ -14,8 +14,8 @@ export default defineConfig(({ command, mode }) => {
       port: 5173,
       host: true, // Позволяет доступ из сети (полезно для тестирования на мобильных)
       open: true,
-      // HTTPS для тестирования Telegram Mini App
-      https: false, // включить при необходимости тестирования в Telegram
+      // HTTPS для тестирования Telegram Mini App (REQUIRED для production-like testing)
+      https: true, // ✅ ENABLED для безопасности и Telegram compatibility
       
       // Advanced: Warmup стратегия для быстрого старта
       warmup: {
