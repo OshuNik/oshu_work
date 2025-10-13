@@ -22,7 +22,6 @@ import './realtime-manager.js'; // Realtime подписки на новые в�
 import './utils.min.js';
 import './utils-xss-patch.js';   // ✅ XSS Patch для utils.min.js
 import './utils-empty-state.js';
-import './utils-image-button-debug.js'; // 🐛 DEBUG: Image button logging
 
 // Core модули  
 import './websocket-manager.js'; // WebSocket для получения новых вакансий
