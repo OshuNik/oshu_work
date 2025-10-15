@@ -56,8 +56,10 @@ export class ChannelsManager {
    */
   validateAndFormatChannelId(input) {
     if (!input) return null;
-    
-    let channelId = input.trim();
+
+    // ✅ SECURITY FIX: Sanitize input для защиты от XSS
+    const sanitized = window.advancedSanitizer?.sanitizeText(input) || input;
+    let channelId = sanitized.trim();
     
     // Преобразование t.me ссылок
     if (channelId.includes('t.me/')) {
@@ -116,11 +118,14 @@ export class ChannelsManager {
    */
   async createChannel(channelId) {
     log('log', '[DEBUG] Создание канала:', channelId);
-    
-    const newChannelData = { 
-      channel_id: channelId, 
-      channel_title: channelId, 
-      is_enabled: true 
+
+    // ✅ SECURITY FIX: Sanitize channelId перед отправкой в API
+    const sanitizedChannelId = window.advancedSanitizer?.sanitizeText(channelId) || channelId;
+
+    const newChannelData = {
+      channel_id: sanitizedChannelId,
+      channel_title: sanitizedChannelId,
+      is_enabled: true
     };
     
     log('log', '[DEBUG] Отправляемые данные:', newChannelData);
@@ -199,24 +204,35 @@ export class ChannelsManager {
       className: 'channel-item',
       dataset: { dbId: channel.id }
     });
-    
+
+    // ✅ SECURITY FIX: Sanitize channel_id для защиты от XSS
+    const sanitizedChannelId = window.advancedSanitizer?.sanitizeText(channel.channel_id || '') ||
+                               channel.channel_id || '';
+
     // Получаем @username из channel_id - убираем все лишнее
-    let username = channel.channel_id || '';
+    let username = sanitizedChannelId;
     if (username.includes('t.me/')) {
       username = '@' + username.split('t.me/')[1].split('/')[0];
     } else if (!username.startsWith('@')) {
       username = '@' + username.replace('@', '');
     }
-    
+
+    // ✅ SECURITY FIX: Sanitize username для безопасного отображения
+    const sanitizedUsername = window.advancedSanitizer?.sanitizeText(username) || username;
+
+    // ✅ SECURITY FIX: Validate URL перед созданием ссылки
+    const telegramUrl = `https://t.me/${sanitizedUsername.replace('@', '')}`;
+    const safeUrl = window.advancedSanitizer?.sanitizeURL(telegramUrl) || telegramUrl;
+
     // Создаем кликабельную ссылку с правильным @username
-    const titleLink = createElement('a', { 
+    const titleLink = createElement('a', {
       className: 'channel-item-title',
-      href: `https://t.me/${username.replace('@', '')}`,
+      href: safeUrl,
       target: '_blank',
       rel: 'noopener noreferrer'
     });
-    const escapedTitle = this.utils.escapeHtml ? this.utils.escapeHtml(username) : username;
-    titleLink.textContent = escapedTitle;
+    // Используем sanitized username вместо escapeHtml
+    titleLink.textContent = sanitizedUsername;
     
     // Контейнер для правых кнопок
     const rightControls = createElement('div', {

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XSS Protection Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    h1 {
+      color: #28a745;
+      border-bottom: 2px solid #28a745;
+      padding-bottom: 10px;
+    }
+    .test-section {
+      background: #2d2d2d;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .test-case {
+      background: rgba(40, 167, 69, 0.1);
+      border-left: 3px solid #28a745;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .test-input {
+      background: #1a1a1a;
+      color: #ffc107;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .test-output {
+      background: #1a1a1a;
+      color: #28a745;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .test-result {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .passed {
+      background: #28a745;
+      color: white;
+    }
+    .failed {
+      background: #dc3545;
+      color: white;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .stat-card {
+      background: rgba(40, 167, 69, 0.1);
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #28a745;
+    }
+    .stat-label {
+      color: #aaa;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 5px;
+      color: #28a745;
+    }
+    .results-summary {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(40, 167, 69, 0.1);
+      border-radius: 8px;
+      border: 2px solid #28a745;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛡️ XSS Protection Test (DOMPurify)</h1>
+
+  <div class="test-section">
+    <h2>Test 1: Script Tag Injection</h2>
+    <button onclick="runAllTests()">Запустить все тесты XSS</button>
+    <button onclick="runBuiltInTests()">Запустить встроенные тесты sanitizer</button>
+    <div id="test-results"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 2: Manual Input Test</h2>
+    <p>Введите HTML/текст для проверки sanitization:</p>
+    <textarea id="manual-input" style="width:100%; height:100px; background:#1a1a1a; color:#fff; border:1px solid #28a745; border-radius:4px; padding:10px; font-family:monospace;"></textarea>
+    <br>
+    <button onclick="testHTML()">Тест как HTML</button>
+    <button onclick="testText()">Тест как Text</button>
+    <button onclick="testURL()">Тест как URL</button>
+    <div id="manual-results"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 3: Statistics</h2>
+    <button onclick="showStats()">Показать статистику</button>
+    <button onclick="resetStats()">Сбросить статистику</button>
+    <div id="stats-container"></div>
+  </div>
+
+  <script type="module">
+    // Импортируем sanitizer
+    import './src/js/advanced-sanitizer.js';
+
+    // XSS тестовые векторы
+    const xssTests = [
+      {
+        name: 'Script tag',
+        input: '<script>alert("XSS")</script>Hello',
+        method: 'sanitizeHTML',
+        shouldBlock: true,
+        expectedOutput: 'Hello'
+      },
+      {
+        name: 'Event handler (onerror)',
+        input: '<img src=x onerror="alert(\'XSS\')">',
+        method: 'sanitizeHTML',
+        shouldBlock: true,
+        expectedOutput: ''
+      },
+      {
+        name: 'Event handler (onclick)',
+        input: '<div onclick="alert(\'XSS\')">Click me</div>',
+        method: 'sanitizeHTML',
+        shouldBlock: true,
+        expectedOutput: 'Click me' // Содержимое div должно остаться
+      },
+      {
+        name: 'JavaScript protocol',
+        input: 'javascript:alert("XSS")',
+        method: 'sanitizeURL',
+        shouldBlock: true,
+        expectedOutput: ''
+      },
+      {
+        name: 'Iframe injection',
+        input: '<iframe src="malicious.com"></iframe>',
+        method: 'sanitizeHTML',
+        shouldBlock: true,
+        expectedOutput: ''
+      },
+      {
+        name: 'SVG with script',
+        input: '<svg onload="alert(\'XSS\')"></svg>',
+        method: 'sanitizeHTML',
+        shouldBlock: true,
+        expectedOutput: ''
+      },
+      {
+        name: 'Style with expression',
+        input: '<div style="width: expression(alert(\'XSS\'))">Test</div>',
+        method: 'sanitizeHTML',
+        shouldBlock: true,
+        expectedOutput: 'Test'
+      },
+      {
+        name: 'Valid HTML (bold)',
+        input: '<b>Bold text</b>',
+        method: 'sanitizeHTML',
+        shouldBlock: false,
+        expectedOutput: '<b>Bold text</b>'
+      },
+      {
+        name: 'Valid HTML (emphasis)',
+        input: '<em>Emphasis</em> and <strong>strong</strong>',
+        method: 'sanitizeHTML',
+        shouldBlock: false,
+        expectedOutput: '<em>Emphasis</em> and <strong>strong</strong>'
+      },
+      {
+        name: 'Valid text',
+        input: 'Hello World',
+        method: 'sanitizeText',
+        shouldBlock: false,
+        expectedOutput: 'Hello World'
+      },
+      {
+        name: 'Valid Telegram URL',
+        input: 'https://t.me/example',
+        method: 'sanitizeURL',
+        shouldBlock: false,
+        expectedOutput: 'https://t.me/example'
+      },
+      {
+        name: 'Text with HTML tags',
+        input: '<script>alert("XSS")</script>Hello',
+        method: 'sanitizeText',
+        shouldBlock: true,
+        expectedOutput: 'Hello' // Все HTML должно быть удалено
+      }
+    ];
+
+    window.runAllTests = function() {
+      const container = document.getElementById('test-results');
+      container.innerHTML = '<div style="color:#28a745; margin-bottom:20px;">Запуск XSS тестов...</div>';
+
+      let passed = 0;
+      let failed = 0;
+
+      xssTests.forEach((test, index) => {
+        const output = window.advancedSanitizer[test.method](test.input);
+        const testPassed = output === test.expectedOutput ||
+                          (test.shouldBlock && output.length < test.input.length);
+
+        if (testPassed) passed++;
+        else failed++;
+
+        const testDiv = document.createElement('div');
+        testDiv.className = 'test-case';
+        testDiv.innerHTML = `
+          <div style="font-weight:bold; color:#28a745;">
+            ${index + 1}. ${test.name} ${testPassed ? '✅' : '❌'}
+          </div>
+          <div style="margin-top:5px; color:#aaa; font-size:12px;">
+            Метод: <code>${test.method}</code>
+          </div>
+          <div class="test-input">
+            <strong>Ввод:</strong> ${escapeHtml(test.input)}
+          </div>
+          <div class="test-output">
+            <strong>Вывод:</strong> ${escapeHtml(output)}
+          </div>
+          <div class="test-result ${testPassed ? 'passed' : 'failed'}">
+            ${testPassed ? '✅ ТЕСТ ПРОЙДЕН' : '❌ ТЕСТ НЕ ПРОЙДЕН'}
+          </div>
+        `;
+        container.appendChild(testDiv);
+      });
+
+      // Итоговая статистика
+      const summary = document.createElement('div');
+      summary.className = 'results-summary';
+      summary.innerHTML = `
+        <h3 style="margin-top:0; color:#28a745;">Итоги тестирования</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Всего тестов</div>
+            <div class="stat-value">${xssTests.length}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Пройдено</div>
+            <div class="stat-value" style="color:#28a745">${passed}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Провалено</div>
+            <div class="stat-value" style="color:#dc3545">${failed}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Успех</div>
+            <div class="stat-value">${Math.round((passed / xssTests.length) * 100)}%</div>
+          </div>
+        </div>
+        <div style="margin-top:20px; padding:15px; background:${passed === xssTests.length ? '#28a745' : '#dc3545'}; border-radius:6px; text-align:center; font-size:18px; font-weight:bold;">
+          ${passed === xssTests.length ? '✅ ВСЕ ТЕСТЫ ПРОЙДЕНЫ' : `⚠️ ${failed} ТЕСТОВ НЕ ПРОЙДЕНО`}
+        </div>
+      `;
+      container.appendChild(summary);
+    };
+
+    window.runBuiltInTests = function() {
+      const container = document.getElementById('test-results');
+      container.innerHTML = '<div style="color:#28a745;">Запуск встроенных тестов sanitizer...</div>';
+
+      const results = window.advancedSanitizer.test();
+
+      container.innerHTML = `
+        <div class="results-summary">
+          <h3 style="margin-top:0; color:#28a745;">Встроенные тесты DOMPurify</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Всего тестов</div>
+              <div class="stat-value">${results.total}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Пройдено</div>
+              <div class="stat-value" style="color:#28a745">${results.passed}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Провалено</div>
+              <div class="stat-value" style="color:#dc3545">${results.total - results.passed}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Успех</div>
+              <div class="stat-value">${Math.round((results.passed / results.total) * 100)}%</div>
+            </div>
+          </div>
+          <div style="margin-top:20px; padding:15px; background:${results.success ? '#28a745' : '#dc3545'}; border-radius:6px; text-align:center; font-size:18px; font-weight:bold;">
+            ${results.success ? '✅ ВСЕ ТЕСТЫ ПРОЙДЕНЫ' : '⚠️ НЕКОТОРЫЕ ТЕСТЫ НЕ ПРОЙДЕНЫ'}
+          </div>
+          <div style="margin-top:20px; padding:15px; background:#1a1a1a; border-radius:6px;">
+            <strong>Детали тестов:</strong>
+            <pre style="margin-top:10px; color:#aaa; overflow-x:auto;">${JSON.stringify(results.results, null, 2)}</pre>
+          </div>
+        </div>
+      `;
+    };
+
+    window.testHTML = function() {
+      const input = document.getElementById('manual-input').value;
+      const output = window.advancedSanitizer.sanitizeHTML(input);
+      displayManualResult('HTML', input, output);
+    };
+
+    window.testText = function() {
+      const input = document.getElementById('manual-input').value;
+      const output = window.advancedSanitizer.sanitizeText(input);
+      displayManualResult('Text', input, output);
+    };
+
+    window.testURL = function() {
+      const input = document.getElementById('manual-input').value;
+      const output = window.advancedSanitizer.sanitizeURL(input);
+      displayManualResult('URL', input, output);
+    };
+
+    function displayManualResult(type, input, output) {
+      const container = document.getElementById('manual-results');
+      container.innerHTML = `
+        <div class="test-case">
+          <div style="font-weight:bold; color:#28a745; margin-bottom:10px;">
+            Результат sanitize${type}:
+          </div>
+          <div class="test-input">
+            <strong>Ввод:</strong> ${escapeHtml(input)}
+          </div>
+          <div class="test-output">
+            <strong>Вывод:</strong> ${escapeHtml(output)}
+          </div>
+          <div style="margin-top:10px; color:#aaa; font-size:13px;">
+            Длина: ${input.length} → ${output.length} символов
+            ${output.length < input.length ? '<span style="color:#28a745;">✅ Контент был очищен</span>' : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    window.showStats = function() {
+      const stats = window.advancedSanitizer.getStats();
+      const container = document.getElementById('stats-container');
+
+      container.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Всего обработано</div>
+            <div class="stat-value">${stats.totalSanitized}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Заблокировано</div>
+            <div class="stat-value" style="color:#dc3545">${stats.blocked}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Блок рейт</div>
+            <div class="stat-value">${stats.blockRate}%</div>
+          </div>
+        </div>
+        <div style="margin-top:20px; padding:15px; background:rgba(40,167,69,0.1); border-radius:6px;">
+          <strong>По типам:</strong>
+          <div class="stats-grid" style="margin-top:10px;">
+            <div class="stat-card">
+              <div class="stat-label">HTML</div>
+              <div class="stat-value">${stats.byType.html}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Text</div>
+              <div class="stat-value">${stats.byType.text}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">URL</div>
+              <div class="stat-value">${stats.byType.url}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    window.resetStats = function() {
+      window.advancedSanitizer.resetStats();
+      document.getElementById('stats-container').innerHTML = '<div style="color:#28a745; padding:15px; background:rgba(40,167,69,0.1); border-radius:6px;">✅ Статистика сброшена</div>';
+    };
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Автоматически показываем информацию при загрузке
+    setTimeout(() => {
+      console.log('✅ XSS Protection Test Page loaded');
+      console.log('🛡️ Available tests:', {
+        test1: 'Automated XSS vector tests',
+        test2: 'Manual input testing',
+        test3: 'Statistics display',
+        builtIn: 'DOMPurify built-in tests'
+      });
+      console.log('💡 Try running tests to verify XSS protection');
+    }, 500);
+  </script>
+</body>
+</html>
