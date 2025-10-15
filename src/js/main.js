@@ -4,14 +4,17 @@ console.log('🚀 [MAIN] oshu://work v15.2.0 loading...');
 // Импортируем основные модули
 import './config.js';
 import './constants.js';
+import './advanced-rate-limiter.js'; // ✅ SECURITY FIX: Rate limiting
 import './debug-logger.js'; // Умный логгер - первым после config
 import './csp-manager.js';
 import './error-monitor.js';
 import './error-helpers.js';
 
 // ✅ Security & Performance Modules (NEW)
-import './sanitizer.js';           // XSS Protection
+import './sanitizer.js';           // XSS Protection (legacy)
+import './advanced-sanitizer.js';  // ✅ SECURITY FIX: Enhanced XSS Protection with DOMPurify
 import './error-boundary.js';      // Global error handler
+import './error-fallback-ui.js';   // ✅ SECURITY FIX: Fallback UI for critical errors
 import './pagination-manager.js';  // Pagination & infinite scroll
 
 // Supabase клиент для Realtime

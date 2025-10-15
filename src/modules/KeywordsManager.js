@@ -56,12 +56,14 @@ export class KeywordsManager {
   createKeywordTag(keyword) {
     const tag = document.createElement('div');
     tag.className = 'keyword-tag';
-    
-    const escapedKeyword = this.utils.escapeHtml ? this.utils.escapeHtml(keyword) : keyword;
-    
+
+    // ✅ SECURITY FIX: Use advanced sanitizer for XSS protection
+    const sanitizedKeyword = window.advancedSanitizer?.sanitizeText(keyword) ||
+                            (this.utils.escapeHtml ? this.utils.escapeHtml(keyword) : keyword);
+
     tag.innerHTML = `
-      <span class="keyword-tag-text">${escapedKeyword}</span>
-      <button class="keyword-tag-remove" type="button" title="Удалить" data-keyword="${escapedKeyword}"></button>
+      <span class="keyword-tag-text">${sanitizedKeyword}</span>
+      <button class="keyword-tag-remove" type="button" title="Удалить" data-keyword="${sanitizedKeyword}"></button>
     `;
     
     // Добавляем обработчик удаления
@@ -116,8 +118,10 @@ export class KeywordsManager {
    * @returns {boolean} true если добавлено успешно
    */
   addKeyword(keyword) {
-    const trimmed = keyword.trim().toLowerCase();
-    
+    // ✅ SECURITY FIX: Sanitize input before processing
+    const sanitized = window.advancedSanitizer?.sanitizeText(keyword) || keyword;
+    const trimmed = sanitized.trim().toLowerCase();
+
     if (!trimmed || trimmed.length > 30) {
       if (this.utils.safeAlert) {
         this.utils.safeAlert('Ключевое слово должно содержать от 1 до 30 символов');

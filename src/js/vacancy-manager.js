@@ -269,11 +269,11 @@
         return;
       }
 
-      // Проверяем rate limit
+      // ✅ SECURITY FIX: Advanced rate limit check
       const operation = newStatus === CFG.STATUSES?.FAVORITE ? 'favorite' : 'updateStatus';
-      const rateResult = await UTIL.checkRateLimit?.(operation);
-      if (rateResult && !rateResult.allowed) {
-        UTIL.uiToast?.(rateResult.message);
+      const rateLimitResult = window.advancedRateLimiter?.checkLimit(operation);
+      if (rateLimitResult && !rateLimitResult.allowed) {
+        UTIL.uiToast?.(rateLimitResult.message);
         return;
       }
 

@@ -396,9 +396,22 @@ class RealtimeSearch {
    */
   highlightText(text, query) {
     if (!text || !query) return text;
-    
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<mark class="highlight">$1</mark>');
+
+    // ✅ SECURITY: Escape HTML in text
+    const escapeHtml = (str) => {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    };
+
+    // ✅ SECURITY: Escape regex special chars in query
+    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const safeText = escapeHtml(text);
+    const safeQuery = escapeRegex(escapeHtml(query));
+
+    const regex = new RegExp(`(${safeQuery})`, 'gi');
+    return safeText.replace(regex, '<mark class="highlight">$1</mark>');
   }
 
   /**

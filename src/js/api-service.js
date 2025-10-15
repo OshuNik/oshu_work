@@ -85,9 +85,20 @@
 
     // Загрузить вакансии для категории
     async fetchVacancies(key, limit, offset, query, signal) {
+      // ✅ SECURITY FIX: Rate limit check
+      const rateLimitResult = window.advancedRateLimiter?.checkLimit('fetchVacancies');
+      if (rateLimitResult && !rateLimitResult.allowed) {
+        return {
+          success: false,
+          error: rateLimitResult.message,
+          severity: 'warning',
+          isRetryable: true
+        };
+      }
+
       const url = this.buildCategoryUrl(key, limit, offset, query);
       const headers = this.createHeaders({ prefer: 'count=exact' });
-      
+
       try {
         const response = await UTIL.fetchWithRetry(url, {
           headers,
