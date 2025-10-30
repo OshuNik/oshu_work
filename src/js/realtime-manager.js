@@ -8,8 +8,9 @@ class RealtimeManager {
     this.channel = null;
     this.isSubscribed = false;
     this.retryAttempts = 0;
-    this.maxRetries = 3;
-    
+    this.maxRetries = 5; // 1s, 2s, 4s, 8s, 16s = 31s total
+    this.reconnectTimeout = null;
+
     console.log('[Realtime Manager] Инициализирован');
     this.init();
   }
@@ -101,10 +102,31 @@ class RealtimeManager {
   }
 
   /**
-   * Обработка новой вакансии
+   * Обработка новой вакансии с проверкой дублирования
    */
   handleNewVacancy(payload) {
     const vacancy = payload.new;
+
+    // Check for duplicates via VacancyManager
+    const vacancyManager = window.vacancyManager;
+    if (vacancyManager && vacancyManager.isVacancyLoaded) {
+      // Check across all categories
+      const categoryKeys = ['perfect', 'maybe', 'skip'];
+      const isDuplicate = categoryKeys.some(key =>
+        vacancyManager.isVacancyLoaded(key, vacancy.id)
+      );
+
+      if (isDuplicate) {
+        console.debug(`[Realtime Manager] Ignoring duplicate vacancy: ${vacancy.id}`);
+        return;
+      }
+
+      // Mark as loaded in all categories (realtime is global)
+      categoryKeys.forEach(key => {
+        vacancyManager.markVacancyLoaded(key, vacancy.id);
+      });
+    }
+
     console.log('🎯 [Realtime Manager] Новая вакансия получена:', {
       id: vacancy.id,
       title: vacancy.reason || vacancy.text_highlighted || 'Без названия',
@@ -112,7 +134,7 @@ class RealtimeManager {
       timestamp: vacancy.created_at
     });
 
-    // Диспетчим событие vacancy:new для системы уведомлений
+    // Dispatch event for notifications system
     document.dispatchEvent(new CustomEvent('vacancy:new', {
       detail: {
         id: vacancy.id,
@@ -150,24 +172,54 @@ class RealtimeManager {
   }
 
   /**
-   * Обработка ошибок подписки
+   * Вычисление задержки для exponential backoff
+   * Attempt 1 -> 1s, Attempt 2 -> 2s, Attempt 3 -> 4s, etc.
    */
-  handleSubscriptionError() {
+  getBackoffDelay(attempt) {
+    return Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s, 8s, 16s...
+  }
+
+  /**
+   * Обработка ошибок подписки с exponential backoff
+   */
+  async handleSubscriptionError() {
     this.isSubscribed = false;
-    
+
+    // Clear any pending reconnect timeout
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+
     if (this.retryAttempts < this.maxRetries) {
       this.retryAttempts++;
-      console.log(`[Realtime Manager] Попытка повторного подключения ${this.retryAttempts}/${this.maxRetries}`);
-      
-      setTimeout(() => {
+      const delay = this.getBackoffDelay(this.retryAttempts);
+      const delaySeconds = (delay / 1000).toFixed(1);
+
+      console.warn(
+        `⚠️ [Realtime Manager] Ошибка подписки. ` +
+        `Попытка переподключения ${this.retryAttempts}/${this.maxRetries} ` +
+        `через ${delaySeconds}s...`
+      );
+
+      // Schedule reconnection with exponential backoff
+      this.reconnectTimeout = setTimeout(() => {
+        console.log(`[Realtime Manager] Переподключение (попытка ${this.retryAttempts})...`);
         this.setupVacancySubscription();
-      }, 2000 * this.retryAttempts); // Exponential backoff
+      }, delay);
     } else {
-      console.error('[Realtime Manager] ❌ Превышено максимальное количество попыток подключения');
-      
-      // Уведомляем о fallback на WebSocket или другие методы
+      console.error(
+        '[Realtime Manager] ❌ Превышено максимальное количество попыток подключения ' +
+        `(${this.maxRetries}). Realtime отключена.`
+      );
+
+      // Notify app that realtime failed permanently
       document.dispatchEvent(new CustomEvent('realtime:failed', {
-        detail: { reason: 'max_retries_exceeded' }
+        detail: {
+          reason: 'max_retries_exceeded',
+          attempts: this.retryAttempts,
+          totalTime: `${(this.maxRetries * (this.maxRetries + 1) / 2)}s`
+        }
       }));
     }
   }
@@ -187,6 +239,12 @@ class RealtimeManager {
    * Принудительное отключение
    */
   disconnect() {
+    // Clear pending reconnect timeout
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+
     if (this.channel) {
       console.log('[Realtime Manager] Отключение канала...');
       window.supabaseClient?.removeChannel(this.channel);
