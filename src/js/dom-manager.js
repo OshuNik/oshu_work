@@ -147,15 +147,22 @@
       }
     }
 
-    // Очистить контейнер
+    // ✅ OPTIMIZED: Очистить контейнер
+    // Использует removeChild вместо innerHTML для сохранения event listeners на load-more
     clearContainer(containerKey) {
       const container = this.getElement(`containers.${containerKey}`);
       if (!container) return;
 
+      // ✅ Сохраняем load-more элемент перед очисткой
       const loadMoreWrap = container.querySelector('.load-more-wrap');
-      container.innerHTML = '';
-      if (loadMoreWrap) {
-        container.appendChild(loadMoreWrap);
+
+      // ✅ Удаляем все children кроме load-more (избегаем innerHTML = '')
+      while (container.firstChild) {
+        if (container.firstChild !== loadMoreWrap) {
+          container.removeChild(container.firstChild);
+        } else {
+          break;
+        }
       }
     }
 

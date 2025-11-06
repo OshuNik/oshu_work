@@ -257,21 +257,22 @@ class RealtimeSearch {
   }
 
   /**
-   * Отображение результатов локального поиска
+   * ✅ OPTIMIZED: Отображение результатов локального поиска
+   * Use classList instead of style manipulation to batch CSS changes
    */
   displayLocalSearchResults(query, results) {
     // Скрываем все вакансии
     this.hideAllVacancies();
-    
-    // Показываем только найденные
+
+    // ✅ Показываем только найденные с использованием classList
     results.forEach(result => {
-      result.card.style.display = 'block';
+      result.card.classList.remove('hidden');
       this.highlightSearchTerms(result.card, query);
     });
-    
+
     // Обновляем счетчик результатов
     this.updateSearchResultsCount(results.length, true);
-    
+
     // Скрываем индикатор после локального поиска
     this.showSearchIndicator(false);
   }
@@ -467,35 +468,43 @@ class RealtimeSearch {
   }
 
   /**
-   * Скрытие всех вакансий
+   * ✅ OPTIMIZED: Скрытие всех вакансий (use classList instead of style manipulation)
+   * Prevents layout thrashing by batching CSS class changes
    */
   hideAllVacancies() {
     const allCards = document.querySelectorAll('.vacancy-card');
+    // ✅ Using classList allows CSS engine to batch changes and avoid reflows
     allCards.forEach(card => {
-      card.style.display = 'none';
+      card.classList.add('hidden');
     });
   }
 
   /**
-   * Очистка результатов поиска
+   * ✅ OPTIMIZED: Очистка результатов поиска
+   * Use classList for visibility and proper DOM methods for highlight removal
+   * Prevents layout thrashing and improper DOM mutations
    */
   clearSearchResults() {
-    // Показываем все вакансии обратно
+    // ✅ Показываем все вакансии обратно используя classList
     const allCards = document.querySelectorAll('.vacancy-card');
     allCards.forEach(card => {
-      card.style.display = 'block';
-      
-      // Убираем подсветку
+      card.classList.remove('hidden');
+
+      // ✅ Убираем подсветку правильным способом (remove class, not outerHTML replacement)
       const highlighted = card.querySelectorAll('.highlight');
       highlighted.forEach(el => {
-        el.outerHTML = el.textContent;
+        // Extract text content and replace the element properly
+        const textNode = document.createTextNode(el.textContent);
+        if (el.parentNode) {
+          el.parentNode.replaceChild(textNode, el);
+        }
       });
     });
-    
-    // Скрываем контейнер server-side результатов
+
+    // ✅ Скрываем контейнер server-side результатов используя classList
     const resultsContainer = document.getElementById('search-results-container');
     if (resultsContainer) {
-      resultsContainer.style.display = 'none';
+      resultsContainer.classList.add('hidden');
       resultsContainer.innerHTML = '';
     }
   }

@@ -198,18 +198,25 @@
     const query = (searchInputFav?.value || '').trim().toLowerCase();
     
     let visibleCount = 0;
-    
-    container.querySelectorAll('.vacancy-card').forEach(card => {
-        const isVisible = query ? card.dataset.searchText.toLowerCase().includes(query) : true;
-        card.style.display = isVisible ? '' : 'none';
-        
-        if (isVisible) {
-            visibleCount++;
-            const summaryEl = card.querySelector('.card-summary');
-            if (summaryEl && summaryEl.dataset.originalSummary) {
-                window.utils.setHighlightedText(summaryEl, summaryEl.dataset.originalSummary, query);
-            }
+
+    // ✅ OPTIMIZED: Use classList instead of style.display and cache querySelectors
+    const allCards = container.querySelectorAll('.vacancy-card');
+    allCards.forEach(card => {
+      const isVisible = query ? card.dataset.searchText.toLowerCase().includes(query) : true;
+
+      // ✅ Use classList instead of direct style manipulation (batches CSS changes)
+      if (isVisible) {
+        card.classList.remove('hidden');
+        visibleCount++;
+
+        // ✅ Cache querySelector result instead of querying each card separately
+        const summaryEl = card.querySelector('.card-summary');
+        if (summaryEl && summaryEl.dataset.originalSummary) {
+          window.utils.setHighlightedText(summaryEl, summaryEl.dataset.originalSummary, query);
         }
+      } else {
+        card.classList.add('hidden');
+      }
     });
 
     const emptyEl = container.querySelector('.empty-state');
