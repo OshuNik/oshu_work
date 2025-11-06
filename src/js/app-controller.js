@@ -339,14 +339,19 @@
           const query = window.stateManager.getState().query;
           
           // Обновляем счетчики
-          window.apiService.fetchCountsAll(query).then(result => {
-            if (result.success) {
-              window.stateManager.updateCounts(result.counts);
-              Object.keys(result.counts).forEach(key => {
-                window.domManager.updateCounter(key, result.counts[key]);
-              });
-            }
-          });
+          // ✅ BUG #15: Add .catch() handler to prevent unhandled promise rejection
+          window.apiService.fetchCountsAll(query)
+            .then(result => {
+              if (result.success) {
+                window.stateManager.updateCounts(result.counts);
+                Object.keys(result.counts).forEach(key => {
+                  window.domManager.updateCounter(key, result.counts[key]);
+                });
+              }
+            })
+            .catch(error => {
+              console.warn('⚠️ Error updating counters on page visibility:', error);
+            });
           
           // Перезагружаем активную категорию
           window.vacancyManager.refetchFromZero(activeKey);
@@ -449,11 +454,15 @@
             }
 
             // Фоновая загрузка остальных категорий
+            // ✅ BUG #15: Replace .catch(() => null) with proper error logging
             const backgroundLoads = ['maybe', 'other']
               .filter(key => !window.stateManager.isCategoryLoadedForQuery(key))
-              .map(key => 
+              .map(key =>
                 window.vacancyManager.fetchVacanciesForCategory(key, { isInitialLoad: false })
-                  .catch(() => null)
+                  .catch(error => {
+                    console.warn(`⚠️ Background load failed for category "${key}":`, error);
+                    return null; // Continue with other loads
+                  })
               );
 
             if (backgroundLoads.length > 0) {

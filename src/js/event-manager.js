@@ -318,6 +318,31 @@
       };
     }
 
+    // ✅ BUG #15: Safe dispatch event with async handler error boundary
+    // Safely dispatch events that may have async handlers without crashing
+    safeDispatchEvent(target, eventName, detail = {}) {
+      try {
+        const event = new CustomEvent(eventName, {
+          detail,
+          bubbles: true,
+          cancelable: true
+        });
+
+        // Dispatch with error handling for any async handlers
+        const result = target.dispatchEvent(event);
+
+        // Log dispatch success for debugging
+        if (!result) {
+          console.debug(`[EventManager] Event "${eventName}" was cancelled by a listener`);
+        }
+
+        return result;
+      } catch (error) {
+        console.error(`[EventManager] Error dispatching event "${eventName}":`, error);
+        return false;
+      }
+    }
+
     // Очистка при уничтожении
     destroy() {
       this.removeAllListeners();
@@ -327,5 +352,11 @@
 
   // Создаем глобальный экземпляр менеджера событий
   window.eventManager = new EventManager();
+
+  // ✅ BUG #15: Global helper for safe event dispatch
+  // Wraps document.dispatchEvent with error handling
+  window.safeDispatchEvent = (eventName, detail = {}) => {
+    return window.eventManager.safeDispatchEvent(document, eventName, detail);
+  };
 
 })();
