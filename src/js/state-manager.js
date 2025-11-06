@@ -234,39 +234,102 @@
       this.notifyListeners('countsUpdated', counts);
     }
 
-    // Управление AbortController
+    // ✅ Управление AbortController с валидацией
     getCurrentController() {
       return this.currentController;
     }
 
+    // ✅ VALIDATION: Validate AbortController before setting
     setCurrentController(controller) {
+      // Валидируем что это valid AbortController
+      if (controller !== null && !(controller instanceof AbortController)) {
+        console.warn('[StateManager] setCurrentController: Invalid controller, must be AbortController instance or null');
+        return false;
+      }
+
       this.currentController = controller;
+      console.debug('[StateManager] AbortController updated');
+      return true;
     }
 
+    // ✅ VALIDATION: Abort with proper error handling and state validation
     abortCurrentRequest() {
-      if (this.currentController && !this.currentController.signal.aborted) {
-        try {
+      try {
+        if (this.currentController && !this.currentController.signal.aborted) {
+          // Проверяем что это valid controller перед abort
+          if (!(this.currentController instanceof AbortController)) {
+            console.warn('[StateManager] Current controller is not valid AbortController');
+            this.currentController = new AbortController();
+            return this.currentController;
+          }
+
           this.currentController.abort();
-        } catch (error) {
-          console.warn('Ошибка отмены запроса:', error);
+          console.debug('[StateManager] Current request aborted');
         }
+      } catch (error) {
+        console.error('[StateManager] Error aborting request:', error);
       }
-      this.currentController = new AbortController();
+
+      // Всегда создаем новый controller для следующего запроса
+      try {
+        this.currentController = new AbortController();
+      } catch (error) {
+        console.error('[StateManager] Failed to create new AbortController:', error);
+        this.currentController = null;
+      }
+
       return this.currentController;
     }
 
-    // Система подписок на изменения состояния
+    // ✅ Система подписок на изменения состояния с валидацией
     subscribe(event, callback) {
+      // VALIDATION: Check event name
+      if (!event || typeof event !== 'string') {
+        console.warn('[StateManager] subscribe: Event name must be a non-empty string');
+        return () => {}; // Return no-op unsubscribe function
+      }
+
+      // VALIDATION: Check callback is a function
+      if (typeof callback !== 'function') {
+        console.warn('[StateManager] subscribe: Callback must be a function');
+        return () => {}; // Return no-op unsubscribe function
+      }
+
+      // VALIDATION: Check event name is allowed
+      const VALID_EVENTS = new Set([
+        'categoryStateChanged',
+        'activeCategoryChanged',
+        'queryChanged',
+        'categoryStateReset',
+        'countsUpdated'
+      ]);
+
+      if (!VALID_EVENTS.has(event)) {
+        console.warn(`[StateManager] subscribe: Unknown event "${event}". Valid events: ${Array.from(VALID_EVENTS).join(', ')}`);
+        return () => {}; // Return no-op unsubscribe function
+      }
+
       if (!this.listeners.has(event)) {
         this.listeners.set(event, new Set());
       }
-      this.listeners.get(event).add(callback);
-      
+
+      const callbacks = this.listeners.get(event);
+
+      // VALIDATION: Prevent duplicate subscriptions from same callback
+      if (callbacks.has(callback)) {
+        console.warn('[StateManager] subscribe: This callback is already subscribed to this event');
+        return () => {}; // Return no-op unsubscribe function
+      }
+
+      callbacks.add(callback);
+      console.debug(`[StateManager] Listener subscribed to "${event}"`);
+
       // Возвращаем функцию для отписки
       return () => {
-        const callbacks = this.listeners.get(event);
-        if (callbacks) {
-          callbacks.delete(callback);
+        const listeners = this.listeners.get(event);
+        if (listeners) {
+          listeners.delete(callback);
+          console.debug(`[StateManager] Listener unsubscribed from "${event}"`);
         }
       };
     }
