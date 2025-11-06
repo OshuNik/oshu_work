@@ -10,7 +10,11 @@ class SimpleBotNotifications {
       enabled: localStorage.getItem('notifications-enabled') === 'true',
       categoryFilter: localStorage.getItem('notifications-category') || 'all' // all|main|maybe|other
     };
-    
+
+    // ✅ BUG FIX: Отслеживание handlers для очистки
+    this.eventHandlers = new Map();
+    this.pendingTimeouts = new Set();
+
     this.init();
   }
 
@@ -273,12 +277,18 @@ class SimpleBotNotifications {
    * Настройка слушателей событий
    */
   setupEventListeners() {
-    // Слушаем события новых вакансий
-    document.addEventListener('vacancy:new', (event) => {
+    // ✅ BUG FIX: Сохранили handler для возможности его удаления
+    const vacancyHandler = (event) => {
       if (this.shouldShowNotification(event.detail)) {
         this.showVacancyNotification(event.detail);
       }
-    });
+    };
+
+    // Слушаем события новых вакансий
+    document.addEventListener('vacancy:new', vacancyHandler);
+
+    // Сохраняем в Map для удаления в destroy()
+    this.eventHandlers.set('vacancy:new', vacancyHandler);
   }
 
   /**
@@ -450,17 +460,42 @@ class SimpleBotNotifications {
       toast.style.transform = 'translateX(-50%) translateY(0)';
     });
 
+    // ✅ BUG FIX: Отслеживаем timeouts для возможности очистки
     // Автоскрытие
-    setTimeout(() => {
+    const hideTimer = setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateX(-50%) translateY(-20px)';
-      
-      setTimeout(() => {
+
+      const removeTimer = setTimeout(() => {
         if (toast.parentNode) {
           toast.parentNode.removeChild(toast);
         }
+        this.pendingTimeouts.delete(removeTimer);
       }, 300);
+
+      this.pendingTimeouts.add(removeTimer);
     }, duration);
+
+    this.pendingTimeouts.add(hideTimer);
+  }
+
+  /**
+   * Очистка всех handlers и timeouts
+   */
+  destroy() {
+    // ✅ BUG FIX: Удаляем все event listeners
+    for (const [eventName, handler] of this.eventHandlers) {
+      document.removeEventListener(eventName, handler);
+    }
+    this.eventHandlers.clear();
+
+    // ✅ BUG FIX: Очищаем все pending timeouts
+    for (const timeout of this.pendingTimeouts) {
+      clearTimeout(timeout);
+    }
+    this.pendingTimeouts.clear();
+
+    console.log('[Simple Bot] Очищены все handlers и timeouts');
   }
 
   /**

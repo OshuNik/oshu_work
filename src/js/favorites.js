@@ -8,6 +8,7 @@
     const container = document.getElementById('favorites-list');
     if (!container) return;
 
+    // ✅ SAFE: skeletonHTML содержит только статический HTML без пользовательских данных
     const skeletonHTML = `
       <div class="skeleton-container">
         <div class="vacancy-card-skeleton">

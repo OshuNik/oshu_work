@@ -10,21 +10,24 @@ class RealtimeSearch {
     this.isSearching = false;
     this.lastQuery = '';
     this.searchHistory = [];
-    
+
     // Настройки debouncing
     this.debounceDelay = 300; // локальный поиск
     this.serverDebounceDelay = 800; // server-side поиск через WebSocket
     this.minQueryLength = 2;
     this.maxHistoryItems = 10;
-    
+
     // Таймеры debouncing
     this.localSearchTimer = null;
     this.serverSearchTimer = null;
-    
+
+    // ✅ BUG FIX: Отслеживаем все animation timeouts для очистки
+    this.animationTimeouts = new Set();
+
     // Кэш результатов
     this.searchCache = new Map();
     this.cacheExpiry = 300000; // 5 минут
-    
+
     this.init();
   }
 
@@ -300,12 +303,15 @@ class RealtimeSearch {
     results.forEach((vacancy, index) => {
       const card = this.createSearchResultCard(vacancy, query);
       if (card) {
+        // ✅ BUG FIX: Отслеживаем animation timeouts
         // Анимация появления с задержкой
-        setTimeout(() => {
+        const animTimer = setTimeout(() => {
           card.style.opacity = '1';
           card.style.transform = 'translateY(0)';
+          this.animationTimeouts.delete(animTimer);
         }, index * 50);
-        
+
+        this.animationTimeouts.add(animTimer);
         resultsContainer.appendChild(card);
       }
     });
@@ -351,8 +357,8 @@ class RealtimeSearch {
     if (window.realtimeUpdates) {
       return window.realtimeUpdates.createVacancyCard(vacancy);
     }
-    
-    // Fallback - простая карточка
+
+    // ✅ FIX: Используем безопасные DOM методы вместо innerHTML
     const card = document.createElement('div');
     card.className = 'vacancy-card search-result-card';
     card.style.cssText = `
@@ -364,17 +370,46 @@ class RealtimeSearch {
       border: 1px solid var(--border-color, #ddd);
       border-radius: 6px;
     `;
-    
-    card.innerHTML = `
-      <h3 class="vacancy-title">${this.highlightText(vacancy.title || '', query)}</h3>
-      <p class="vacancy-company">${this.highlightText(vacancy.company || '', query)}</p>
-      <p class="vacancy-description">${this.highlightText(vacancy.description || '', query)}</p>
-      <div class="vacancy-meta">
-        <span class="vacancy-category">${vacancy.category}</span>
-        <span class="vacancy-timestamp">${this.formatTimestamp(vacancy.timestamp)}</span>
-      </div>
-    `;
-    
+
+    // Заголовок с подсветкой
+    const titleEl = document.createElement('h3');
+    titleEl.className = 'vacancy-title';
+    titleEl.innerHTML = this.highlightText(vacancy.title || '', query);
+    card.appendChild(titleEl);
+
+    // Компания с подсветкой
+    const companyEl = document.createElement('p');
+    companyEl.className = 'vacancy-company';
+    companyEl.innerHTML = this.highlightText(vacancy.company || '', query);
+    card.appendChild(companyEl);
+
+    // Описание с подсветкой
+    const descEl = document.createElement('p');
+    descEl.className = 'vacancy-description';
+    descEl.innerHTML = this.highlightText(vacancy.description || '', query);
+    card.appendChild(descEl);
+
+    // Метаинформация (категория и время) - ✅ БЕЗОПАСНО, используем textContent
+    const metaEl = document.createElement('div');
+    metaEl.className = 'vacancy-meta';
+
+    const categoryEl = document.createElement('span');
+    categoryEl.className = 'vacancy-category';
+    categoryEl.textContent = vacancy.category || 'NO_CATEGORY'; // ✅ textContent для предотвращения XSS
+    metaEl.appendChild(categoryEl);
+
+    const separator = document.createElement('span');
+    separator.className = 'meta-separator';
+    separator.textContent = ' • ';
+    metaEl.appendChild(separator);
+
+    const timestampEl = document.createElement('span');
+    timestampEl.className = 'vacancy-timestamp';
+    timestampEl.textContent = this.formatTimestamp(vacancy.timestamp);
+    metaEl.appendChild(timestampEl);
+
+    card.appendChild(metaEl);
+
     return card;
   }
 
@@ -383,9 +418,10 @@ class RealtimeSearch {
    */
   highlightSearchTerms(card, query) {
     const elements = card.querySelectorAll('[data-element="summary"], [data-element="channel"]');
-    
+
     elements.forEach(el => {
       if (el.textContent) {
+        // ✅ FIX: используем innerHTML только с результатом highlightText который уже эскейпит HTML
         el.innerHTML = this.highlightText(el.textContent, query);
       }
     });
@@ -473,11 +509,17 @@ class RealtimeSearch {
       clearTimeout(this.localSearchTimer);
       this.localSearchTimer = null;
     }
-    
+
     if (this.serverSearchTimer) {
       clearTimeout(this.serverSearchTimer);
       this.serverSearchTimer = null;
     }
+
+    // ✅ BUG FIX: Также очищаем animation timeouts
+    for (const timer of this.animationTimeouts) {
+      clearTimeout(timer);
+    }
+    this.animationTimeouts.clear();
   }
 
   /**

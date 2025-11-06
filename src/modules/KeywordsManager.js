@@ -317,11 +317,18 @@ export class KeywordsManager {
       this.displayKeywordTags();
     } catch (error) {
       log('error', 'loadKeywords: произошла ошибка', error);
+      // ✅ FIX: Используем textContent вместо innerHTML для предотвращения DOM XSS
+      this.container.innerHTML = '';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'loading-indicator error-indicator';
+
       if (error.message.includes('авторизации')) {
-        this.container.innerHTML = `<div class="loading-indicator error-indicator">${error.message}</div>`;
+        // ✅ SAFE: textContent не интерпретирует HTML
+        errorDiv.textContent = error.message;
       } else {
-        this.container.innerHTML = '<div class="loading-indicator">Ошибка загрузки</div>';
+        errorDiv.textContent = 'Ошибка загрузки';
       }
+      this.container.appendChild(errorDiv);
     }
   }
 

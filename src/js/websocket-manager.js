@@ -11,10 +11,16 @@ class WebSocketManager {
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000; // 1 секунда
     this.heartbeatInterval = null;
-    
+
+    // ✅ BUG FIX: Отслеживание всех timeouts для очистки
+    this.reconnectTimeout = null;
+
+    // ✅ BUG FIX: Сохранение обработчиков событий для удаления
+    this.eventListeners = new Map();
+
     // URL WebSocket сервера
     this.wsUrl = this.getWebSocketUrl();
-    
+
     console.log('[WebSocket Manager] Инициализирован с URL:', this.wsUrl);
     this.connect();
   }
@@ -299,10 +305,16 @@ class WebSocketManager {
 
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts); // Exponential backoff
     this.reconnectAttempts++;
-    
+
     console.log(`[WebSocket Manager] Переподключение через ${delay}ms (попытка ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-    
-    setTimeout(() => {
+
+    // ✅ BUG FIX: Сохранить timeout для очистки
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+    }
+
+    this.reconnectTimeout = setTimeout(() => {
+      this.reconnectTimeout = null;
       this.connect();
     }, delay);
   }
@@ -312,11 +324,23 @@ class WebSocketManager {
    */
   disconnect() {
     console.log('[WebSocket Manager] Принудительное отключение');
-    
+
+    // ✅ BUG FIX: Очистить все timers
     this.stopHeartbeat();
-    
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+
+    // ✅ BUG FIX: Очистить все event listeners
+    for (const [eventName, handler] of this.eventListeners) {
+      document.removeEventListener(eventName, handler);
+    }
+    this.eventListeners.clear();
+
     if (this.ws) {
       this.ws.close(1000, 'Закрыто пользователем');
+      this.ws = null;
     }
   }
 
