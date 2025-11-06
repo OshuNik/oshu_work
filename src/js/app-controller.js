@@ -517,12 +517,24 @@
         font-family: 'Roboto Mono', monospace;
       `;
       
-      errorDiv.innerHTML = `
-        <h3>Ошибка загрузки приложения</h3>
-        <p>${UTIL.escapeHtml?.(error.message) || 'Неизвестная ошибка'}</p>
-        <button onclick="location.reload()" class="error-reload-btn">Перезагрузить</button>
-      `;
-      
+      // БЕЗОПАСНО: создаем элементы через DOM API вместо innerHTML
+      const h3 = document.createElement('h3');
+      h3.textContent = 'Ошибка загрузки приложения';
+
+      const p = document.createElement('p');
+      const errorMsg = UTIL.escapeHtml?.(error.message) || 'Неизвестная ошибка';
+      p.textContent = errorMsg;
+
+      const button = document.createElement('button');
+      button.className = 'error-reload-btn';
+      button.textContent = 'Перезагрузить';
+      button.addEventListener('click', () => {
+        location.reload();
+      });
+
+      errorDiv.appendChild(h3);
+      errorDiv.appendChild(p);
+      errorDiv.appendChild(button);
       document.body.appendChild(errorDiv);
     }
 

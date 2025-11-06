@@ -6,6 +6,7 @@
 
   /**
    * Sanitize HTML - удаляет опасные элементы и атрибуты
+   * Использует DOMParser для безопасного парсинга (без выполнения скриптов)
    * @param {string} html - HTML для очистки
    * @param {object} options - Опции санитизации
    * @returns {string} - Безопасный HTML
@@ -30,9 +31,24 @@
       '*': ['class'] // class разрешен для всех
     };
 
-    // Создаем временный DOM элемент
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
+    // БЕЗОПАСНЫЙ парсинг: используем DOMParser вместо innerHTML
+    // DOMParser не выполняет скрипты при парсинге
+    let temp;
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      temp = document.createElement('div');
+      // Копируем parsed nodes в temp вместо прямого использования innerHTML
+      Array.from(doc.body.childNodes).forEach(node => {
+        temp.appendChild(node.cloneNode(true));
+      });
+    } catch (error) {
+      console.warn('[Sanitizer] DOMParser error, falling back to safe mode:', error);
+      // Fallback: используем textContent для полной безопасности
+      temp = document.createElement('div');
+      temp.textContent = html;
+      return temp.textContent;
+    }
 
     // Рекурсивно очищаем все узлы
     function cleanNode(node) {
@@ -144,15 +160,22 @@
 
   /**
    * Strip all HTML tags - оставляет только текст
+   * БЕЗОПАСНО: использует DOMParser вместо innerHTML
    */
   function stripHTML(html) {
     if (!html || typeof html !== 'string') {
       return '';
     }
 
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    return temp.textContent || temp.innerText || '';
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      return doc.body.textContent || '';
+    } catch (error) {
+      console.warn('[Sanitizer] stripHTML error:', error);
+      // Fallback: используем регулярное выражение для удаления HTML тегов
+      return html.replace(/<[^>]*>/g, '');
+    }
   }
 
   /**

@@ -110,10 +110,17 @@
         }
 
         const data = await response.json();
+
+        // Безопасное получение total с проверкой существования функции
+        let total = 0;
+        if (UTIL && typeof UTIL.parseTotal === 'function') {
+          total = UTIL.parseTotal(response) || 0;
+        }
+
         return {
           success: true,
           data,
-          total: UTIL.parseTotal(response)
+          total: Number.isFinite(total) ? total : 0
         };
       } catch (error) {
         if (error.name === 'AbortError') {
@@ -147,8 +154,14 @@
             if (!response.ok) {
               throw new Error('count failed');
             }
-            
-            return { key, count: UTIL.parseTotal(response) };
+
+            // Безопасное получение count с проверкой
+            let count = 0;
+            if (UTIL && typeof UTIL.parseTotal === 'function') {
+              count = UTIL.parseTotal(response) || 0;
+            }
+
+            return { key, count: Number.isFinite(count) ? count : 0 };
           } finally {
             clearTimeout(timeoutId);
           }
