@@ -113,16 +113,20 @@
 
         const data = await response.json();
 
-        // Безопасное получение total с проверкой существования функции
+        // ✅ FIX: Безопасное получение total с проверкой существования функции и type coercion
         let total = 0;
         if (UTIL && typeof UTIL.parseTotal === 'function') {
-          total = UTIL.parseTotal(response) || 0;
+          const parsedTotal = UTIL.parseTotal(response);
+          // Проверяем что результат валидное число (не NaN, не Infinity)
+          if (typeof parsedTotal === 'number' && Number.isFinite(parsedTotal) && parsedTotal >= 0) {
+            total = parsedTotal;
+          }
         }
 
         return {
           success: true,
           data,
-          total: Number.isFinite(total) ? total : 0
+          total: Number.isFinite(total) && total >= 0 ? total : 0
         };
       } catch (error) {
         if (error.name === 'AbortError') {
@@ -157,13 +161,17 @@
               throw new Error('count failed');
             }
 
-            // Безопасное получение count с проверкой
+            // ✅ FIX: Безопасное получение count с проверкой type coercion
             let count = 0;
             if (UTIL && typeof UTIL.parseTotal === 'function') {
-              count = UTIL.parseTotal(response) || 0;
+              const parsedCount = UTIL.parseTotal(response);
+              // Проверяем что результат валидное число (не NaN, не Infinity)
+              if (typeof parsedCount === 'number' && Number.isFinite(parsedCount) && parsedCount >= 0) {
+                count = parsedCount;
+              }
             }
 
-            return { key, count: Number.isFinite(count) ? count : 0 };
+            return { key, count: Number.isFinite(count) && count >= 0 ? count : 0 };
           } finally {
             clearTimeout(timeoutId);
           }
@@ -267,34 +275,50 @@
       let userMessage = 'Произошла ошибка при загрузке данных';
       let isRetryable = false;
       let severity = 'error';
-      
+
+      // ✅ FIX: Безопасный доступ к свойствам error с проверкой существования
+      // Проверяем что error объект существует и имеет ожидаемые свойства
+      if (!error || typeof error !== 'object') {
+        console.error('Invalid error object:', error);
+        return {
+          success: false,
+          error: userMessage,
+          isRetryable: false,
+          severity: 'error'
+        };
+      }
+
+      const errorName = error.name || '';
+      const errorMessage = error.message || '';
+      const errorStatus = typeof error.status === 'number' ? error.status : null;
+
       // Анализ типа ошибки
-      if (error.name === 'TypeError' || error.message?.includes('NetworkError') || error.message?.includes('Failed to fetch')) {
+      if (errorName === 'TypeError' || errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
         userMessage = 'Проблема с подключением к интернету';
         isRetryable = true;
         severity = 'warning';
-      } else if (error.name === 'AbortError') {
+      } else if (errorName === 'AbortError') {
         userMessage = 'Запрос был отменен';
         isRetryable = false;
         severity = 'info';
-      } else if (error.status === 401) {
+      } else if (errorStatus === 401) {
         userMessage = 'Проблема с авторизацией. Перезагрузите страницу';
         isRetryable = false;
-      } else if (error.status === 403) {
+      } else if (errorStatus === 403) {
         userMessage = 'Доступ запрещен';
         isRetryable = false;
-      } else if (error.status === 404) {
+      } else if (errorStatus === 404) {
         userMessage = 'Данные не найдены';
         isRetryable = false;
-      } else if (error.status === 429) {
+      } else if (errorStatus === 429) {
         userMessage = 'Слишком много запросов. Попробуйте через минуту';
         isRetryable = true;
         severity = 'warning';
-      } else if (error.status >= 500) {
+      } else if (errorStatus !== null && errorStatus >= 500) {
         userMessage = 'Временные проблемы сервера. Попробуйте позже';
         isRetryable = true;
         severity = 'warning';
-      } else if (error.status >= 400 && error.status < 500) {
+      } else if (errorStatus !== null && errorStatus >= 400 && errorStatus < 500) {
         userMessage = 'Ошибка в запросе. Обновите страницу';
         isRetryable = false;
       }
