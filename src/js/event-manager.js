@@ -136,33 +136,38 @@
     setupSingleTabHandler(button) {
       let pressTimer = null;
       let isHeld = false;
+      let removeMovementListeners = null; // Сохраняем функции удаления
       const holdDuration = CONST.RATE_LIMITS?.HOLD_DURATION || 1200;
 
       // Обработчик начала нажатия
       const handleStart = (e) => {
         isHeld = false;
         button.classList.add('pressing');
-        
+
         let hasMoved = false;
         const startX = e.clientX || e.touches?.[0]?.clientX || 0;
         const startY = e.clientY || e.touches?.[0]?.clientY || 0;
-        
+
         const checkMovement = (e) => {
           const currentX = e.clientX || e.touches?.[0]?.clientX || 0;
           const currentY = e.clientY || e.touches?.[0]?.clientY || 0;
           const distance = Math.sqrt((currentX - startX) ** 2 + (currentY - startY) ** 2);
-          
+
           if (distance > 10) {
             hasMoved = true;
             handleCancel();
           }
         };
-        
-        // Добавляем слушатели движения
-        this.addListener(document, 'pointermove', checkMovement, { passive: true });
-        this.addListener(document, 'touchmove', checkMovement, { passive: true });
-        
-        button._checkMovement = checkMovement;
+
+        // Добавляем слушатели движения и сохраняем функции удаления
+        const removePtrMove = this.addListener(document, 'pointermove', checkMovement, { passive: true });
+        const removeTouchMove = this.addListener(document, 'touchmove', checkMovement, { passive: true });
+
+        removeMovementListeners = () => {
+          if (removePtrMove) removePtrMove();
+          if (removeTouchMove) removeTouchMove();
+          removeMovementListeners = null;
+        };
         
         pressTimer = setTimeout(() => {
           if (!hasMoved) {
@@ -182,11 +187,10 @@
       const handleCancel = () => {
         button.classList.remove('pressing');
         clearTimeout(pressTimer);
-        
-        if (button._checkMovement) {
-          document.removeEventListener('pointermove', button._checkMovement);
-          document.removeEventListener('touchmove', button._checkMovement);
-          delete button._checkMovement;
+
+        // ПРАВИЛЬНО: используем сохраненные функции удаления
+        if (removeMovementListeners) {
+          removeMovementListeners();
         }
       };
 

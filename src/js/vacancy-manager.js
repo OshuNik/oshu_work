@@ -419,7 +419,9 @@
             if (!vacancyDataString) throw new Error('Нет данных вакансии');
 
             const vacancyData = JSON.parse(vacancyDataString);
-            const newCard = window.utils.createVacancyCard(vacancyData, { pageType: 'main' });
+            // Используем UTIL (window.utils) с проверкой существования
+            const UTIL = window.utils || window.UTIL || {};
+            const newCard = UTIL.createVacancyCard?.(vacancyData, { pageType: 'main' });
 
             if (newCard) {
               parent.insertBefore(newCard, nextSibling);
