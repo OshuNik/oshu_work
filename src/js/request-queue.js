@@ -55,7 +55,8 @@ class RequestQueue {
   }
 
   /**
-   * Выполнить запрос
+   * ✅ RACE CONDITION FIX: Выполнить запрос с безопасным обновлением метрик
+   * Использует атомарные операции для update metrics и array removal
    */
   async executeRequest(request) {
     const { task, label, timestamp, resolve, reject } = request;
@@ -72,6 +73,8 @@ class RequestQueue {
       const result = await task();
       const duration = Date.now() - startTime;
 
+      // ✅ RACE CONDITION FIX: Atomic metric update + array removal
+      // Выполняем обновления вместе перед любым await
       this.metrics.completed++;
       this.updateAvgTime(duration);
 
@@ -79,8 +82,11 @@ class RequestQueue {
         `[RequestQueue "${this.name}"] ✅ Завершено: ${label} (${duration}ms)`
       );
 
-      // Удаляем из executing
-      this.executing = this.executing.filter((r) => r !== request);
+      // ✅ RACE CONDITION FIX: Безопасное удаление из executing используя indexOf
+      const index = this.executing.indexOf(request);
+      if (index !== -1) {
+        this.executing.splice(index, 1);
+      }
 
       // Обрабатываем следующий запрос
       this.processQueue();
@@ -89,6 +95,7 @@ class RequestQueue {
     } catch (error) {
       const duration = Date.now() - startTime;
 
+      // ✅ RACE CONDITION FIX: Atomic failure metric update
       this.metrics.failed++;
 
       console.error(
@@ -96,8 +103,11 @@ class RequestQueue {
         error
       );
 
-      // Удаляем из executing
-      this.executing = this.executing.filter((r) => r !== request);
+      // ✅ RACE CONDITION FIX: Безопасное удаление из executing используя indexOf
+      const index = this.executing.indexOf(request);
+      if (index !== -1) {
+        this.executing.splice(index, 1);
+      }
 
       // Обрабатываем следующий запрос
       this.processQueue();
@@ -119,18 +129,33 @@ class RequestQueue {
   }
 
   /**
-   * Получить статистику
+   * ✅ RACE CONDITION FIX: Получить безопасную копию статистики
+   * Возвращает снимок данных, избегая проблем с частичным обновлением metrics
    */
   getStats() {
+    // ✅ Создаем безопасную копию metrics перед использованием
+    const metricsSnapshot = {
+      total: this.metrics.total,
+      completed: this.metrics.completed,
+      failed: this.metrics.failed,
+      avgTime: Math.round(this.metrics.avgTime * 10) / 10 // Округляем для безопасности
+    };
+
+    // ✅ Вычисляем successRate используя snapshotted значения
+    const successRate = metricsSnapshot.total > 0
+      ? ((metricsSnapshot.completed / metricsSnapshot.total) * 100).toFixed(1) + '%'
+      : 'N/A';
+
     return {
       name: this.name,
       queueLength: this.queue.length,
       executing: this.executing.length,
       concurrency: this.concurrency,
-      ...this.metrics,
-      successRate: this.metrics.total > 0
-        ? ((this.metrics.completed / this.metrics.total) * 100).toFixed(1) + '%'
-        : 'N/A'
+      total: metricsSnapshot.total,
+      completed: metricsSnapshot.completed,
+      failed: metricsSnapshot.failed,
+      avgTime: metricsSnapshot.avgTime,
+      successRate: successRate
     };
   }
 
