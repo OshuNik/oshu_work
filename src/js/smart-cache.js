@@ -9,7 +9,12 @@ class SmartCacheManager {
     this.STATIC_CACHE_TIME = 7 * 24 * 60 * 60 * 1000; // 7 дней
     this.DATA_CACHE_TIME = 5 * 60 * 1000; // 5 минут для данных
     this.SEARCH_CACHE_TIME = 2 * 60 * 1000; // 2 минуты для поиска
-    
+
+    // ✅ FIX: Добавлен лимит на размер кэша
+    this.MAX_CACHE_SIZE = 5 * 1024 * 1024; // 5 МБ максимум для кэша данных
+    this.MAX_CACHE_ENTRIES = 50; // Максимум 50 записей кэша
+    this.cacheEntries = []; // Отслеживаем порядок записей для FIFO удаления
+
     this.isSupported = 'caches' in window;
     this.init();
   }
@@ -107,8 +112,42 @@ class SmartCacheManager {
     };
 
     try {
-      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-      console.log(`📦 Закэшированы данные для "${query}": ${jobs.length} вакансий`);
+      // ✅ FIX: Проверяем размер кэша перед добавлением
+      const dataString = JSON.stringify(cacheData);
+      const dataSize = new Blob([dataString]).size;
+
+      // Проверяем количество записей
+      if (this.cacheEntries.length >= this.MAX_CACHE_ENTRIES) {
+        const oldestKey = this.cacheEntries.shift();
+        localStorage.removeItem(oldestKey);
+        console.log(`🗑️ Удалена старая запись кэша: ${oldestKey}`);
+      }
+
+      // Проверяем общий размер (примерно)
+      let totalSize = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('job-')) {
+          const item = localStorage.getItem(key);
+          totalSize += item ? item.length : 0;
+        }
+      }
+
+      if (totalSize + dataSize > this.MAX_CACHE_SIZE) {
+        // Удаляем самую старую запись и пробуем снова
+        if (this.cacheEntries.length > 0) {
+          const oldestKey = this.cacheEntries.shift();
+          localStorage.removeItem(oldestKey);
+          console.log(`🗑️ Превышен размер кэша, удалена запись: ${oldestKey}`);
+        } else {
+          console.warn('⚠️ Не удалось закэшировать - размер превышен');
+          return;
+        }
+      }
+
+      localStorage.setItem(cacheKey, dataString);
+      this.cacheEntries.push(cacheKey);
+      console.log(`📦 Закэшированы данные для "${query}": ${jobs.length} вакансий (${Math.round(dataSize / 1024)}KB)`);
     } catch (error) {
       console.warn('⚠️ Не удалось закэшировать данные вакансий:', error);
     }

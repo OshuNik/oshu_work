@@ -39,6 +39,28 @@
       // Track loaded vacancy IDs per category to prevent duplicates
       this.loadedIds = new Map(); // { categoryKey: Set<id> }
       this.isLoading = new Map();  // { categoryKey: boolean }
+      this.lastRateLimitCheck = new Map(); // ✅ FIX: Отслеживаем последние проверки rate limit
+    }
+
+    /**
+     * ✅ FIX: Консолидированная проверка rate limit для избежания дублирования
+     */
+    async checkRateLimitConsolidated(operation, shouldBypass = false) {
+      if (shouldBypass) return { allowed: true };
+
+      // Проверяем был ли недавний лимит для этой операции
+      const lastCheck = this.lastRateLimitCheck.get(operation);
+      const now = Date.now();
+
+      // Кэшируем результат на 100мс чтобы избежать дублирования проверок
+      if (lastCheck && (now - lastCheck.timestamp) < 100) {
+        return lastCheck.result;
+      }
+
+      const result = await UTIL.checkRateLimit?.(operation) || { allowed: true };
+      this.lastRateLimitCheck.set(operation, { result, timestamp: now });
+
+      return result;
     }
 
     /**
@@ -105,14 +127,14 @@
         return;
       }
 
-      // Проверяем rate limit только для дополнительных загрузок
+      // ✅ FIX: Используем консолидированную проверку rate limit
       const categoryState = stateManager.getCategoryState(key);
-      if (!isInitialLoad && !isPullToRefresh && categoryState.offset > 0) {
-        const rateResult = await UTIL.checkRateLimit?.('loadVacancies');
-        if (rateResult && !rateResult.allowed) {
-          UTIL.uiToast?.(rateResult.message);
-          return;
-        }
+      const shouldBypassRateLimit = isInitialLoad || isPullToRefresh || categoryState.offset === 0;
+      const rateResult = await this.checkRateLimitConsolidated('loadVacancies', shouldBypassRateLimit);
+
+      if (!rateResult.allowed) {
+        UTIL.uiToast?.(rateResult.message);
+        return;
       }
 
       stateManager.setCategoryBusy(key, true);
@@ -258,18 +280,21 @@
         container.appendChild(fragment);
         domManager.pinLoadMoreToBottom(key);
 
-        // Настраиваем кнопку "Загрузить еще"
-        const { btn } = UTIL.ensureLoadMore?.(container, () => {
+        // ✅ FIX: Correct optional chaining validation для ensureLoadMore результата
+        const loadMoreResult = UTIL.ensureLoadMore?.(container, () => {
           this.fetchVacanciesForCategory(key);
-        }) || {};
+        });
+
+        // Проверяем что результат существует и имеет требуемое свойство
+        const btn = (loadMoreResult && typeof loadMoreResult === 'object' && loadMoreResult.btn) || null;
 
         const newOffset = state.offset + validItems.length;
         const hasMore = newOffset < total;
-        
+
         stateManager.updateCategoryState(key, { offset: newOffset });
         UTIL.updateLoadMore?.(container, hasMore);
-        
-        if (btn) {
+
+        if (btn && btn.disabled !== undefined) {
           btn.disabled = !hasMore;
         }
       }
@@ -339,10 +364,10 @@
         return;
       }
 
-      // Rate limit check
+      // ✅ FIX: Используем консолидированную проверку rate limit
       const operation = newStatus === CFG.STATUSES?.FAVORITE ? 'favorite' : 'updateStatus';
-      const rateLimitResult = window.advancedRateLimiter?.checkLimit(operation);
-      if (rateLimitResult && !rateLimitResult.allowed) {
+      const rateLimitResult = await this.checkRateLimitConsolidated(operation);
+      if (!rateLimitResult.allowed) {
         UTIL.uiToast?.(rateLimitResult.message);
         return;
       }
