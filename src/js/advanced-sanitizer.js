@@ -1,41 +1,18 @@
-// advanced-sanitizer.js - XSS Protection с DOMPurify
-
-import DOMPurify from 'dompurify';
+// advanced-sanitizer.js - XSS Protection without external dependencies
 
 (function() {
   'use strict';
 
   class AdvancedSanitizer {
     constructor() {
-      // Конфигурация DOMPurify для разных сценариев
-      this.configs = {
-        // Для HTML с базовым форматированием (в карточках вакансий)
-        richText: {
-          ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'mark', 'br', 'p', 'span'],
-          ALLOWED_ATTR: ['class'],
-          KEEP_CONTENT: true,
-          RETURN_DOM: false,
-          RETURN_DOM_FRAGMENT: false,
-          SANITIZE_DOM: true,
-          SAFE_FOR_TEMPLATES: true,
-        },
-
-        // Для plain text (keywords, channels)
-        plainText: {
-          ALLOWED_TAGS: [],
-          ALLOWED_ATTR: [],
-          KEEP_CONTENT: true,
-          RETURN_DOM: false,
-          SANITIZE_DOM: true,
-        },
-
-        // Для URL
-        url: {
-          ALLOWED_TAGS: [],
-          ALLOWED_ATTR: [],
-          ALLOWED_URI_REGEXP: /^(?:(?:https?|tg):\/\/|mailto:|tel:)/i,
-        }
+      // Whitelist of allowed HTML tags for rich text
+      this.allowedTags = {
+        'B': true, 'I': true, 'EM': true, 'STRONG': true, 'MARK': true,
+        'BR': true, 'P': true, 'SPAN': true
       };
+
+      // Allowed attributes
+      this.allowedAttrs = new Set(['class']);
 
       // Статистика sanitization
       this.stats = {
@@ -60,15 +37,65 @@ import DOMPurify from 'dompurify';
       this.stats.totalSanitized++;
       this.stats.byType.html++;
 
-      const cleaned = DOMPurify.sanitize(dirty, this.configs.richText);
+      // Parse HTML and filter tags/attributes
+      const temp = document.createElement('div');
+      temp.innerHTML = dirty;
 
-      // Проверяем если что-то было удалено
+      const cleaned = this._filterDOM(temp).innerHTML;
+
+      // Check if content was removed
       if (cleaned.length < dirty.length) {
         this.stats.blocked++;
         console.warn('[Sanitizer] Potentially malicious content removed from HTML');
       }
 
       return cleaned;
+    }
+
+    /**
+     * Filter DOM tree to remove dangerous elements and attributes
+     * @private
+     */
+    _filterDOM(node) {
+      const fragment = document.createDocumentFragment();
+
+      for (const child of Array.from(node.childNodes)) {
+        if (child.nodeType === Node.TEXT_NODE) {
+          fragment.appendChild(child.cloneNode());
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (this.allowedTags[child.tagName]) {
+            const safeEl = document.createElement(child.tagName);
+
+            // Only keep allowed attributes
+            for (const attr of child.attributes) {
+              if (this.allowedAttrs.has(attr.name)) {
+                safeEl.setAttribute(attr.name, attr.value);
+              }
+            }
+
+            // Recursively filter children
+            this._filterDOM(child);
+            for (const childNode of Array.from(child.childNodes)) {
+              if (childNode.nodeType === Node.TEXT_NODE ||
+                  (childNode.nodeType === Node.ELEMENT_NODE && this.allowedTags[childNode.tagName])) {
+                safeEl.appendChild(childNode.cloneNode(true));
+              }
+            }
+
+            fragment.appendChild(safeEl);
+          } else {
+            // Skip disallowed tags, but keep text content
+            const childFragment = this._filterDOM(child);
+            for (const node of Array.from(childFragment.childNodes)) {
+              fragment.appendChild(node.cloneNode(true));
+            }
+          }
+        }
+      }
+
+      const container = document.createElement('div');
+      container.appendChild(fragment);
+      return container;
     }
 
     /**
@@ -82,12 +109,13 @@ import DOMPurify from 'dompurify';
       this.stats.totalSanitized++;
       this.stats.byType.text++;
 
-      const cleaned = DOMPurify.sanitize(dirty, this.configs.plainText);
-
-      // Дополнительная очистка для text input
+      // Strip all HTML tags using safe DOM method
+      const div = document.createElement('div');
+      div.textContent = dirty;
+      const cleaned = div.textContent || '';
       const trimmed = cleaned.trim();
 
-      // Проверяем на подозрительные паттерны
+      // Check for suspicious patterns
       if (this._hasSuspiciousPatterns(dirty)) {
         this.stats.blocked++;
         console.warn('[Sanitizer] Suspicious patterns detected in text input');
@@ -354,7 +382,7 @@ import DOMPurify from 'dompurify';
   // Expose class для тестирования
   window.AdvancedSanitizer = AdvancedSanitizer;
 
-  console.log('✅ [Sanitizer] Advanced Sanitizer initialized with DOMPurify');
+  console.log('✅ [Sanitizer] Advanced Sanitizer initialized');
 
   // Debug helper в dev mode
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
