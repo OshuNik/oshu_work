@@ -10,6 +10,7 @@ class RealtimeManager {
     this.retryAttempts = 0;
     this.maxRetries = 5; // 1s, 2s, 4s, 8s, 16s = 31s total
     this.reconnectTimeout = null;
+    this.backgroundTimeout = null; // ✅ BUG #13: Track background timeout for proper cleanup
 
     console.log('[Realtime Manager] Инициализирован');
     this.init();
@@ -273,6 +274,12 @@ class RealtimeManager {
     // Отключить канал
     this.disconnect();
 
+    // ✅ BUG #13: Clear background timeout
+    if (this.backgroundTimeout) {
+      clearTimeout(this.backgroundTimeout);
+      this.backgroundTimeout = null;
+    }
+
     // Очистить retry attempts
     this.retryAttempts = 0;
     this.maxRetries = 0; // Prevent reconnect
@@ -295,11 +302,11 @@ class RealtimeManager {
     });
 
     // Cleanup при долгом нахождении в background (опционально)
-    let backgroundTimeout = null;
+    // ✅ BUG #13: Use class property instead of local variable for proper cleanup
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         // Отложенный cleanup если > 5 минут в background
-        backgroundTimeout = setTimeout(() => {
+        this.backgroundTimeout = setTimeout(() => {
           if (document.visibilityState === 'hidden') {
             console.log('[Realtime Manager] App долго в background, cleanup...');
             this.cleanup();
@@ -307,9 +314,9 @@ class RealtimeManager {
         }, 300000); // 5 минут
       } else {
         // Вернулись в foreground - отменить cleanup
-        if (backgroundTimeout) {
-          clearTimeout(backgroundTimeout);
-          backgroundTimeout = null;
+        if (this.backgroundTimeout) {
+          clearTimeout(this.backgroundTimeout);
+          this.backgroundTimeout = null;
         }
 
         // Если канал отключен - переподключиться
