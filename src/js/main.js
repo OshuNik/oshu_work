@@ -24,6 +24,7 @@ import './realtime-manager.js'; // Realtime подписки на новые в�
 // Utils модули (КРИТИЧЕСКИ ВАЖНО - содержит createVacancyCard, renderEmptyState)
 import './utils.min.js';
 import './utils-xss-patch.js';   // ✅ XSS Patch для utils.min.js
+import './image-fallback-patch.js'; // ✅ Graceful image degradation
 import './utils-empty-state.js';
 
 // Core модули  

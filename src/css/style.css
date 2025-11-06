@@ -1996,6 +1996,92 @@ details[open] .vacancy-text {
 }
 .image-link-button:active { background-color: var(--accent-blue); color: var(--card-color); }
 
+/* ✅ Graceful image degradation */
+.image-fallback,
+.image-error {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0 0 10px 0;
+  padding: 8px 10px;
+  min-height: 32px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.image-fallback {
+  background-color: var(--border-color);
+  color: var(--text-color);
+  border: var(--border-width) solid var(--border-color);
+}
+
+.image-fallback-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.image-fallback-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.image-fallback-text {
+  white-space: nowrap;
+}
+
+.image-error {
+  background-color: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  border: var(--border-width) solid #ff3b30;
+}
+
+.image-error-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.image-error-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.image-error-text {
+  white-space: nowrap;
+}
+
+/* Индикатор embedded images в тексте */
+.text-image-indicator {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--accent-blue);
+  background-color: rgba(0, 122, 255, 0.05);
+  font-size: 12px;
+  color: var(--accent-blue);
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .image-fallback {
+  background-color: var(--border-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .image-error {
+  background-color: rgba(255, 59, 48, 0.1);
+  border-color: #ff5a52;
+  color: #ff5a52;
+}
+
+[data-theme="dark"] .text-image-indicator {
+  background-color: rgba(0, 122, 255, 0.08);
+  border-left-color: #007AFF;
+  color: #007AFF;
+}
+
 .load-more-wrap {
   display: flex;
   justify-content: center;
