@@ -182,22 +182,38 @@ class RealtimeSearch {
       return;
     }
 
-    // Отправляем запрос через WebSocket
-    if (window.wsManager && window.wsManager.connected) {
-      const activeCategory = window.stateManager?.getCurrentCategory() || 'all';
-      
-      window.wsManager.search(query, {
-        categories: [activeCategory],
-        limit: 20,
-        includeInactive: false
-      });
-    } else {
-      // Fallback к локальному поиску
-      console.warn('[Realtime Search] WebSocket недоступен, используем локальный поиск');
-      this.performLocalSearch(query);
-    }
+    // ✅ BUG FIX: Используем очередь для предотвращения параллельных запросов
+    if (window.searchQueue) {
+      window.searchQueue.enqueue(() => {
+        return new Promise((resolve) => {
+          // Отправляем запрос через WebSocket
+          if (window.wsManager && window.wsManager.connected) {
+            const activeCategory = window.stateManager?.getCurrentCategory() || 'all';
 
-    this.lastQuery = query;
+            window.wsManager.sendSearchQuery(query, activeCategory);
+          } else {
+            // Fallback к локальному поиску
+            console.warn('[Realtime Search] WebSocket недоступен, используем локальный поиск');
+            this.performLocalSearch(query);
+          }
+
+          this.lastQuery = query;
+          resolve();
+        });
+      }, `search:${query}`);
+    } else {
+      // Fallback без очереди
+      if (window.wsManager && window.wsManager.connected) {
+        const activeCategory = window.stateManager?.getCurrentCategory() || 'all';
+
+        window.wsManager.sendSearchQuery(query, activeCategory);
+      } else {
+        console.warn('[Realtime Search] WebSocket недоступен, используем локальный поиск');
+        this.performLocalSearch(query);
+      }
+
+      this.lastQuery = query;
+    }
   }
 
   /**

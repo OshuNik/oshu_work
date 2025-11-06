@@ -203,12 +203,15 @@ if (window.Telegram?.WebApp) {
   tryNextCdn();
 })();
 </script>
+<!-- ✅ BUG FIX: Загружаем RequestQueue перед остальными скриптами -->
+<script src="./src/js/request-queue.js"></script>
+
 <!-- Entry point - ES модуль -->
 <script>
 console.log('🔧 [HTML] Пытаемся загрузить ES модуль main.js...');
 </script>
-<script type="module" src="./src/js/main.js" 
-        onload="console.log('✅ [HTML] ES модуль загружен!')" 
+<script type="module" src="./src/js/main.js"
+        onload="console.log('✅ [HTML] ES модуль загружен!')"
         onerror="console.error('❌ [HTML] Ошибка загрузки ES модуля!')"></script>
 
 

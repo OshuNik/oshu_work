@@ -143,6 +143,9 @@
   tryNextCdn();
 })();
 </script>
+<!-- ✅ BUG FIX: Загружаем RequestQueue перед остальными скриптами -->
+<script src="/src/js/request-queue.js"></script>
+
 <!-- Entry point - ES модуль -->
 <script type="module" src="/src/js/favorites-main.js"></script>
 
