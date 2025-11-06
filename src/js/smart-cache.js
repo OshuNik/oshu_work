@@ -444,7 +444,10 @@ class SmartCacheManager {
           try {
             const data = JSON.parse(localStorage.getItem(key));
             stats.favoritesCount = data.count || 0;
-          } catch (e) {}
+          } catch (e) {
+            console.warn('⚠️ Ошибка парсинга favorites-cache:', e.message);
+            stats.favoritesCount = 0;
+          }
         }
       });
 

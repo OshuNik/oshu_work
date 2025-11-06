@@ -29,17 +29,24 @@ class WebSocketManager {
    * Определяет URL WebSocket сервера в зависимости от окружения
    */
   getWebSocketUrl() {
-    const isLocalhost = window.location.hostname === 'localhost' || 
+    const isLocalhost = window.location.hostname === 'localhost' ||
                        window.location.hostname === '127.0.0.1';
-                       
+
     if (isLocalhost) {
       // Для разработки - подключаемся к mock серверу
       return 'ws://localhost:8081/ws';
     } else {
-      // Для production - здесь должен быть реальный WebSocket сервер
-      // TODO: Настроить production WebSocket сервер
-      console.warn('[WebSocket Manager] Production WebSocket сервер не настроен');
-      return null;
+      // ✅ PRODUCTION CONFIG: Используем environment variable или текущий хост
+      // Попытка подключиться к WebSocket на том же хосте, что и приложение
+      // Поддерживает как api.oshuwork.ru, так и другие production домены
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.hostname;
+
+      // Пытаемся подключиться к /ws эндпоинту на том же хосте
+      const wsUrl = `${protocol}//${host}/ws`;
+
+      console.log('[WebSocket Manager] Production WebSocket URL:', wsUrl);
+      return wsUrl;
     }
   }
 
