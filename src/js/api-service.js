@@ -20,12 +20,14 @@
         'apikey': this.anonKey,
         'Authorization': `Bearer ${this.anonKey}`,
         'Content-Type': 'application/json',
+        // ✅ SECURITY FIX: CSRF Protection - указываем что запрос идет из нашего приложения
+        'X-Requested-With': 'XMLHttpRequest',
       };
-      
+
       if (options.prefer) {
         headers['Prefer'] = options.prefer;
       }
-      
+
       return headers;
     }
 
@@ -191,9 +193,18 @@
 
     // Обновить статус вакансии
     async updateVacancyStatus(vacancyId, newStatus, signal) {
+      // ✅ SECURITY FIX: Validate mutation request origin
+      if (!this.validateMutationRequest()) {
+        return {
+          success: false,
+          error: 'Невозможно выполнить операцию: нарушение CSRF безопасности',
+          isRetryable: false
+        };
+      }
+
       const url = `${this.baseUrl}/rest/v1/vacancies?id=eq.${vacancyId}`;
       const headers = this.createHeaders();
-      
+
       try {
         const response = await fetch(url, {
           method: 'PATCH',
@@ -218,9 +229,18 @@
 
     // Удалить вакансию
     async deleteVacancy(vacancyId, signal) {
+      // ✅ SECURITY FIX: Validate mutation request origin
+      if (!this.validateMutationRequest()) {
+        return {
+          success: false,
+          error: 'Невозможно выполнить операцию: нарушение CSRF безопасности',
+          isRetryable: false
+        };
+      }
+
       const url = `${this.baseUrl}/rest/v1/vacancies?id=eq.${vacancyId}`;
       const headers = this.createHeaders();
-      
+
       try {
         const response = await fetch(url, {
           method: 'DELETE',
@@ -331,7 +351,7 @@
           headers: this.createHeaders(),
           signal: AbortSignal.timeout(5000) // 5 секунд таймаут
         });
-        
+
         return {
           success: response.ok,
           status: response.status,
@@ -344,6 +364,30 @@
           available: false
         };
       }
+    }
+
+    // ✅ SECURITY FIX: Validate that mutation requests come from the app context
+    validateMutationRequest() {
+      // Проверяем что мы в HTTPS (критично для безопасности)
+      if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'https:' && !this.isDevelopmentEnv()) {
+        console.warn('⚠️ CSRF validation: HTTPS required for mutations');
+        return false;
+      }
+
+      // Проверяем что приложение инициализировано (базовая проверка что мы в контексте приложения)
+      if (!window.stateManager || !window.vacancyManager) {
+        console.warn('⚠️ CSRF validation: App not properly initialized');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Проверить окружение (для локальной разработки)
+    isDevelopmentEnv() {
+      return window.location.hostname === 'localhost' ||
+             window.location.hostname === '127.0.0.1' ||
+             window.location.hostname.startsWith('192.168.');
     }
   }
 

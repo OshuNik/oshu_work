@@ -376,6 +376,9 @@
 
     // Выполнить инициализацию
     async _performInitialization() {
+      // Объявляем skeletonTimeout вне try блока чтобы гарантировать очистку в finally
+      let skeletonTimeout = null;
+
       try {
         console.log('🚀 Запуск инициализации приложения');
 
@@ -384,8 +387,8 @@
         window.domManager?.showSkeleton('maybe', 3);
         window.domManager?.showSkeleton('other', 2);
 
-        // Устанавливаем таймаут для skeleton
-        const skeletonTimeout = setTimeout(() => {
+        // Устанавливаем таймаут для skeleton - ГАРАНТИРОВАННО очистится в finally
+        skeletonTimeout = setTimeout(() => {
           console.warn('⚠️ Skeleton висит слишком долго, принудительно скрываем');
           window.domManager?.hideSkeleton('main');
           window.domManager?.hideSkeleton('maybe');
@@ -474,6 +477,11 @@
         window.domManager?.hideSkeleton('other');
         this.showCriticalError(error);
         throw error;
+      } finally {
+        // ГАРАНТИРОВАННО очищаем таймаут skeleton независимо от успеха инициализации
+        if (skeletonTimeout) {
+          clearTimeout(skeletonTimeout);
+        }
       }
     }
 

@@ -50,18 +50,52 @@
       this.cached = true;
     }
 
-    // Получить элемент по ключу
+    // Получить элемент по ключу (поддерживает array access как "containers.0")
     getElement(path) {
+      if (!path || typeof path !== 'string') {
+        console.warn('[DOMManager] Invalid path:', path);
+        return null;
+      }
+
       if (!this.cached) this.cacheElements();
-      
+
       const keys = path.split('.');
       let element = this.elements;
-      
-      for (const key of keys) {
-        element = element[key];
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        // Проверяем существование элемента перед доступом
+        if (element === null || element === undefined) {
+          console.warn('[DOMManager] Cannot access property', key, 'of', element);
+          return null;
+        }
+
+        // Проверяем, это ли числовой индекс
+        if (/^\d+$/.test(key)) {
+          const index = parseInt(key, 10);
+
+          // Проверяем, это ли массив
+          if (!Array.isArray(element)) {
+            console.warn('[DOMManager] Expected array at path', keys.slice(0, i).join('.'), 'but got', typeof element);
+            return null;
+          }
+
+          // Проверяем границы массива
+          if (index < 0 || index >= element.length) {
+            console.warn('[DOMManager] Array index out of bounds:', index, 'length:', element.length);
+            return null;
+          }
+
+          element = element[index];
+        } else {
+          // Обычный доступ к свойству
+          element = element[key];
+        }
+
         if (!element) return null;
       }
-      
+
       return element;
     }
 
