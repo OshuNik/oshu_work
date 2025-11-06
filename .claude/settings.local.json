@@ -4,7 +4,13 @@
       "Bash(cmd /c dir \"E:\\ОшуВорк\\КЛОД\\Фронтенд\\src\\js\\realtime-manager.js\")",
       "mcp__supabase__list_tables",
       "mcp__github__get_me",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "mcp__supabase__get_project_url",
+      "mcp__supabase__get_anon_key",
+      "mcp__notion__notion-create-pages",
+      "Bash(git log:*)",
+      "mcp__notion__notion-search",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

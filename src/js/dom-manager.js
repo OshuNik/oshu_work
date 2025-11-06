@@ -133,15 +133,23 @@
       // Очищаем контейнер сначала
       this.clearContainer(containerKey);
 
-      // Создаем skeleton карточки
+      // Создаем skeleton карточки используя DocumentFragment (более эффективно и безопасно)
       const skeletonHTML = this.createSkeletonCard();
       const skeletonContainer = document.createElement('div');
       skeletonContainer.className = 'skeleton-container';
-      
+
+      // Используем DocumentFragment для эффективной вставки
+      const fragment = document.createDocumentFragment();
+      const tempDiv = document.createElement('div');
+
       for (let i = 0; i < count; i++) {
-        skeletonContainer.innerHTML += skeletonHTML;
+        tempDiv.innerHTML = skeletonHTML;
+        while (tempDiv.firstChild) {
+          fragment.appendChild(tempDiv.firstChild);
+        }
       }
 
+      skeletonContainer.appendChild(fragment);
       container.appendChild(skeletonContainer);
     }
 

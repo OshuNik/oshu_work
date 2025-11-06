@@ -110,8 +110,8 @@ class RealtimeManager {
     // Check for duplicates via VacancyManager
     const vacancyManager = window.vacancyManager;
     if (vacancyManager && vacancyManager.isVacancyLoaded) {
-      // Check across all categories
-      const categoryKeys = ['perfect', 'maybe', 'skip'];
+      // Check across all categories (must match state-manager.js)
+      const categoryKeys = ['main', 'maybe', 'other'];
       const isDuplicate = categoryKeys.some(key =>
         vacancyManager.isVacancyLoaded(key, vacancy.id)
       );

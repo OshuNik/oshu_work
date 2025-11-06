@@ -30,7 +30,7 @@ class SmartCacheManager {
       // Предзагружаем критические ресурсы
       await this.preloadCriticalAssets();
       
-      logger.log('✅ Smart Cache Manager готов');
+      console.log('✅ Smart Cache Manager готов');
     } catch (error) {
       console.error('❌ Ошибка инициализации Smart Cache:', error);
     }
@@ -62,7 +62,7 @@ class SmartCacheManager {
 
       if (missingAssets.length > 0) {
         await cache.addAll(missingAssets);
-        logger.log(`📦 Закэшировано ${missingAssets.length} критических ресурсов`);
+        console.log(`📦 Закэшировано ${missingAssets.length} критических ресурсов`);
       }
     } catch (error) {
       console.warn('⚠️ Не удалось предзагрузить критические ресурсы:', error);
@@ -108,7 +108,7 @@ class SmartCacheManager {
 
     try {
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-      logger.log(`📦 Закэшированы данные для "${query}": ${jobs.length} вакансий`);
+      console.log(`📦 Закэшированы данные для "${query}": ${jobs.length} вакансий`);
     } catch (error) {
       console.warn('⚠️ Не удалось закэшировать данные вакансий:', error);
     }
@@ -130,7 +130,7 @@ class SmartCacheManager {
         return null;
       }
 
-      logger.log(`📦 Данные получены из кэша для "${query}": ${cachedData.count} вакансий`);
+      console.log(`📦 Данные получены из кэша для "${query}": ${cachedData.count} вакансий`);
       return cachedData.data;
     } catch (error) {
       console.warn('⚠️ Не удалось получить данные из кэша:', error);
@@ -156,7 +156,7 @@ class SmartCacheManager {
 
     try {
       localStorage.setItem('favorites-cache', JSON.stringify(cacheData));
-      logger.log(`💖 Закэшировано ${favorites.length} избранных вакансий`);
+      console.log(`💖 Закэшировано ${favorites.length} избранных вакансий`);
     } catch (error) {
       console.warn('⚠️ Не удалось закэшировать избранное:', error);
     }
@@ -168,7 +168,7 @@ class SmartCacheManager {
       if (!cachedDataStr) return null;
 
       const cachedData = JSON.parse(cachedDataStr);
-      logger.log(`💖 Избранное получено из кэша: ${cachedData.count} вакансий`);
+      console.log(`💖 Избранное получено из кэша: ${cachedData.count} вакансий`);
       return cachedData.data;
     } catch (error) {
       console.warn('⚠️ Не удалось получить избранное из кэша:', error);
@@ -186,7 +186,7 @@ class SmartCacheManager {
         data: settings,
         timestamp: Date.now()
       }));
-      logger.log('⚙️ Настройки закэшированы');
+      console.log('⚙️ Настройки закэшированы');
     } catch (error) {
       console.warn('⚠️ Не удалось закэшировать настройки:', error);
     }
@@ -232,7 +232,7 @@ class SmartCacheManager {
       // Если сеть недоступна, пытаемся получить из кэша
       const cachedResponse = await this.getStaticAsset(cacheKey);
       if (cachedResponse) {
-        logger.log('📦 Данные получены из кэша после ошибки сети');
+        console.log('📦 Данные получены из кэша после ошибки сети');
         return cachedResponse;
       }
 
@@ -250,7 +250,7 @@ class SmartCacheManager {
     // Сначала проверяем кэш
     const cachedResponse = await this.getStaticAsset(cacheKey);
     if (cachedResponse) {
-      logger.log('📦 Статический ресурс получен из кэша');
+      console.log('📦 Статический ресурс получен из кэша');
       
       // В фоне обновляем кэш
       this.updateCacheInBackground(url, options);
@@ -278,7 +278,7 @@ class SmartCacheManager {
       const networkResponse = await fetch(url, options);
       if (networkResponse.ok) {
         await this.cacheStaticAsset(url, networkResponse);
-        logger.log('🔄 Кэш обновлен в фоне для:', url);
+        console.log('🔄 Кэш обновлен в фоне для:', url);
       }
     } catch (error) {
       console.warn('⚠️ Не удалось обновить кэш в фоне:', error);
@@ -300,7 +300,7 @@ class SmartCacheManager {
       }
     }
 
-    logger.log(`🔮 Префетчинг страниц: ${pagesToPrefetch.join(', ')}`);
+    console.log(`🔮 Префетчинг страниц: ${pagesToPrefetch.join(', ')}`);
 
     // Префетчим в фоне с задержкой
     pagesToPrefetch.forEach((page, index) => {
@@ -343,7 +343,7 @@ class SmartCacheManager {
       );
 
       if (oldCacheNames.length > 0) {
-        logger.log(`🧹 Удалены старые кэши: ${oldCacheNames.join(', ')}`);
+        console.log(`🧹 Удалены старые кэши: ${oldCacheNames.join(', ')}`);
       }
     } catch (error) {
       console.warn('⚠️ Не удалось очистить старые кэши:', error);
@@ -354,7 +354,7 @@ class SmartCacheManager {
     try {
       const keys = Object.keys(localStorage).filter(key => key.startsWith('job-'));
       keys.forEach(key => localStorage.removeItem(key));
-      logger.log(`🧹 Очищены данные вакансий: ${keys.length} записей`);
+      console.log(`🧹 Очищены данные вакансий: ${keys.length} записей`);
     } catch (error) {
       console.warn('⚠️ Не удалось очистить кэш данных:', error);
     }
@@ -372,7 +372,7 @@ class SmartCacheManager {
       );
       keys.forEach(key => localStorage.removeItem(key));
 
-      logger.log('🧹 Все кэши очищены');
+      console.log('🧹 Все кэши очищены');
     } catch (error) {
       console.error('❌ Ошибка очистки кэшей:', error);
     }
