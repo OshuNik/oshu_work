@@ -35,11 +35,54 @@
 
   class VacancyManager {
     constructor() {
-      this.updateStatusLocks = new Set();
+      // ✅ FIX: Replace Set with Map for per-element debounce tracking
+      this.statusUpdateDebounce = new Map(); // { vacancyId: { timestamp, abortController } }
+      this.debounceDelay = 300; // ms - minimum time between operations on same element
+
       // Track loaded vacancy IDs per category to prevent duplicates
       this.loadedIds = new Map(); // { categoryKey: Set<id> }
       this.isLoading = new Map();  // { categoryKey: boolean }
       this.lastRateLimitCheck = new Map(); // ✅ FIX: Отслеживаем последние проверки rate limit
+    }
+
+    /**
+     * ✅ FIX: Проверка debounce для предотвращения double-click race condition
+     */
+    isStatusUpdateDebounced(vacancyId) {
+      const record = this.statusUpdateDebounce.get(vacancyId);
+      if (!record) return false;
+
+      const now = Date.now();
+      const timeSinceLastUpdate = now - record.timestamp;
+
+      // Если с момента последнего обновления прошло достаточно времени - разрешаем
+      if (timeSinceLastUpdate >= this.debounceDelay) {
+        return false; // NOT debounced
+      }
+
+      return true; // IS debounced (too soon)
+    }
+
+    /**
+     * ✅ FIX: Записать timestamp для debounce tracking
+     */
+    recordStatusUpdateAttempt(vacancyId, abortController) {
+      const existing = this.statusUpdateDebounce.get(vacancyId);
+      
+      // Отменяем предыдущую операцию если она еще выполняется
+      if (existing && existing.abortController) {
+        try {
+          existing.abortController.abort();
+          console.log(`[VacancyManager] Отменена стоящая операция для ID: ${vacancyId}`);
+        } catch (e) {
+          // Controller может быть уже использован
+        }
+      }
+
+      this.statusUpdateDebounce.set(vacancyId, {
+        timestamp: Date.now(),
+        abortController
+      });
     }
 
     /**
@@ -358,10 +401,27 @@
         return;
       }
 
-      // Предотвращаем race conditions
-      if (this.updateStatusLocks.has(vacancyId)) {
-        console.log('updateStatus уже выполняется для ID:', vacancyId);
+      // ✅ FIX: Проверяем debounce ПЕРВЫМ ДЕЛОМ перед любыми операциями
+      if (this.isStatusUpdateDebounced(vacancyId)) {
+        console.log('[VacancyManager] ⏱️ Слишком частые клики на ID:', vacancyId);
         return;
+      }
+
+      // ✅ FIX: Создаем AbortController для отмены операции
+      const abortController = new AbortController();
+
+      // ✅ FIX: Записываем попытку обновления со временем
+      this.recordStatusUpdateAttempt(vacancyId, abortController);
+
+      // ✅ FIX: Отключаем все кнопки действий для этой карточки
+      const cardElement = document.querySelector(`#card-${CSS.escape(vacancyId)}`);
+      if (cardElement) {
+        const actionButtons = cardElement.querySelectorAll('[data-action], .action-btn, button[data-vacancy-id]');
+        actionButtons.forEach(btn => {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+          btn.style.pointerEvents = 'none';
+        });
       }
 
       // ✅ FIX: Используем консолидированную проверку rate limit
@@ -369,40 +429,66 @@
       const rateLimitResult = await this.checkRateLimitConsolidated(operation);
       if (!rateLimitResult.allowed) {
         UTIL.uiToast?.(rateLimitResult.message);
+        // Re-enable buttons on rate limit
+        if (cardElement) {
+          const actionButtons = cardElement.querySelectorAll('[data-action], .action-btn, button[data-vacancy-id]');
+          actionButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
+          });
+        }
         return;
       }
-
-      this.updateStatusLocks.add(vacancyId);
 
       try {
         const isFavorite = newStatus === CFG.STATUSES?.FAVORITE;
         
+        // ✅ FIX: Проверяем что абортов не было
+        if (abortController.signal.aborted) {
+          console.log('[VacancyManager] Операция была отменена для ID:', vacancyId);
+          return;
+        }
+
         // Если это свайп, используем специальную логику с возможностью отмены
         if (isFromSwipe) {
           console.log('🔄 Это свайп, используем performSwipeStatusUpdate');
-          await this.performSwipeStatusUpdate(vacancyId, newStatus, isFavorite);
+          await this.performSwipeStatusUpdate(vacancyId, newStatus, isFavorite, abortController);
         } else {
           console.log('🔄 Это кнопка, используем performStatusUpdate');
           // Сразу выполняем действие без подтверждения для кнопок
-          await this.performStatusUpdate(vacancyId, newStatus, isFavorite);
+          await this.performStatusUpdate(vacancyId, newStatus, isFavorite, abortController);
         }
 
       } catch (error) {
         console.error('Ошибка в updateVacancyStatus:', error);
         triggerHaptic('notification', 'error');
         UTIL.safeAlert?.('Произошла ошибка при обновлении статуса');
-      } finally {
-        this.updateStatusLocks.delete(vacancyId);
+        
+        // Re-enable buttons on error
+        if (cardElement) {
+          const actionButtons = cardElement.querySelectorAll('[data-action], .action-btn, button[data-vacancy-id]');
+          actionButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
+          });
+        }
       }
     }
 
     // Выполнить обновление статуса для свайпов с возможностью отмены
-    async performSwipeStatusUpdate(vacancyId, newStatus, isFavorite) {
+    async performSwipeStatusUpdate(vacancyId, newStatus, isFavorite, abortController) {
       console.log('🔄 performSwipeStatusUpdate вызван:', { vacancyId, newStatus, isFavorite });
       
       const cardElement = document.querySelector(`#card-${CSS.escape(vacancyId)}`);
       if (!cardElement) {
         console.warn('Карточка вакансии не найдена:', vacancyId);
+        return;
+      }
+
+      if (abortController.signal.aborted) {
+        console.log('[VacancyManager] Операция была отменена');
         return;
       }
 
@@ -482,6 +568,7 @@
         timeout: 5000,
         onUndo,
         onTimeout: async () => {
+          if (abortController.signal.aborted) return;
           console.log('⏰ Таймаут toast для свайпа, финализируем удаление:', vacancyId);
           await this.finalizeStatusUpdate(vacancyId, newStatus, cardElement, parent);
         }
@@ -489,10 +576,15 @@
     }
 
     // Выполнить обновление статуса для кнопок
-    async performStatusUpdate(vacancyId, newStatus, isFavorite) {
+    async performStatusUpdate(vacancyId, newStatus, isFavorite, abortController) {
       const cardElement = document.querySelector(`#card-${CSS.escape(vacancyId)}`);
       if (!cardElement) {
         console.warn('Карточка вакансии не найдена:', vacancyId);
+        return;
+      }
+
+      if (abortController.signal.aborted) {
+        console.log('[VacancyManager] Операция была отменена');
         return;
       }
 
@@ -532,6 +624,14 @@
           cardElement.style.removeProperty('background');
           cardElement.style.removeProperty('background-color');
           
+          // Re-enable action buttons
+          const actionButtons = cardElement.querySelectorAll('[data-action], .action-btn, button[data-vacancy-id]');
+          actionButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
+          });
+          
           // Убираем transition после анимации
           setTimeout(() => {
             cardElement.style.transition = '';
@@ -553,6 +653,7 @@
         timeout: 5000,
         onUndo,
         onTimeout: async () => {
+          if (abortController.signal.aborted) return;
           await this.finalizeStatusUpdate(vacancyId, newStatus, cardElement, parent);
         }
       });
@@ -657,6 +758,14 @@
         // Восстанавливаем карточку при ошибке
         parentContainer.insertBefore(cardElement, parentContainer.firstChild);
         this.animateCardShowing(cardElement);
+        
+        // Re-enable action buttons on error
+        const actionButtons = cardElement.querySelectorAll('[data-action], .action-btn, button[data-vacancy-id]');
+        actionButtons.forEach(btn => {
+          btn.disabled = false;
+          btn.style.opacity = '';
+          btn.style.pointerEvents = '';
+        });
       }
     }
 
@@ -758,8 +867,8 @@
     // Получить статистику менеджера
     getStats() {
       return {
-        activeLocks: this.updateStatusLocks.size,
-        lockedVacancies: Array.from(this.updateStatusLocks)
+        activeDebounces: this.statusUpdateDebounce.size,
+        debouncedVacancies: Array.from(this.statusUpdateDebounce.keys())
       };
     }
   }
