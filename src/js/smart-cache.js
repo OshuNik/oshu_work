@@ -101,6 +101,22 @@ class SmartCacheManager {
   // ДАННЫЕ ВАКАНСИЙ
   // ==================
 
+  /**
+   * ✅ FIX: Simple hash function for stable cache keys without timestamps
+   * Prevents cache collisions by using query content instead of timestamp
+   */
+  simpleHash(str) {
+    let hash = 0;
+    if (!str || typeof str !== 'string') return '0';
+    
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(36);
+  }
+
   cacheJobData(query, jobs, type = 'search') {
     const cacheKey = this.generateJobCacheKey(query, type);
     const cacheData = {
@@ -108,10 +124,16 @@ class SmartCacheManager {
       timestamp: Date.now(),
       ttl: type === 'search' ? this.SEARCH_CACHE_TIME : this.DATA_CACHE_TIME,
       query: query,
-      count: jobs.length
+      count: Array.isArray(jobs) ? jobs.length : 0
     };
 
     try {
+      // ✅ FIX: Validate jobs is array before processing
+      if (!Array.isArray(jobs)) {
+        console.warn('⚠️ Jobs data is not an array:', typeof jobs);
+        return;
+      }
+
       // ✅ FIX: Проверяем размер кэша перед добавлением
       const dataString = JSON.stringify(cacheData);
       const dataSize = new Blob([dataString]).size;
@@ -119,8 +141,10 @@ class SmartCacheManager {
       // Проверяем количество записей
       if (this.cacheEntries.length >= this.MAX_CACHE_ENTRIES) {
         const oldestKey = this.cacheEntries.shift();
-        localStorage.removeItem(oldestKey);
-        console.log(`🗑️ Удалена старая запись кэша: ${oldestKey}`);
+        if (oldestKey) {
+          localStorage.removeItem(oldestKey);
+          console.log(`🗑️ Удалена старая запись кэша: ${oldestKey}`);
+        }
       }
 
       // Проверяем общий размер (примерно)
@@ -137,8 +161,10 @@ class SmartCacheManager {
         // Удаляем самую старую запись и пробуем снова
         if (this.cacheEntries.length > 0) {
           const oldestKey = this.cacheEntries.shift();
-          localStorage.removeItem(oldestKey);
-          console.log(`🗑️ Превышен размер кэша, удалена запись: ${oldestKey}`);
+          if (oldestKey) {
+            localStorage.removeItem(oldestKey);
+            console.log(`🗑️ Превышен размер кэша, удалена запись: ${oldestKey}`);
+          }
         } else {
           console.warn('⚠️ Не удалось закэшировать - размер превышен');
           return;
@@ -147,7 +173,7 @@ class SmartCacheManager {
 
       localStorage.setItem(cacheKey, dataString);
       this.cacheEntries.push(cacheKey);
-      console.log(`📦 Закэшированы данные для "${query}": ${jobs.length} вакансий (${Math.round(dataSize / 1024)}KB)`);
+      console.log(`📦 Закэшированы данные для "${query}": ${cacheData.count} вакансий (${Math.round(dataSize / 1024)}KB)`);
     } catch (error) {
       console.warn('⚠️ Не удалось закэшировать данные вакансий:', error);
     }
@@ -160,7 +186,30 @@ class SmartCacheManager {
       const cachedDataStr = localStorage.getItem(cacheKey);
       if (!cachedDataStr) return null;
 
-      const cachedData = JSON.parse(cachedDataStr);
+      // ✅ FIX: Validate JSON parse and check structure
+      let cachedData;
+      try {
+        cachedData = JSON.parse(cachedDataStr);
+      } catch (parseError) {
+        console.warn('⚠️ Invalid JSON in cache:', parseError.message);
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+
+      // ✅ FIX: Validate cache object structure
+      if (!cachedData || typeof cachedData !== 'object') {
+        console.warn('⚠️ Cache data has invalid structure');
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+
+      // ✅ FIX: Validate required fields exist and have correct types
+      if (!Array.isArray(cachedData.data) || typeof cachedData.timestamp !== 'number' || typeof cachedData.ttl !== 'number') {
+        console.warn('⚠️ Cache data missing required fields');
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+
       const now = Date.now();
 
       // Проверяем TTL
@@ -177,9 +226,21 @@ class SmartCacheManager {
     }
   }
 
+  /**
+   * ✅ FIX: Use content hash instead of timestamp to prevent collisions
+   */
   generateJobCacheKey(query, type) {
-    const cleanQuery = typeof query === 'string' ? query : JSON.stringify(query);
-    return `job-${type}-${btoa(cleanQuery).slice(0, 20)}-${Date.now().toString().slice(-6)}`;
+    if (!query) {
+      return `job-${type}-empty`;
+    }
+
+    // Convert query to string safely
+    const queryStr = typeof query === 'string' ? query : JSON.stringify(query);
+    
+    // Use hash of query content instead of timestamp
+    const queryHash = this.simpleHash(queryStr);
+    
+    return `job-${type}-${queryHash}`;
   }
 
   // =================
@@ -187,6 +248,12 @@ class SmartCacheManager {
   // =================
 
   cacheFavorites(favorites) {
+    // ✅ FIX: Validate favorites is array
+    if (!Array.isArray(favorites)) {
+      console.warn('⚠️ Favorites is not an array:', typeof favorites);
+      return;
+    }
+
     const cacheData = {
       data: favorites,
       timestamp: Date.now(),
@@ -206,7 +273,23 @@ class SmartCacheManager {
       const cachedDataStr = localStorage.getItem('favorites-cache');
       if (!cachedDataStr) return null;
 
-      const cachedData = JSON.parse(cachedDataStr);
+      // ✅ FIX: Validate JSON and structure
+      let cachedData;
+      try {
+        cachedData = JSON.parse(cachedDataStr);
+      } catch (parseError) {
+        console.warn('⚠️ Invalid JSON in favorites cache:', parseError.message);
+        localStorage.removeItem('favorites-cache');
+        return null;
+      }
+
+      // ✅ FIX: Validate structure before using
+      if (!cachedData || typeof cachedData !== 'object' || !Array.isArray(cachedData.data)) {
+        console.warn('⚠️ Favorites cache has invalid structure');
+        localStorage.removeItem('favorites-cache');
+        return null;
+      }
+
       console.log(`💖 Избранное получено из кэша: ${cachedData.count} вакансий`);
       return cachedData.data;
     } catch (error) {
@@ -220,6 +303,12 @@ class SmartCacheManager {
   // =================
 
   cacheSettings(settings) {
+    // ✅ FIX: Validate settings is object
+    if (!settings || typeof settings !== 'object') {
+      console.warn('⚠️ Settings is not an object:', typeof settings);
+      return;
+    }
+
     try {
       localStorage.setItem('settings-cache', JSON.stringify({
         data: settings,
@@ -236,7 +325,23 @@ class SmartCacheManager {
       const cachedDataStr = localStorage.getItem('settings-cache');
       if (!cachedDataStr) return null;
 
-      const cachedData = JSON.parse(cachedDataStr);
+      // ✅ FIX: Validate JSON and structure
+      let cachedData;
+      try {
+        cachedData = JSON.parse(cachedDataStr);
+      } catch (parseError) {
+        console.warn('⚠️ Invalid JSON in settings cache:', parseError.message);
+        localStorage.removeItem('settings-cache');
+        return null;
+      }
+
+      // ✅ FIX: Validate structure before using
+      if (!cachedData || typeof cachedData !== 'object' || typeof cachedData.data !== 'object') {
+        console.warn('⚠️ Settings cache has invalid structure');
+        localStorage.removeItem('settings-cache');
+        return null;
+      }
+
       return cachedData.data;
     } catch (error) {
       console.warn('⚠️ Не удалось получить настройки из кэша:', error);
@@ -351,13 +456,22 @@ class SmartCacheManager {
 
   async prefetchJobPage(page) {
     try {
+      // ✅ FIX: Validate page is number
+      if (!Number.isInteger(page) || page < 1) {
+        console.warn('⚠️ Invalid page number:', page);
+        return;
+      }
+
       // Здесь будет реальный API endpoint
       const url = `/api/jobs?page=${page}&limit=20`;
       const response = await fetch(url, { cache: 'no-cache' });
       
       if (response.ok) {
         const data = await response.json();
-        this.cacheJobData(`page-${page}`, data.jobs, 'prefetch');
+        // ✅ FIX: Validate data.jobs is array
+        if (Array.isArray(data.jobs)) {
+          this.cacheJobData(`page-${page}`, data.jobs, 'prefetch');
+        }
       }
     } catch (error) {
       console.warn(`⚠️ Не удалось префетчить страницу ${page}:`, error);
@@ -442,8 +556,15 @@ class SmartCacheManager {
         if (key.startsWith('job-')) jobDataCount++;
         if (key === 'favorites-cache') {
           try {
-            const data = JSON.parse(localStorage.getItem(key));
-            stats.favoritesCount = data.count || 0;
+            const dataStr = localStorage.getItem(key);
+            // ✅ FIX: Validate before parsing
+            if (dataStr && typeof dataStr === 'string') {
+              const data = JSON.parse(dataStr);
+              // ✅ FIX: Validate structure
+              if (data && typeof data === 'object' && typeof data.count === 'number') {
+                stats.favoritesCount = data.count;
+              }
+            }
           } catch (e) {
             console.warn('⚠️ Ошибка парсинга favorites-cache:', e.message);
             stats.favoritesCount = 0;
