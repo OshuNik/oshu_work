@@ -14,6 +14,50 @@
       this.retryOptions = CFG.RETRY_OPTIONS || {};
     }
 
+    /**
+     * ✅ SECURITY FIX: Escape special characters in filter values to prevent SQL injection
+     * Escapes wildcards and special characters for safe use in ilike filters
+     */
+    escapeFilterValue(value) {
+      if (typeof value !== 'string') {
+        return '';
+      }
+
+      // ✅ FIX: Escape SQL LIKE special characters (% and _) and backslash
+      // This prevents filter injection attacks through LIKE wildcards
+      return value
+        .replace(/\\/g, '\\\\')  // Escape backslash first (must be first)
+        .replace(/%/g, '\\%')    // Escape percent (SQL LIKE wildcard)
+        .replace(/_/g, '\\_');   // Escape underscore (SQL LIKE wildcard)
+    }
+
+    /**
+     * ✅ SECURITY FIX: Validate and sanitize search query input
+     */
+    sanitizeSearchQuery(query) {
+      if (!query || typeof query !== 'string') {
+        return '';
+      }
+
+      // ✅ FIX: Normalize whitespace
+      let sanitized = query.trim();
+
+      // ✅ FIX: Remove null bytes and control characters
+      sanitized = sanitized.replace(/[\x00-\x1f\x7f]/g, '');
+
+      // ✅ FIX: Limit length to prevent extremely long queries
+      const maxQueryLength = 256;
+      if (sanitized.length > maxQueryLength) {
+        sanitized = sanitized.substring(0, maxQueryLength);
+      }
+
+      // ✅ FIX: Only allow safe characters (alphanumeric, spaces, common punctuation)
+      // This is an additional layer of protection
+      sanitized = sanitized.replace(/[^\w\s\-\.@'\"]/gi, '');
+
+      return sanitized;
+    }
+
     // Создать заголовки для запросов
     createHeaders(options = {}) {
       const headers = {
@@ -50,9 +94,11 @@
       }
 
       // Добавление поискового запроса
-      const trimmedQuery = (query || '').trim();
+      // ✅ FIX: Sanitize and escape user input before using in filters
+      const trimmedQuery = this.sanitizeSearchQuery(query);
       if (trimmedQuery && Array.isArray(CFG.SEARCH_FIELDS) && CFG.SEARCH_FIELDS.length) {
-        const orExpr = '(' + CFG.SEARCH_FIELDS.map(field => `${field}.ilike.*${trimmedQuery}*`).join(',') + ')';
+        const escapedQuery = this.escapeFilterValue(trimmedQuery);
+        const orExpr = '(' + CFG.SEARCH_FIELDS.map(field => `${field}.ilike.*${escapedQuery}*`).join(',') + ')';
         params.set('or', orExpr);
       }
 
@@ -76,9 +122,11 @@
       }
 
       // Добавление поискового запроса
-      const trimmedQuery = (query || '').trim();
+      // ✅ FIX: Sanitize and escape user input before using in filters
+      const trimmedQuery = this.sanitizeSearchQuery(query);
       if (trimmedQuery && Array.isArray(CFG.SEARCH_FIELDS) && CFG.SEARCH_FIELDS.length) {
-        const orExpr = '(' + CFG.SEARCH_FIELDS.map(field => `${field}.ilike.*${trimmedQuery}*`).join(',') + ')';
+        const escapedQuery = this.escapeFilterValue(trimmedQuery);
+        const orExpr = '(' + CFG.SEARCH_FIELDS.map(field => `${field}.ilike.*${escapedQuery}*`).join(',') + ')';
         params.set('or', orExpr);
       }
 
@@ -210,6 +258,16 @@
         };
       }
 
+      // ✅ SECURITY FIX: Validate vacancy ID format (must be UUID or number)
+      if (!this.isValidVacancyId(vacancyId)) {
+        console.error('❌ Invalid vacancy ID format:', vacancyId);
+        return {
+          success: false,
+          error: 'Invalid vacancy ID',
+          isRetryable: false
+        };
+      }
+
       const url = `${this.baseUrl}/rest/v1/vacancies?id=eq.${vacancyId}`;
       const headers = this.createHeaders();
 
@@ -246,6 +304,16 @@
         };
       }
 
+      // ✅ SECURITY FIX: Validate vacancy ID format (must be UUID or number)
+      if (!this.isValidVacancyId(vacancyId)) {
+        console.error('❌ Invalid vacancy ID format:', vacancyId);
+        return {
+          success: false,
+          error: 'Invalid vacancy ID',
+          isRetryable: false
+        };
+      }
+
       const url = `${this.baseUrl}/rest/v1/vacancies?id=eq.${vacancyId}`;
       const headers = this.createHeaders();
 
@@ -268,6 +336,24 @@
         
         return this.handleError(error, true);
       }
+    }
+
+    /**
+     * ✅ SECURITY FIX: Validate vacancy ID format to prevent injection attacks
+     */
+    isValidVacancyId(vacancyId) {
+      if (!vacancyId) {
+        return false;
+      }
+
+      // Convert to string for validation
+      const idStr = String(vacancyId);
+
+      // ✅ FIX: Allow UUID format (8-4-4-4-12) or numeric IDs
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const numericPattern = /^\d+$/;
+
+      return uuidPattern.test(idStr) || numericPattern.test(idStr);
     }
 
     // Обработать ошибки API с пользовательским интерфейсом
