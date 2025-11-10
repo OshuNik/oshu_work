@@ -1,59 +1,47 @@
 /**
  * WebSocket Manager для получения новых вакансий из каналов
  * Подключается к backend WebSocket серверу для real-time обновлений
+ * 
+ * ✅ NOTE: In production, Supabase Realtime (realtime-manager.js) is used instead
+ * This component is only for local development with mock WebSocket server
  */
 
 class WebSocketManager {
   constructor() {
+    // ✅ FIX: Only initialize in development (localhost)
+    // In production (GitHub Pages, etc), skip initialization since Realtime Manager handles real-time updates
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1';
+    
+    if (!isLocalhost) {
+      console.log('[WebSocket Manager] ⚠️ Skipped in production. Using Supabase Realtime instead.');
+      this.disabled = true;
+      return;
+    }
+
+    this.disabled = false;
     this.ws = null;
     this.connected = false;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000; // 1 секунда
     this.heartbeatInterval = null;
-
-    // ✅ BUG FIX: Отслеживание всех timeouts для очистки
     this.reconnectTimeout = null;
-
-    // ✅ BUG FIX: Сохранение обработчиков событий для удаления
     this.eventListeners = new Map();
 
-    // URL WebSocket сервера
-    this.wsUrl = this.getWebSocketUrl();
+    // URL WebSocket сервера - only for localhost development
+    this.wsUrl = 'ws://localhost:8081/ws';
 
-    console.log('[WebSocket Manager] Инициализирован с URL:', this.wsUrl);
+    console.log('[WebSocket Manager] Инициализирован для development с URL:', this.wsUrl);
     this.connect();
-  }
-
-  /**
-   * Определяет URL WebSocket сервера в зависимости от окружения
-   */
-  getWebSocketUrl() {
-    const isLocalhost = window.location.hostname === 'localhost' ||
-                       window.location.hostname === '127.0.0.1';
-
-    if (isLocalhost) {
-      // Для разработки - подключаемся к mock серверу
-      return 'ws://localhost:8081/ws';
-    } else {
-      // ✅ PRODUCTION CONFIG: Используем environment variable или текущий хост
-      // Попытка подключиться к WebSocket на том же хосте, что и приложение
-      // Поддерживает как api.oshuwork.ru, так и другие production домены
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.hostname;
-
-      // Пытаемся подключиться к /ws эндпоинту на том же хосте
-      const wsUrl = `${protocol}//${host}/ws`;
-
-      console.log('[WebSocket Manager] Production WebSocket URL:', wsUrl);
-      return wsUrl;
-    }
   }
 
   /**
    * Подключение к WebSocket серверу
    */
   connect() {
+    if (this.disabled) return;
+    
     if (!this.wsUrl) {
       console.warn('[WebSocket Manager] WebSocket URL не определен, пропускаем подключение');
       return;
@@ -78,14 +66,14 @@ class WebSocketManager {
    * Обработка успешного подключения
    */
   onOpen() {
+    if (this.disabled) return;
+
     console.log('✅ [WebSocket Manager] Подключение установлено');
     this.connected = true;
     this.reconnectAttempts = 0;
     
-    // Запускаем heartbeat
     this.startHeartbeat();
     
-    // Уведомляем приложение о подключении
     document.dispatchEvent(new CustomEvent('websocket:connected', {
       detail: { url: this.wsUrl }
     }));
@@ -105,11 +93,9 @@ class WebSocketManager {
   isValidMessageContent(data) {
     switch (data.type) {
       case 'vacancy:new':
-        // Should have id and vacancy data
         return data.data && typeof data.data === 'object' && data.data.id;
 
       case 'search:results':
-        // Should have results array and total
         return (
           data.data &&
           typeof data.data === 'object' &&
@@ -118,13 +104,11 @@ class WebSocketManager {
         );
 
       case 'error':
-        // Should have error message
         return data.data && typeof data.data === 'object' && data.data.message;
 
       case 'welcome':
       case 'pong':
       case 'status':
-        // These can be minimal
         return true;
 
       default:
@@ -136,8 +120,9 @@ class WebSocketManager {
    * Обработка входящих сообщений с валидацией
    */
   onMessage(event) {
+    if (this.disabled) return;
+
     try {
-      // 1. Validate JSON parsing
       let message;
       try {
         message = JSON.parse(event.data);
@@ -146,19 +131,16 @@ class WebSocketManager {
         return;
       }
 
-      // 2. Validate message type exists
       if (!message || typeof message !== 'object' || !message.type) {
         console.error('[WebSocket Manager] Message missing type field');
         return;
       }
 
-      // 3. Validate message type is known
       if (!this.isValidMessageType(message)) {
         console.warn('[WebSocket Manager] Unknown message type:', message.type);
         return;
       }
 
-      // 4. Validate message content structure
       if (!this.isValidMessageContent(message)) {
         console.warn('[WebSocket Manager] Invalid content for type:', message.type);
         return;
@@ -166,7 +148,6 @@ class WebSocketManager {
 
       console.log('[WebSocket Manager] Valid message received:', message.type);
 
-      // Process message after validation
       switch (message.type) {
         case 'welcome':
           console.log('[WebSocket Manager] Welcome:', message.message);
@@ -181,7 +162,6 @@ class WebSocketManager {
           break;
 
         case 'pong':
-          // Heartbeat ответ
           break;
 
         case 'error':
@@ -189,7 +169,6 @@ class WebSocketManager {
           break;
 
         default:
-          // Already validated, but safe guard
           console.warn('[WebSocket Manager] Unhandled message type:', message.type);
       }
     } catch (error) {
@@ -201,17 +180,17 @@ class WebSocketManager {
    * Обработка закрытия соединения
    */
   onClose(event) {
+    if (this.disabled) return;
+
     console.warn(`[WebSocket Manager] Соединение закрыто (код: ${event.code})`);
     this.connected = false;
     this.stopHeartbeat();
     
-    // Уведомляем приложение о разрыве соединения
     document.dispatchEvent(new CustomEvent('websocket:disconnected', {
       detail: { code: event.code, reason: event.reason }
     }));
     
-    // Пытаемся переподключиться
-    if (event.code !== 1000) { // Не переподключаемся при нормальном закрытии
+    if (event.code !== 1000) {
       this.scheduleReconnect();
     }
   }
@@ -220,6 +199,8 @@ class WebSocketManager {
    * Обработка ошибок
    */
   onError(error) {
+    if (this.disabled) return;
+
     console.error('[WebSocket Manager] WebSocket ошибка:', error);
     
     document.dispatchEvent(new CustomEvent('websocket:error', {
@@ -233,7 +214,6 @@ class WebSocketManager {
   handleNewVacancy(vacancy) {
     console.log('📢 [WebSocket Manager] Новая вакансия:', vacancy.title);
     
-    // Отправляем событие vacancy:new для уведомлений и UI
     document.dispatchEvent(new CustomEvent('vacancy:new', {
       detail: vacancy,
       bubbles: true
@@ -246,7 +226,6 @@ class WebSocketManager {
   handleSearchResults(data) {
     console.log(`🔍 [WebSocket Manager] Результаты поиска: ${data.results.length} из ${data.total}`);
     
-    // Отправляем событие для компонента поиска
     document.dispatchEvent(new CustomEvent('search:results', {
       detail: data
     }));
@@ -256,6 +235,8 @@ class WebSocketManager {
    * Отправка сообщения на сервер
    */
   send(message) {
+    if (this.disabled) return false;
+
     if (!this.connected || !this.ws) {
       console.warn('[WebSocket Manager] Нет соединения для отправки сообщения');
       return false;
@@ -284,11 +265,13 @@ class WebSocketManager {
    * Запуск heartbeat для проверки соединения
    */
   startHeartbeat() {
+    if (this.disabled) return;
+
     this.heartbeatInterval = setInterval(() => {
       if (this.connected) {
         this.send({ type: 'ping' });
       }
-    }, 30000); // Каждые 30 секунд
+    }, 30000);
   }
 
   /**
@@ -305,17 +288,18 @@ class WebSocketManager {
    * Планирование переподключения
    */
   scheduleReconnect() {
+    if (this.disabled) return;
+
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('[WebSocket Manager] Максимальное количество попыток переподключения превышено');
       return;
     }
 
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts); // Exponential backoff
+    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
     this.reconnectAttempts++;
 
     console.log(`[WebSocket Manager] Переподключение через ${delay}ms (попытка ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
-    // ✅ BUG FIX: Сохранить timeout для очистки
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
     }
@@ -330,16 +314,16 @@ class WebSocketManager {
    * Принудительное закрытие соединения
    */
   disconnect() {
+    if (this.disabled) return;
+
     console.log('[WebSocket Manager] Принудительное отключение');
 
-    // ✅ BUG FIX: Очистить все timers
     this.stopHeartbeat();
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = null;
     }
 
-    // ✅ BUG FIX: Очистить все event listeners
     for (const [eventName, handler] of this.eventListeners) {
       document.removeEventListener(eventName, handler);
     }
@@ -356,6 +340,7 @@ class WebSocketManager {
    */
   getStatus() {
     return {
+      disabled: this.disabled,
       connected: this.connected,
       url: this.wsUrl,
       reconnectAttempts: this.reconnectAttempts,
@@ -365,6 +350,7 @@ class WebSocketManager {
 }
 
 // Создаем глобальный экземпляр WebSocket Manager
+// В production это будет отключено, в development - активно
 window.wsManager = new WebSocketManager();
 
-console.log('[WebSocket Manager] ✅ Глобальный wsManager создан');
+console.log('[WebSocket Manager] ✅ Инициализирован (production: disabled, development: active)');
