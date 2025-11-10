@@ -40,6 +40,13 @@
             realtime: {
               params: {
                 eventsPerSecond: 10
+              },
+              // ✅ FIX: Add reconnection configuration
+              timeout: 30000,  // 30s timeout for WebSocket
+              maxAttempts: 10,  // Max 10 reconnection attempts
+              retryDelayMs: (attempt) => {
+                // Exponential backoff: 1s, 2s, 4s, 8s, 16s... (cap at 30s)
+                return Math.min(1000 * Math.pow(2, attempt - 1), 30000);
               }
             }
           }
