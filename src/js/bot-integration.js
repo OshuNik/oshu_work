@@ -315,6 +315,59 @@ class SimpleBotNotifications {
   }
 
   /**
+   * Получение динамического Telegram User ID
+   */
+  getTelegramUserId() {
+    try {
+      // Первый приоритет: telegramIntegration (если доступен)
+      if (window.telegramIntegration && typeof window.telegramIntegration.getUserInfo === 'function') {
+        try {
+          const userInfo = window.telegramIntegration.getUserInfo();
+          if (userInfo && userInfo.id) {
+            const userId = String(userInfo.id);
+            console.log(`✅ [Bot Integration] Using dynamic Telegram user ID: ${userId}`);
+            return userId;
+          }
+        } catch (err) {
+          console.warn('[Bot Integration] Failed to get user ID from telegramIntegration:', err.message);
+        }
+      }
+
+      // Второй приоритет: Telegram WebApp API (встроенный)
+      if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+        const userId = String(window.Telegram.WebApp.initDataUnsafe.user.id);
+        console.log(`✅ [Bot Integration] Using Telegram WebApp user ID: ${userId}`);
+        return userId;
+      }
+
+      // Третий приоритет: попытка из initData
+      if (window.Telegram?.WebApp?.initData) {
+        try {
+          const params = new URLSearchParams(window.Telegram.WebApp.initData);
+          const userData = params.get('user');
+          if (userData) {
+            const user = JSON.parse(userData);
+            if (user.id) {
+              const userId = String(user.id);
+              console.log(`✅ [Bot Integration] Using user ID from initData: ${userId}`);
+              return userId;
+            }
+          }
+        } catch (err) {
+          console.warn('[Bot Integration] Failed to parse user from initData:', err.message);
+        }
+      }
+
+      // Fallback: возвращаем идентификатор ошибки с логом
+      console.warn('⚠️ [Bot Integration] Could not determine Telegram user ID from any source');
+      return 'unknown_user';
+    } catch (error) {
+      console.error('❌ [Bot Integration] Error getting Telegram user ID:', error);
+      return 'error_user';
+    }
+  }
+
+  /**
    * Показ уведомления о вакансии
    */
   showVacancyNotification(vacancy) {
@@ -350,12 +403,15 @@ class SimpleBotNotifications {
         return;
       }
 
+      // Получаем динамический Telegram User ID вместо hardcoded
+      const userId = this.getTelegramUserId();
+
       // Сохраняем уведомление в таблицу notifications
       const { data, error } = await window.supabaseClient
         .from('notifications')
         .insert([
           {
-            user_id: '1521478462', // Ваш Telegram ID
+            user_id: userId, // ✅ FIX: Dynamic user ID instead of hardcoded
             vacancy_id: vacancy.id,
             title: vacancy.title || vacancy.reason || 'Без названия',
             message: this.formatNotificationMessage(vacancy),
@@ -511,8 +567,8 @@ class SimpleBotNotifications {
   getStatus() {
     return {
       enabled: this.settings.enabled,
-      userId: 'simplified_user',
-      chatId: 'simplified_user',
+      userId: this.getTelegramUserId(), // ✅ FIX: Use dynamic user ID
+      chatId: this.getTelegramUserId(), // ✅ FIX: Use dynamic user ID
       settings: this.settings,
       quietTime: false
     };
