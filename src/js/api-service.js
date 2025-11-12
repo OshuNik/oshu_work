@@ -450,6 +450,11 @@
         userMessage = 'Запрос был отменен';
         isRetryable = false;
         severity = 'info';
+      } else if (errorStatus === 400) {
+        // ✅ FIX HIGH #9: Specific handling for Bad Request
+        userMessage = 'Неправильный формат запроса. Проверьте данные';
+        isRetryable = false;
+        severity = 'error';
       } else if (AuthUtils.isAuthErrorStatus && AuthUtils.isAuthErrorStatus(errorStatus)) {
         // ✅ FIX HIGH #8: Use centralized auth error handling
         const authError = AuthUtils.handleAuthError?.({ status: errorStatus }) || {};
@@ -459,20 +464,32 @@
             : 'Доступ запрещен'
         );
         isRetryable = false;
+        severity = errorStatus === 401 ? 'error' : 'warning';
       } else if (errorStatus === 404) {
-        userMessage = 'Данные не найдены';
+        // ✅ FIX HIGH #9: Specific handling for Not Found
+        userMessage = 'Запрашиваемые данные не найдены';
         isRetryable = false;
+        severity = 'warning';
       } else if (errorStatus === 429) {
+        // ✅ FIX HIGH #9: Specific handling for Rate Limit
         userMessage = 'Слишком много запросов. Попробуйте через минуту';
         isRetryable = true;
         severity = 'warning';
+      } else if (errorStatus === 503) {
+        // ✅ FIX HIGH #9: Specific handling for Service Unavailable
+        userMessage = 'Сервис временно недоступен. Пожалуйста, попробуйте позже';
+        isRetryable = true;
+        severity = 'warning';
       } else if (errorStatus !== null && errorStatus >= 500) {
-        userMessage = 'Временные проблемы сервера. Попробуйте позже';
+        // ✅ FIX HIGH #9: Generic 5xx (excluding 503 which is handled above)
+        userMessage = 'Ошибка сервера. Попробуйте позже';
         isRetryable = true;
         severity = 'warning';
       } else if (errorStatus !== null && errorStatus >= 400 && errorStatus < 500) {
-        userMessage = 'Ошибка в запросе. Обновите страницу';
+        // ✅ FIX HIGH #9: Generic 4xx client errors
+        userMessage = `Ошибка клиента (${errorStatus}). Обновите страницу`;
         isRetryable = false;
+        severity = 'error';
       }
 
       // Логирование с дополнительной информацией
