@@ -306,18 +306,32 @@ class RealtimeSearch {
    */
   displayServerSearchResults(data) {
     const { query, results, total } = data;
-    
+
+    // ✅ FIX HIGH #7: Validate array and items before processing
+    if (!Array.isArray(results)) {
+      console.error('[Realtime Search] Results is not an array:', typeof results);
+      this.showNoResults(query);
+      return;
+    }
+
     // Очищаем текущие результаты
     this.clearSearchResults();
-    
+
     // Создаем контейнер результатов если его нет
     let resultsContainer = document.getElementById('search-results-container');
     if (!resultsContainer) {
       resultsContainer = this.createSearchResultsContainer();
     }
-    
-    // Отображаем результаты
+
+    // Отображаем результаты с валидацией каждого элемента
+    let validCount = 0;
     results.forEach((vacancy, index) => {
+      // ✅ FIX HIGH #7: Validate vacancy item structure
+      if (!this.isValidVacancyItem(vacancy)) {
+        console.warn(`[Realtime Search] Invalid vacancy at index ${index}:`, vacancy);
+        return;
+      }
+
       const card = this.createSearchResultCard(vacancy, query);
       if (card) {
         // ✅ BUG FIX: Отслеживаем animation timeouts
@@ -326,10 +340,11 @@ class RealtimeSearch {
           card.style.opacity = '1';
           card.style.transform = 'translateY(0)';
           this.animationTimeouts.delete(animTimer);
-        }, index * 50);
+        }, validCount * 50);
 
         this.animationTimeouts.add(animTimer);
         resultsContainer.appendChild(card);
+        validCount++;
       }
     });
     
@@ -338,6 +353,33 @@ class RealtimeSearch {
     
     // Показываем контейнер результатов
     resultsContainer.style.display = 'block';
+  }
+
+  /**
+   * ✅ FIX HIGH #7: Validate vacancy item structure
+   */
+  isValidVacancyItem(vacancy) {
+    // Check if vacancy is an object
+    if (!vacancy || typeof vacancy !== 'object') {
+      return false;
+    }
+
+    // Check for required properties
+    if (!vacancy.id || typeof vacancy.id !== 'string' && typeof vacancy.id !== 'number') {
+      return false;
+    }
+
+    // At least one of these should be present for display
+    const hasDisplayableContent =
+      (vacancy.title && typeof vacancy.title === 'string') ||
+      (vacancy.description && typeof vacancy.description === 'string') ||
+      (vacancy.company && typeof vacancy.company === 'string');
+
+    if (!hasDisplayableContent) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
