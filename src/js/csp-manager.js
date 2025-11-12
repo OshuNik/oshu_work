@@ -57,43 +57,65 @@
 
     // Построить CSP политику
     buildCSPPolicy() {
+      // ✅ FIX HIGH #10: Restrict CORS policy to known trusted domains
+      const isProduction = !window.location.hostname.includes('localhost');
+      const connectSrcHosts = [
+        "'self'",
+        'https://*.supabase.co',
+        'wss://*.supabase.co',
+        'https://cdn.socket.io',
+        'https://unpkg.com',
+        'https://cdnjs.cloudflare.com',
+        'https://api.telegram.org',
+        'https://api.oshuwork.ru', // Specific API domain
+        'wss://api.oshuwork.ru',    // Specific WebSocket domain
+        'https://oshuwork.ru',       // Main domain
+        'wss://oshuwork.ru'          // Main domain WebSocket
+      ];
+
+      // Allow localhost only in development
+      if (!isProduction) {
+        connectSrcHosts.push('wss://localhost:*', 'ws://localhost:*');
+      }
+
       const policy = [
         // Базовая политика - только собственные ресурсы
         `default-src 'self'`,
-        
+
         // Скрипты: разрешаем inline handlers + CDN (без nonce чтобы не блокировать unsafe-inline)
         `script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
-        
+
         // Стили: собственные + Google Fonts + Bootstrap Icons + inline стили
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net`,
-        
+
         // Шрифты: Google Fonts + Bootstrap Icons
         `font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net`,
-        
+
         // Изображения: собственные + GitHub + data URLs для base64
         `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
-        
-        // Сетевые запросы: Supabase API + Socket.IO CDN + WebSocket серверы + Telegram Bot API
-        `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.socket.io https://unpkg.com https://cdnjs.cloudflare.com https://api.telegram.org wss://localhost:* ws://localhost:* wss://*.oshuwork.ru https://*.oshuwork.ru wss://* ws://*`,
-        
+
+        // ✅ FIX HIGH #10: Restrict sетевые запросы only to known trusted domains
+        // Removed overly permissive wss://* and ws://*
+        `connect-src ${connectSrcHosts.join(' ')}`,
+
         // Медиа: только собственные
         `media-src 'self'`,
-        
+
         // Объекты: запрещены (предотвращение Flash, etc.)
         `object-src 'none'`,
-        
+
         // Базовые ресурсы: только собственные
         `base-uri 'self'`,
-        
+
         // Формы: только на собственный домен
         `form-action 'self'`,
-        
+
         // Фреймы: разрешить встраивание в Telegram
         `frame-ancestors 'self' https://web.telegram.org https://telegram.org`,
-        
+
         // Обновление небезопасных запросов
         `upgrade-insecure-requests`,
-        
+
         // Блокировка mixed content
         `block-all-mixed-content`
       ];
@@ -103,37 +125,58 @@
 
     // Построить CSP политику для meta tag (без server-only директив)
     buildMetaCSPPolicy() {
+      // ✅ FIX HIGH #10: Match production/development environment
+      const isProduction = !window.location.hostname.includes('localhost');
+      const connectSrcHosts = [
+        "'self'",
+        'https://*.supabase.co',
+        'wss://*.supabase.co',
+        'https://cdn.socket.io',
+        'https://unpkg.com',
+        'https://cdnjs.cloudflare.com',
+        'https://api.telegram.org',
+        'https://api.oshuwork.ru',
+        'wss://api.oshuwork.ru',
+        'https://oshuwork.ru',
+        'wss://oshuwork.ru'
+      ];
+
+      if (!isProduction) {
+        connectSrcHosts.push('wss://localhost:*', 'ws://localhost:*');
+      }
+
       const policy = [
         // Базовая политика - только собственные ресурсы
         `default-src 'self'`,
-        
+
         // Скрипты: разрешаем inline handlers + CDN (без nonce чтобы не блокировать unsafe-inline)
         `script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://telegram.org https://unpkg.com https://cdnjs.cloudflare.com https://cdn.interactjs.io`,
-        
+
         // Стили: собственные + Google Fonts + Bootstrap Icons + inline стили
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net`,
-        
+
         // Шрифты: Google Fonts + Bootstrap Icons
         `font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net`,
-        
+
         // Изображения: собственные + GitHub + data URLs для base64
         `img-src 'self' data: https://raw.githubusercontent.com https://oshu-vacancies.github.io https://github.com`,
-        
-        // Сетевые запросы: Supabase API + Socket.IO CDN + WebSocket серверы + Telegram Bot API
-        `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.socket.io https://unpkg.com https://cdnjs.cloudflare.com https://api.telegram.org wss://localhost:* ws://localhost:* wss://*.oshuwork.ru https://*.oshuwork.ru wss://* ws://*`,
-        
+
+        // ✅ FIX HIGH #10: Restrict sетевые запросы only to known trusted domains
+        // Removed overly permissive wss://* and ws://*
+        `connect-src ${connectSrcHosts.join(' ')}`,
+
         // Медиа: только собственные
         `media-src 'self'`,
-        
+
         // Объекты: запрещены (предотвращение Flash, etc.)
         `object-src 'none'`,
-        
+
         // Базовые ресурсы: только собственные
         `base-uri 'self'`,
-        
-        // Формы: только на собственный домен  
+
+        // Формы: только на собственный домен
         `form-action 'self'`
-        
+
         // НЕ включаем frame-ancestors, upgrade-insecure-requests, block-all-mixed-content
         // так как они не поддерживаются в meta tags
       ];
