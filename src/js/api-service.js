@@ -12,6 +12,54 @@
       this.baseUrl = CFG.SUPABASE_URL;
       this.anonKey = CFG.SUPABASE_ANON_KEY;
       this.retryOptions = CFG.RETRY_OPTIONS || {};
+      // ✅ FIX: DB query timeout
+      this.DB_QUERY_TIMEOUT = 5000; // 5 seconds
+      // ✅ FIX: Telegram API timeout
+      this.TELEGRAM_TIMEOUT = 3000; // 3 seconds
+    }
+
+    /**
+     * ✅ FIX: Create AbortSignal with timeout to prevent hanging requests
+     * Prevents database queries and API calls from hanging indefinitely
+     */
+    createTimeoutSignal(timeoutMs) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        if (!controller.signal.aborted) {
+          controller.abort();
+        }
+      }, timeoutMs);
+
+      // Store timeout ID for cleanup if request completes before timeout
+      controller.signal._timeoutId = timeoutId;
+      return controller.signal;
+    }
+
+    /**
+     * ✅ FIX: Merge two abort signals (user abort + timeout abort)
+     */
+    mergeSignals(userSignal, timeoutSignal) {
+      if (!userSignal) return timeoutSignal;
+      if (!timeoutSignal) return userSignal;
+
+      const controller = new AbortController();
+
+      const cleanup = () => {
+        if (userSignal._timeoutId) clearTimeout(userSignal._timeoutId);
+        if (timeoutSignal._timeoutId) clearTimeout(timeoutSignal._timeoutId);
+      };
+
+      userSignal.addEventListener('abort', () => {
+        controller.abort();
+        cleanup();
+      });
+
+      timeoutSignal.addEventListener('abort', () => {
+        controller.abort();
+        cleanup();
+      });
+
+      return controller.signal;
     }
 
     /**
@@ -150,9 +198,13 @@
       const headers = this.createHeaders({ prefer: 'count=exact' });
 
       try {
+        // ✅ FIX: Add timeout to DB queries to prevent hanging
+        const timeoutSignal = this.createTimeoutSignal(this.DB_QUERY_TIMEOUT);
+        const finalSignal = this.mergeSignals(signal, timeoutSignal);
+
         const response = await UTIL.fetchWithRetry(url, {
           headers,
-          signal
+          signal: finalSignal
         }, this.retryOptions);
 
         if (!response.ok) {
@@ -272,11 +324,15 @@
       const headers = this.createHeaders();
 
       try {
+        // ✅ FIX: Add timeout to DB mutations to prevent hanging
+        const timeoutSignal = this.createTimeoutSignal(this.DB_QUERY_TIMEOUT);
+        const finalSignal = this.mergeSignals(signal, timeoutSignal);
+
         const response = await fetch(url, {
           method: 'PATCH',
           headers,
           body: JSON.stringify({ status: newStatus }),
-          signal
+          signal: finalSignal
         });
 
         if (!response.ok) {
@@ -318,10 +374,14 @@
       const headers = this.createHeaders();
 
       try {
+        // ✅ FIX: Add timeout to DB mutations to prevent hanging
+        const timeoutSignal = this.createTimeoutSignal(this.DB_QUERY_TIMEOUT);
+        const finalSignal = this.mergeSignals(signal, timeoutSignal);
+
         const response = await fetch(url, {
           method: 'DELETE',
           headers,
-          signal
+          signal: finalSignal
         });
 
         if (!response.ok) {
