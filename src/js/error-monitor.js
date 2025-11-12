@@ -3,6 +3,15 @@
 (function() {
   'use strict';
 
+  // ✅ FIX HIGH #8: Use centralized auth validation
+  // AuthUtils should be loaded before this script
+  const AuthUtils = window.AuthUtils || {
+    isAuthErrorMessage: (msg) => {
+      const patterns = ['auth', 'unauthorized', '401', '403', 'permission', 'token'];
+      return patterns.some(p => msg.toLowerCase().includes(p));
+    }
+  };
+
   class ErrorMonitor {
     constructor(config = {}) {
       this.config = {
@@ -487,8 +496,8 @@
     }
 
     isAuthError(message) {
-      const authPatterns = ['auth', 'unauthorized', '401', '403', 'permission', 'token'];
-      return authPatterns.some(pattern => message.includes(pattern));
+      // ✅ FIX HIGH #8: Delegate to centralized AuthUtils instead of duplicating logic
+      return AuthUtils.isAuthErrorMessage(message);
     }
 
     isUIError(message, type) {

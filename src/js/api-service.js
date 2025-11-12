@@ -7,6 +7,9 @@
   const CONST = window.APP_CONSTANTS || {};
   const UTIL = window.utils || {};
 
+  // ✅ FIX HIGH #8: Use centralized auth validation
+  const AuthUtils = window.AuthUtils || {};
+
   class ApiService {
     constructor() {
       this.baseUrl = CFG.SUPABASE_URL;
@@ -447,11 +450,14 @@
         userMessage = 'Запрос был отменен';
         isRetryable = false;
         severity = 'info';
-      } else if (errorStatus === 401) {
-        userMessage = 'Проблема с авторизацией. Перезагрузите страницу';
-        isRetryable = false;
-      } else if (errorStatus === 403) {
-        userMessage = 'Доступ запрещен';
+      } else if (AuthUtils.isAuthErrorStatus && AuthUtils.isAuthErrorStatus(errorStatus)) {
+        // ✅ FIX HIGH #8: Use centralized auth error handling
+        const authError = AuthUtils.handleAuthError?.({ status: errorStatus }) || {};
+        userMessage = authError.userMessage || (
+          errorStatus === 401
+            ? 'Проблема с авторизацией. Перезагрузите страницу'
+            : 'Доступ запрещен'
+        );
         isRetryable = false;
       } else if (errorStatus === 404) {
         userMessage = 'Данные не найдены';
