@@ -313,6 +313,17 @@
         };
       }
 
+      // ✅ FIX HIGH #11: Rate limit check for status updates
+      const rateLimitResult = window.advancedRateLimiter?.checkLimit('updateStatus');
+      if (rateLimitResult && !rateLimitResult.allowed) {
+        return {
+          success: false,
+          error: rateLimitResult.message,
+          severity: 'warning',
+          isRetryable: true
+        };
+      }
+
       // ✅ SECURITY FIX: Validate vacancy ID format (must be UUID or number)
       if (!this.isValidVacancyId(vacancyId)) {
         console.error('❌ Invalid vacancy ID format:', vacancyId);
@@ -360,6 +371,17 @@
           success: false,
           error: 'Невозможно выполнить операцию: нарушение CSRF безопасности',
           isRetryable: false
+        };
+      }
+
+      // ✅ FIX HIGH #11: Rate limit check for deletes
+      const rateLimitResult = window.advancedRateLimiter?.checkLimit('bulkDelete');
+      if (rateLimitResult && !rateLimitResult.allowed) {
+        return {
+          success: false,
+          error: rateLimitResult.message,
+          severity: 'warning',
+          isRetryable: true
         };
       }
 
