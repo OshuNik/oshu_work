@@ -106,70 +106,111 @@ class RealtimeManager {
    * Обработка новой вакансии с проверкой дублирования
    */
   handleNewVacancy(payload) {
-    const vacancy = payload.new;
+    try {
+      if (!payload || !payload.new) {
+        throw new Error('Invalid payload structure');
+      }
 
-    // Check for duplicates via VacancyManager
-    const vacancyManager = window.vacancyManager;
-    if (vacancyManager && vacancyManager.isVacancyLoaded) {
-      // Check across all categories (must match state-manager.js)
-      const categoryKeys = ['main', 'maybe', 'other'];
-      const isDuplicate = categoryKeys.some(key =>
-        vacancyManager.isVacancyLoaded(key, vacancy.id)
-      );
+      const vacancy = payload.new;
 
-      if (isDuplicate) {
-        console.debug(`[Realtime Manager] Ignoring duplicate vacancy: ${vacancy.id}`);
+      // ✅ FIX: Validate required fields
+      if (!vacancy.id) {
+        console.warn('[Realtime Manager] Vacancy missing ID, skipping');
         return;
       }
 
-      // Mark as loaded in all categories (realtime is global)
-      categoryKeys.forEach(key => {
-        vacancyManager.markVacancyLoaded(key, vacancy.id);
-      });
-    }
+      // Check for duplicates via VacancyManager
+      const vacancyManager = window.vacancyManager;
+      if (vacancyManager && vacancyManager.isVacancyLoaded) {
+        // Check across all categories (must match state-manager.js)
+        const categoryKeys = ['main', 'maybe', 'other'];
+        const isDuplicate = categoryKeys.some(key =>
+          vacancyManager.isVacancyLoaded(key, vacancy.id)
+        );
 
-    console.log('🎯 [Realtime Manager] Новая вакансия получена:', {
-      id: vacancy.id,
-      title: vacancy.reason || vacancy.text_highlighted || 'Без названия',
-      category: vacancy.ai_category,
-      timestamp: vacancy.created_at
-    });
+        if (isDuplicate) {
+          console.debug(`[Realtime Manager] Ignoring duplicate vacancy: ${vacancy.id}`);
+          return;
+        }
 
-    // Dispatch event for notifications system
-    document.dispatchEvent(new CustomEvent('vacancy:new', {
-      detail: {
+        // Mark as loaded in all categories (realtime is global)
+        categoryKeys.forEach(key => {
+          try {
+            vacancyManager.markVacancyLoaded(key, vacancy.id);
+          } catch (e) {
+            console.error('[Realtime Manager] Error marking vacancy as loaded:', e);
+          }
+        });
+      }
+
+      console.log('🎯 [Realtime Manager] Новая вакансия получена:', {
         id: vacancy.id,
         title: vacancy.reason || vacancy.text_highlighted || 'Без названия',
-        text: vacancy.text_highlighted || vacancy.text || '',
-        category: vacancy.ai_category || 'НЕ ТВОЁ',
-        company: vacancy.company_name || '',
-        industry: vacancy.industry || '',
-        reason: vacancy.reason || '',
-        is_new: true,
-        timestamp: vacancy.created_at,
-        source: 'realtime'
-      },
-      bubbles: true
-    }));
+        category: vacancy.ai_category,
+        timestamp: vacancy.created_at
+      });
 
-    console.log('📡 [Realtime Manager] Событие vacancy:new отправлено');
+      // ✅ FIX: Add error handler to event dispatch
+      try {
+        document.dispatchEvent(new CustomEvent('vacancy:new', {
+          detail: {
+            id: vacancy.id,
+            title: vacancy.reason || vacancy.text_highlighted || 'Без названия',
+            text: vacancy.text_highlighted || vacancy.text || '',
+            category: vacancy.ai_category || 'НЕ ТВОЁ',
+            company: vacancy.company_name || '',
+            industry: vacancy.industry || '',
+            reason: vacancy.reason || '',
+            is_new: true,
+            timestamp: vacancy.created_at,
+            source: 'realtime'
+          },
+          bubbles: true
+        }));
+
+        console.log('📡 [Realtime Manager] Событие vacancy:new отправлено');
+      } catch (eventError) {
+        console.error('[Realtime Manager] Error dispatching vacancy:new event:', eventError);
+      }
+    } catch (error) {
+      console.error('[Realtime Manager] Error handling new vacancy:', error);
+    }
   }
 
   /**
    * Обработка обновления вакансии
    */
   handleVacancyUpdate(payload) {
-    const vacancy = payload.new;
-    console.log('🔄 [Realtime Manager] Обновление вакансии:', {
-      id: vacancy.id,
-      title: vacancy.reason || 'Без названия'
-    });
+    try {
+      if (!payload || !payload.new) {
+        throw new Error('Invalid payload structure for vacancy update');
+      }
 
-    // Можно добавить обработку обновлений если нужно
-    document.dispatchEvent(new CustomEvent('vacancy:updated', {
-      detail: vacancy,
-      bubbles: true
-    }));
+      const vacancy = payload.new;
+
+      // ✅ FIX: Validate required fields
+      if (!vacancy.id) {
+        console.warn('[Realtime Manager] Updated vacancy missing ID, skipping');
+        return;
+      }
+
+      console.log('🔄 [Realtime Manager] Обновление вакансии:', {
+        id: vacancy.id,
+        title: vacancy.reason || 'Без названия'
+      });
+
+      // ✅ FIX: Add error handler to event dispatch for updates
+      try {
+        document.dispatchEvent(new CustomEvent('vacancy:updated', {
+          detail: vacancy,
+          bubbles: true
+        }));
+      } catch (eventError) {
+        console.error('[Realtime Manager] Error dispatching vacancy:updated event:', eventError);
+      }
+    } catch (error) {
+      console.error('[Realtime Manager] Error handling vacancy update:', error);
+    }
   }
 
   /**
